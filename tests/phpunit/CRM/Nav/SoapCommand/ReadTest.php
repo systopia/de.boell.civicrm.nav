@@ -20,7 +20,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class CRM_Nav_SoapCommand_ReadTest extends \PHPUnit_Framework_TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
+class CRM_Nav_SoapCommand_ReadTest extends \PHPUnit_Framework_TestCase {
 
   private $soapConnector;
 
@@ -49,8 +49,14 @@ class CRM_Nav_SoapCommand_ReadTest extends \PHPUnit_Framework_TestCase implement
     $params = array(
       "Entry_No" => 1,
     );
+    // $this->soapConnector = new CRM_Nav_SOAPConnector();
     $testReadCommand = new CRM_Nav_SoapCommand_Read($params);
-    $this->executeCommand($testReadCommand);
+    try{
+      $this->soapConnector->executeCommand($testReadCommand);
+    } catch (Exception $e) {
+      error_log($e->getMessage());
+      throw new Exception("Read Command failed. Message: " . $e->getMessage());
+    }
 
     print "API call successful! Result: \n";
     print_r($testReadCommand->getSoapResult());
