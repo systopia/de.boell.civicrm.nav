@@ -44,7 +44,7 @@ class CRM_Nav_SoapCommand_Read extends CRM_Nav_SoapCommand_BaseSoapCommand {
    *
    * @throws SoapFault
    */
-  public function execute($soapClient) {
+  public function execute(&$soapClient) {
     // TODO: Implement execute() method.
     $this->result = $soapClient->Read($this->searchParams);
   }
