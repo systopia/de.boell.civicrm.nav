@@ -38,6 +38,6 @@ abstract class CRM_Nav_SoapCommand_BaseSoapCommand {
    *
    * @return mixed
    */
-  abstract public function execute($soapClient);
+  abstract public function execute(&$soapClient);
 
 }
