@@ -40,6 +40,18 @@ class CRM_Nav_SOAPConnector {
     $this->setSoapLocations();
     // set SOAP options
     $this->setSoapOptions();
+    // initialize SOAP Object
+    // TODO: add debug option to extension (probably in settings page)
+    $debug = TRUE;
+    try {
+      if ($debug) {
+        $this->soapClient = new CRM_Nav_SOAPDebugClient($this->wsdl, $this->soap_options);
+      } else {
+        $this->soapClient = new SoapClient($this->wsdl, $this->soap_options);
+      }
+    } catch (Exception $e) {
+      error_log($e->getMessage());
+    }
   }
 
   /**
@@ -51,6 +63,9 @@ class CRM_Nav_SOAPConnector {
   public function executeCommand($navSoapCommand) {
     return $navSoapCommand->execute($this->soapClient);
   }
+
+  // TODO: function to set location for this SOAPObject (needs to be called form Command).
+  // E.g. Read(contact) Command needs location for CiviContact
 
   private function getSoapCredentials(){
     $this->wsdl = "resources/wsdl/civiContact.wsdl";
