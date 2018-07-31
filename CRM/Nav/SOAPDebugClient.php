@@ -30,4 +30,4 @@ class CRM_Nav_SOAPDebugClient extends SoapClient {
   }
 }
 
-// TODO: maybe overwrite result as well. Parse arguments? 
+// TODO: maybe overwrite result as well. Parse arguments?
