@@ -47,9 +47,6 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
    * @throws Exception
    */
   public function testSoapReadMultipleCommand() {
-//    $threshold_date = strtotime("18.05.2018");
-
-    $threshold_date = new DateTime('2018-07-25');
     $params = array( 'filter' =>
       array(
         "Field"     => "Transferred",
@@ -57,7 +54,6 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
       ),
       'setSize' => '5',
     );
-    // $this->soapConnector = new CRM_Nav_SOAPConnector();
     $testReadCommand = new CRM_Nav_SoapCommand_ReadMultiple($params);
     try{
       $this->soapConnector->executeCommand($testReadCommand);
@@ -67,7 +63,7 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
     }
 
     print "API call successful! Result: \n";
-    print_r($testReadCommand->getSoapResult());
+//    print_r($testReadCommand->getSoapResult());
   }
 
 }

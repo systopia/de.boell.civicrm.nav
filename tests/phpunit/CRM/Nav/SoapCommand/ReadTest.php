@@ -59,7 +59,7 @@ class CRM_Nav_SoapCommand_ReadTest extends \PHPUnit_Framework_TestCase {
     }
 
     print "API call successful! Result: \n";
-    print_r($testReadCommand->getSoapResult());
+//    print_r($testReadCommand->getSoapResult());
   }
 
 }
