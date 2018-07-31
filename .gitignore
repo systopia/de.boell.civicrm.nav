@@ -1,0 +1,7 @@
+soapTester/wsdl
+resources/wsdl
+.idea
+soapTester/pw.txt
+soapTester/user.txt
+resources/pw.txt
+resources/user.txt
