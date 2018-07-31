@@ -33,7 +33,7 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
   }
 
   public function setUp() {
-    $this->soapConnector = new CRM_Nav_SOAPConnector();
+    $this->soapConnector = new CRM_Nav_SOAPConnector(FALSE);
     parent::setUp();
   }
 
