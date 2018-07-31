@@ -58,7 +58,7 @@ class CRM_Nav_SoapCommand_ReadTest extends \PHPUnit_Framework_TestCase {
       throw new Exception("Read Command failed. Message: " . $e->getMessage());
     }
 
-    print "API call successful! Result: \n";
+    print "Read API call successful!\n";
 //    print_r($testReadCommand->getSoapResult());
   }
 

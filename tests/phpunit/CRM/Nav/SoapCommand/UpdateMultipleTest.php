@@ -67,7 +67,7 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
     }
     $update_params['civiContact_List'] = $read_result['ReadMultiple_Result'];
 
-    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultipe($update_params);
+    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
     try{
       $this->soapConnector->executeCommand($testUpdateMultipleCommand);
     } catch (Exception $e) {
@@ -75,7 +75,7 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
       throw new Exception("UpdateMultiple Command failed. Message: " . $e->getMessage());
     }
 
-    print "API call successful! Result: \n";
+    print "UpdateMultiple API call successful! \n";
 //    print_r($testUpdateCommand->getSoapResult());
   }
 

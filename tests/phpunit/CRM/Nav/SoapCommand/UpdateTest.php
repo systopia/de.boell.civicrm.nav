@@ -69,7 +69,7 @@ class CRM_Nav_SoapCommand_UpdateTest extends \PHPUnit_Framework_TestCase {
       throw new Exception("Update Command failed. Message: " . $e->getMessage());
     }
 
-    print "Update API call successful! Result: \n";
+    print "Update API call successful!\n";
 //    print_r($testUpdateCommand->getSoapResult());
   }
 }

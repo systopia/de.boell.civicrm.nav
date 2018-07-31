@@ -62,7 +62,7 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
       throw new Exception("Read Command failed. Message: " . $e->getMessage());
     }
 
-    print "API call successful! Result: \n";
+    print "ReadMultiple API call successful!\n";
 //    print_r($testReadCommand->getSoapResult());
   }
 
