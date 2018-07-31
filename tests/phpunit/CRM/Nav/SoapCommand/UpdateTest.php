@@ -20,7 +20,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
+class CRM_Nav_SoapCommand_UpdateTest extends \PHPUnit_Framework_TestCase {
 
   private $soapConnector;
 
@@ -37,37 +37,31 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
     parent::setUp();
   }
 
-    public function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
   /**
-   * test the Navision API Read Command
+   * test the Navision API Update Command
    * Gets the first record in the Navision Database and outputs the contents
-   * @throws Exception
    */
-  public function testSoapReadMultipleCommand() {
-//    $threshold_date = strtotime("18.05.2018");
-
-    $threshold_date = new DateTime('2018-07-25');
-    $params = array( 'filter' =>
-        array(
-        "Field"     => "_TIMESTAMP",
-        "Criteria"  => "{$threshold_date->format('c')}",
+  public function testSoapUpdateCommand() {
+    $params = array('civiContact' =>
+      array(
+        'Key'         => '12;xtkAAACHAQ==10;13199485500',
+        'Transferred' => '1',
       ),
-        'setSize' => '10',
     );
-    // $this->soapConnector = new CRM_Nav_SOAPConnector();
-    $testReadCommand = new CRM_Nav_SoapCommand_ReadMultiple($params);
+    $testUpdateCommand = new CRM_Nav_SoapCommand_Update($params);
     try{
-      $this->soapConnector->executeCommand($testReadCommand);
+      $this->soapConnector->executeCommand($testUpdateCommand);
     } catch (Exception $e) {
       error_log($e->getMessage());
-      throw new Exception("Read Command failed. Message: " . $e->getMessage());
+      throw new Exception("Update Command failed. Message: " . $e->getMessage());
     }
 
     print "API call successful! Result: \n";
-    print_r($testReadCommand->getSoapResult());
+    print_r($testUpdateCommand->getSoapResult());
   }
 
 }
