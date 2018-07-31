@@ -33,7 +33,7 @@ class CRM_Nav_SOAPConnector {
   /**
    * CRM_Nav_SOAPConnector constructor.
    */
-  public function __construct() {
+  public function __construct($debug = TRUE) {
     // get credentials from file
     $this->getSoapCredentials();
     // set NAV API URLs
@@ -42,7 +42,6 @@ class CRM_Nav_SOAPConnector {
     $this->setSoapOptions();
     // initialize SOAP Object
     // TODO: add debug option to extension (probably in settings page)
-    $debug = TRUE;
     try {
       if ($debug) {
         $this->soapClient = new CRM_Nav_SOAPDebugClient($this->wsdl, $this->soap_options);
