@@ -51,11 +51,11 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
 
     $threshold_date = new DateTime('2018-07-25');
     $params = array( 'filter' =>
-        array(
-        "Field"     => "_TIMESTAMP",
-        "Criteria"  => "{$threshold_date->format('c')}",
+      array(
+        "Field"     => "Transferred",
+        "Criteria"  => "0",
       ),
-        'setSize' => '10',
+      'setSize' => '5',
     );
     // $this->soapConnector = new CRM_Nav_SOAPConnector();
     $testReadCommand = new CRM_Nav_SoapCommand_ReadMultiple($params);
