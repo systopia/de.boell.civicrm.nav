@@ -5,3 +5,7 @@ soapTester/pw.txt
 soapTester/user.txt
 resources/pw.txt
 resources/user.txt
+resources/dataModel/navContact.json
+resources/dataModel/navResource.json
+resources/dataModel/navStatus.json
+resources/dataModel/navProcess.json
