@@ -61,7 +61,7 @@ class CRM_Nav_Data_NavContact extends CRM_Nav_Data_NavDataRepresentationBase {
     if (!isset($data['Version'])) {
       return FALSE;
     }
-    if ($data['Version'] !== 'BEFORE' and  $data['Version'] !== 'AFTER')) {
+    if ($data['Version'] !== 'BEFORE' and  $data['Version'] !== 'AFTER') {
       return FALSE;
     }
     return TRUE;
