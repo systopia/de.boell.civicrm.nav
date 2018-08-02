@@ -71,9 +71,10 @@ class CRM_Nav_Data_NavContact extends CRM_Nav_Data_NavDataRepresentationBase {
    * - Verifies the incoming data ($this->verify_data)
    * - Compares the data with array_diff
    * - returns array with different data
-   * @param $data
+   * @param $other_nav_data \CRM_Nav_Data_NavContact object
    *
-   * @return mixed
+   * @return array|mixed
+   * @throws \Exception
    */
   protected function compare_data($other_nav_data) {
     // TODO: Compare Objects
