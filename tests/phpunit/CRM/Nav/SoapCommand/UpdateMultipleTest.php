@@ -39,8 +39,8 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
   public function setUp() {
     $this->soapConnectorContact = new CRM_Nav_SOAPConnector("civiContact");
     $this->soapConnectorRelationship = new CRM_Nav_SOAPConnector("civiContRelation");
-    $this->soapConnectorContactProcess = new CRM_Nav_SOAPConnector("civiContStatus");
-    $this->soapConnectorContactStatus = new CRM_Nav_SOAPConnector("civiProcess");
+    $this->soapConnectorContactProcess = new CRM_Nav_SOAPConnector("civiProcess");
+    $this->soapConnectorContactStatus = new CRM_Nav_SOAPConnector("civiContStatus");
     parent::setUp();
   }
 
@@ -75,7 +75,7 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
 
     $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
     try{
-      $this->soapConnector->executeCommand($testUpdateMultipleCommand);
+      $this->soapConnectorContact->executeCommand($testUpdateMultipleCommand);
     } catch (Exception $e) {
       error_log($e->getMessage());
       throw new Exception("UpdateMultipleContacts Command failed. Message: " . $e->getMessage());
