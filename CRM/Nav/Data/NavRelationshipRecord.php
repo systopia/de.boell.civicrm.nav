@@ -16,7 +16,7 @@
 +--------------------------------------------------------*/
 
 
-class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRepresentationBase {
+class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRecordBase {
 
   public function __construct($navision_data) {
     parent::__construct($navision_data);
@@ -37,15 +37,11 @@ class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRepresentationBas
 
   }
 
-  /**
-   * - Verifies the incoming data ($this->verify_data)
-   * - Compares the data with array_diff
-   * - returns array with different data
-   * @param $data
-   *
-   * @return mixed
-   */
-  protected function compare_data($data) {
+  protected function compare_data(&$data) {
+
+  }
+
+  protected function convert_to_civi_data() {
 
   }
 }

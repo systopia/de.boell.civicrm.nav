@@ -15,16 +15,19 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-abstract class CRM_Nav_Data_NavDataRepresentationBase {
+abstract class CRM_Nav_Data_NavDataRecordBase {
 
   private $nav_data_before;
   private $nav_data_after;
   private $consumed;
 
+  // overwritten by subclasses
   protected $type;
+
   protected $timestamp;
-  protected $civi_data_before;
-  protected $civi_data_after;
+  protected $civi_data_mapping;
+  protected $civi_data;
+  protected $civi_extra_data;
   protected $changed_data;
 
   /**
@@ -32,46 +35,67 @@ abstract class CRM_Nav_Data_NavDataRepresentationBase {
    *
    * @param $navision_data
    *
-   * @throws \Exception if inherited class doesn't set $nav_data
+   * @throws \Exception if data is not valid
    */
-  public function __construct($navision_data) {
-    if (!isset($this->nav_data)) {
-      throw new Exception("Runtime Error - No Data Model defined. Please define a Data Structure for \$nav_data in classes inheriting from CRM_Nav_Data_NavDataRepresentationBase");
-    }
-    $this->set_navision_data_model();
-    if ($this->verify_data($navision_data)) {
-      $this->nav_data = $navision_data;
-    }
+  public function __construct($nav_data_after, $nav_data_before = NULL) {
+    $this->nav_data_before = $nav_data_before;
+    $this->nav_data_after = $nav_data_after;
+    $this->consumed = FALSE;
+    $this->set_timestamp();
+    $this->compare_data();
+    $this->set_navision_data_model("{$this->type}.json");
   }
 
   /**
-   * set the datamodel
+   * @throws \Exception
    */
-  protected  abstract function set_navision_data_model();
+  private function set_timestamp() {
+    if ($this->nav_data_after['Change_Type'] == 'New') {
+      $this->timestamp = $this->nav_data_after['_TIMESTAMP'];
+      return;
+    }
+    if (($this->nav_data_before['_TIMESTAMP'] != $this->nav_data_after['_TIMESTAMP'])){
+      throw new Exception("Timestamps of before and after don't match.");
+    }
+    $this->timestamp = $this->nav_data_before['_TIMESTAMP'];
+  }
 
   /**
-   * Verifies data against $this->nav_data
-   * @return mixed
+   * Compares before and after data, and saves changes in $changed_data
    */
-  protected abstract function verify_data($navision_data);
+  protected function compare_data() {
+    $this->changed_data = array_diff($this->nav_data_before, $this->nav_data_after);
+  }
+
+  protected function set_navision_data_model($file_name) {
+    $nav_contact_file = "resources/dataModel/{$file_name}";
+    $file_content = file_get_contents($nav_contact_file);
+    $this->civi_data_mapping = json_decode($file_content, TRUE);
+  }
+
+  abstract protected function convert_to_civi_data();
 
   /**
-   * - Verifies the incoming data ($this->verify_data)
-   * - Compares the data with array_diff
-   * - returns array with different data
-   * @param $data
-   *
+   * Checks if the record is consumed
    * @return mixed
    */
-  protected abstract function compare_data();
-
-
-  protected function is_consumed() {
+  public function is_consumed() {
     return $this->consumed;
   }
 
-  protected function set_consumed(){
+  /**
+   * Sets the Record to consumed
+   */
+  public function set_consumed(){
     $this->consumed = TRUE;
+  }
+
+  protected function get_nav_after_data(){
+    return $this->nav_data_after;
+  }
+
+  protected function get_nav_before_data() {
+    return $this->nav_data_before;
   }
 
 }
