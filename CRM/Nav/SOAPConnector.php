@@ -41,9 +41,7 @@ class CRM_Nav_SOAPConnector {
    * @throws \Exception
    */
   public function __construct($type = "civiContact", $debug = TRUE) {
-    if (!$this->verify_type($type)) {
-      throw new Exception("Invalid type. Please provide a valid type of (e.g. civiContact)");
-    }
+    $this->verify_type($type);
     // get credentials from file
     $this->getSoapCredentials($type);
     // set NAV API URLs
@@ -63,15 +61,16 @@ class CRM_Nav_SOAPConnector {
     }
   }
 
-
   /**
    * Checks if the type in constructor is valid
    * @param $type
    *
-   * @return bool
+   * @throws \Exception
    */
   private function verify_type($type) {
-    return in_array($type, self::types);
+    if (!in_array($type, self::types)) {
+      throw new Exception("Invalid type. Please provide a valid type of (e.g. civiContact)");
+    }
   }
 
   /**
