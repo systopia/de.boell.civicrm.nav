@@ -17,11 +17,15 @@
 
 abstract class CRM_Nav_Data_NavDataRepresentationBase {
 
-  /**
-   * @var $nav_data data model for navision data
-   */
-  protected $nav_data;
-  protected $nav_data_model;
+  private $nav_data_before;
+  private $nav_data_after;
+  private $consumed;
+
+  protected $type;
+  protected $timestamp;
+  protected $civi_data_before;
+  protected $civi_data_after;
+  protected $changed_data;
 
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
@@ -59,13 +63,15 @@ abstract class CRM_Nav_Data_NavDataRepresentationBase {
    *
    * @return mixed
    */
-  protected abstract function compare_data($other_nav_data);
+  protected abstract function compare_data();
 
-  /**
-   * @return mixed
-   */
-  public function getNavData() {
-    return $this->nav_data;
+
+  protected function is_consumed() {
+    return $this->consumed;
+  }
+
+  protected function set_consumed(){
+    $this->consumed = TRUE;
   }
 
 }
