@@ -98,5 +98,12 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     return $this->nav_data_before;
   }
 
+  protected function get_nav_value_if_exist(&$nav_data, $index) {
+    if (isset($nav_data[$index])) {
+      return $nav_data[$index];
+    }
+    return "";
+  }
+
 }
 

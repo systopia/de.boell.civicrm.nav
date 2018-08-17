@@ -16,7 +16,7 @@
 +--------------------------------------------------------*/
 
 
-class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRepresentationBase {
+class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
 
   public function __construct($navision_data) {
     parent::__construct($navision_data);
@@ -45,7 +45,12 @@ class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRepresentationBase {
    *
    * @return mixed
    */
-  protected function compare_data($data) {
+  protected function compare_data(&$data) {
 
   }
+
+  protected function convert_to_civi_data() {
+
+  }
+
 }

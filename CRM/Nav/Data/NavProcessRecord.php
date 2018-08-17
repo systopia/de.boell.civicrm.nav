@@ -37,10 +37,6 @@ class CRM_Nav_Data_NavProcess extends CRM_Nav_Data_NavDataRecordBase {
 
   }
 
-  protected function compare_data(&$data) {
-
-  }
-
   protected function convert_to_civi_data() {
 
   }
