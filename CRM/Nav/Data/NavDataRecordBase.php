@@ -30,6 +30,8 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected $civi_extra_data;
   protected $changed_data;
 
+  protected $debug;
+
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
    *
@@ -44,6 +46,10 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->set_timestamp();
     $this->compare_data();
     $this->set_navision_data_model("{$this->type}.json");
+    $this->convert_to_civi_data();
+
+    // FixMe:
+    $this->debug = TRUE; // for now always true
   }
 
   /**
@@ -67,6 +73,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->changed_data = array_diff($this->nav_data_before, $this->nav_data_after);
   }
 
+  // TODO: is this still needed? Should be depreciated now.
   protected function set_navision_data_model($file_name) {
     $nav_contact_file = "resources/dataModel/{$file_name}";
     $file_content = file_get_contents($nav_contact_file);
@@ -98,11 +105,35 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     return $this->nav_data_before;
   }
 
+  /**
+   * get value from the provided array. Returns "" if no value is set (check via isset())
+   * @param $nav_data
+   * @param $index
+   *
+   * @return string
+   */
   protected function get_nav_value_if_exist(&$nav_data, $index) {
     if (isset($nav_data[$index])) {
       return $nav_data[$index];
     }
+    $this->log("Value not set for {$index}");
     return "";
+  }
+
+  protected function log($message) {
+    if ($this->debug) {
+      CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
+    }
+  }
+
+  protected function dump_record() {
+    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Dumping Record");
+    $dump['timestamp'] = $this->timestamp;
+    $dump['nav_before'] = $this->nav_data_before;
+    $dump['civi_data']  = $this->civi_data;
+    $dump['civi_extra_data']  = $this->civi_extra_data;
+    $dump['changed_data']  = $this->changed_data;
+    RM_Core_Error::debug_log_message(json_encode($dump));
   }
 
 }
