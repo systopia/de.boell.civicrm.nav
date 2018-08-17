@@ -18,30 +18,19 @@
 
 class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRecordBase {
 
+  protected $type = "civiContRelation";
+
   public function __construct($navision_data) {
     parent::__construct($navision_data);
   }
 
-  /**
-   * set $this->datamodel
-   */
-  protected function set_navision_data_model() {
-
-  }
-
-  /**
-   * Verifies data against $this->nav_data
-   * @return mixed
-   */
-  protected function verify_data() {
-
-  }
-
-  protected function compare_data(&$data) {
-
-  }
-
   protected function convert_to_civi_data() {
-
+    $nav_data = $this->get_nav_after_data();
+    $this->civi_data['Contact'] = array(
+      'custom_147'              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+      'relation_code'           => $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code'),
+      // TODO: how is the relation done here? :\
+      'external_identifier'     => $this->get_nav_value_if_exist($nav_data, 'No'),
+    );
   }
 }
