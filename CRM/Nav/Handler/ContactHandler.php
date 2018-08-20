@@ -15,9 +15,14 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-class CRM_Nav_ContactHandler extends CRM_NAV_Handler_HandlerBase {
+class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
+
+  public function __construct() {
+  }
 
   public function process($record) {
     // TODO: Implement process() method.
   }
+
+
 }
