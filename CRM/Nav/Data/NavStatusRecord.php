@@ -18,39 +18,37 @@
 
 class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
 
+  protected $type = "civiStatus";
+  private $hbs_contact_id = "4";
+  private $relationship_type_mapping = array(
+    'Vertrauensdozent_in'       => '15',
+    'Stipendiat_in'             => '12',
+    'Promotionsstipendiat_in'   => '11',
+  );
+
   public function __construct($navision_data) {
     parent::__construct($navision_data);
   }
 
-  /**
-   * set $this->datamodel
-   */
-  protected function set_navision_data_model() {
-
-  }
-
-  /**
-   * Verifies data against $this->nav_data
-   * @return mixed
-   */
-  protected function verify_data() {
-
-  }
-
-  /**
-   * - Verifies the incoming data ($this->verify_data)
-   * - Compares the data with array_diff
-   * - returns array with different data
-   * @param $data
-   *
-   * @return mixed
-   */
-  protected function compare_data(&$data) {
-
-  }
-
   protected function convert_to_civi_data() {
-
+    $nav_data = $this->get_nav_after_data();
+    $this->civi_data['Contact'] = array(
+      'custom_147'        => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+    );
+    $relationship_type_id = get_relationship_type_id($this->get_nav_value_if_exist($nav_data, 'Status'));
+    $this->civi_extra_data['Relationship'] = array (
+      'relationship_type_id'    => $relationship_type_id,
+      'start_date'              => $this->get_nav_value_if_exist($nav_data, 'Valid_from'),
+      'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
+      'contact_id_b'            => $this->hbs_contact_id,
+    );
   }
 
+  private function get_relationship_type_id ($relationship_type) {
+    if (!isset($this->relationship_type_mapping[$relationship_type])) {
+      $this->log("Cannot get the relationship_type_id from '{$relationship_type}'. Aborting");
+      throw new Exception("Cannot get the relationship_type_id from '{$relationship_type}'. Aborting");
+    }
+    return $this->relationship_type_mapping[$relationship_type];
+  }
 }
