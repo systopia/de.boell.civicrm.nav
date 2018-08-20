@@ -23,6 +23,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
 
   // overwritten by subclasses
   protected $type;
+  protected $change_type;
 
   protected $timestamp;
   protected $civi_data_mapping;
@@ -44,9 +45,11 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->nav_data_after = $nav_data_after;
     $this->consumed = FALSE;
     $this->set_timestamp();
+    $this->change_type = $this->get_nav_value_if_exist($this->nav_data_after, 'Change_Type');
     $this->compare_data();
     $this->set_navision_data_model("{$this->type}.json");
     $this->convert_to_civi_data();
+
 
     // FixMe:
     $this->debug = TRUE; // for now always true
@@ -134,6 +137,14 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $dump['civi_extra_data']  = $this->civi_extra_data;
     $dump['changed_data']  = $this->changed_data;
     RM_Core_Error::debug_log_message(json_encode($dump));
+  }
+
+  public function get_type() {
+    return $this->type;
+  }
+
+  public function get_change_type() {
+    return $this->change_type;
   }
 
 }
