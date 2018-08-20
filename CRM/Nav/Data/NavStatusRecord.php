@@ -30,12 +30,15 @@ class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
     parent::__construct($navision_data);
   }
 
+  /**
+   * @throws \Exception
+   */
   protected function convert_to_civi_data() {
     $nav_data = $this->get_nav_after_data();
     $this->civi_data['Contact'] = array(
       'custom_147'        => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
     );
-    $relationship_type_id = get_relationship_type_id($this->get_nav_value_if_exist($nav_data, 'Status'));
+    $relationship_type_id = $this->get_relationship_type_id($this->get_nav_value_if_exist($nav_data, 'Status'));
     $this->civi_extra_data['Relationship'] = array (
       'relationship_type_id'    => $relationship_type_id,
       'start_date'              => $this->get_nav_value_if_exist($nav_data, 'Valid_from'),
@@ -44,6 +47,12 @@ class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
     );
   }
 
+  /**
+   * @param $relationship_type
+   *
+   * @return mixed
+   * @throws \Exception
+   */
   private function get_relationship_type_id ($relationship_type) {
     if (!isset($this->relationship_type_mapping[$relationship_type])) {
       $this->log("Cannot get the relationship_type_id from '{$relationship_type}'. Aborting");
