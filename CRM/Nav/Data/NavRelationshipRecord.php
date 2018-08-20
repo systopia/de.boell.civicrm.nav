@@ -33,4 +33,8 @@ class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRecordBase {
       'external_identifier'     => $this->get_nav_value_if_exist($nav_data, 'No'),
     );
   }
+
+  public function get_contact_data() {
+    return $this->civi_data['Contact'];
+  }
 }
