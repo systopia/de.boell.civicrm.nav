@@ -47,6 +47,14 @@ class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
     );
   }
 
+  public function get_relationship_data() {
+    return $this->civi_extra_data['Relationship'];
+  }
+
+  public function get_Status_start_date() {
+    return $this->civi_extra_data['Relationship']['start_date'];
+  }
+
   /**
    * @param $relationship_type
    *

@@ -24,6 +24,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
     // TODO: Implement process() method.
   }
 
+  private function get_contact() {
+
+  }
+
   /**
    * Check if the record is a civiContRelation
    * @return bool
