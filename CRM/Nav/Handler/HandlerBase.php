@@ -18,6 +18,7 @@
 abstract class CRM_NAV_Handler_HandlerBase {
 
   protected $record;
+  protected $hbs_contact_id = "4";
   private $debug;
 
   public function __construct($record) {

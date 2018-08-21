@@ -55,6 +55,26 @@ class CRM_Nav_Data_NavProcess extends CRM_Nav_Data_NavDataRecordBase {
     );
   }
 
+  public function get_relationship_data() {
+    return $this->civi_extra_data['Relationship'];
+  }
+
+  public function get_navision_id() {
+    if (empty($this->civi_data['Contact']['custom_147'])) {
+      $this->log("Couldn't determine navision Id. Aborting.");
+      throw new Exception("Couldn't determine navision Id. Aborting Process.");
+    }
+    return $this->civi_data['Contact']['custom_147'];
+  }
+
+  public function get_process_id() {
+    if (empty($this->civi_data['Contact']['custom_126'])) {
+      $this->log("Couldn't determine processId. Aborting.");
+      throw new Exception("Couldn't determine ProcessId. Aborting.");
+    }
+    return $this->civi_data['Contact']['custom_126'];
+  }
+
   /**
    * switch over $advancement, then return the corrosponding CiviCRM type_id
    * TODO: Mapping has to be done properly

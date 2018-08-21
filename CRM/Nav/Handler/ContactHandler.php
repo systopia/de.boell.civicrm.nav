@@ -20,9 +20,15 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
   public function __construct() {
   }
 
-  public function process($record) {
+  public function process() {
     // TODO: Implement process() method.
   }
 
-
+  /**
+   * Check if the record is a civiContRelation
+   * @return bool
+   */
+  protected function check_record_type() {
+    return $this->record->get_type() == 'civiContact';
+  }
 }
