@@ -116,6 +116,15 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  public function get_website_fields($locationType = 'organisation') {
+    switch ($locationType) {
+      case 'organisation':
+        return array('Home_Page');
+      default:
+        throw new Exception("Invalid locationType for get_website with {$locationType}. Please provide a valid locationType");
+    }
+  }
+
   public function get_civi_values($nav_index) {
     if (!isset($this->field_mapping[$nav_index])) {
       throw new Exception("Invalid Index '{$nav_index}'. Dataset invalid or mapping has changed.");

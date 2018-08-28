@@ -18,6 +18,7 @@
 abstract class CRM_Nav_Data_NavDataRecordBase {
 
   private $nav_data_before;
+  // in case of a new record, after is used as the ONLY record type internally
   private $nav_data_after;
   private $consumed;
 
@@ -49,7 +50,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->compare_data();
     $this->set_navision_data_model("{$this->type}.json");
     $this->convert_to_civi_data();
-
 
     // FixMe:
     $this->debug = TRUE; // for now always true
