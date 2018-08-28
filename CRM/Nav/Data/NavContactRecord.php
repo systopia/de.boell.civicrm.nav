@@ -152,6 +152,7 @@ class CRM_Nav_Data_NavContact extends CRM_Nav_Data_NavDataRecordBase {
 
   private function create_civi_contact_values($nav_data) {
     return [
+      'contact_type' => "Individual",
       'first_name'   => $this->get_nav_value_if_exist($nav_data, 'First_Name'),
       'middle_name'  => $this->get_nav_value_if_exist($nav_data, 'Middle_Name'),
       'last_name'    => $this->get_nav_value_if_exist($nav_data, 'Surname'),
