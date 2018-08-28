@@ -41,13 +41,11 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
 
     $changed_entities = $this->get_update_values();
 
-    $this->check_nav_before_vs_civi($changed_entities, $contact_id);
-//    check all *_old values against current civi data
-
-    // FIXME: THIS ISNT SUPPOSED TO HAPPEN RIGHT NOW!
-    //    $this->add_entities_to_civicrm($changed_entities);
-
-    // Check ob die alten Werte so schon in CiviCRM vorhanden sind
+    if (!$this->check_nav_before_vs_civi($changed_entities, $contact_id)) {
+      // TODO: i3Val command here now for all Data!
+    }
+    // TODO: Add values to civiCRM
+    // set consumed
   }
 
   private function check_nav_before_vs_civi($entities, $contact_id) {
@@ -55,7 +53,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
       $this->check_civi_contact_data($entities['Contact'], $contact_id);
       $this->check_civi_address_data($entities['Address'], $contact_id);
     } catch (Exception $e) {
-
+      $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
+      return FALSE;
     }
   }
 
