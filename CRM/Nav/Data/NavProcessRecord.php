@@ -27,13 +27,13 @@ class CRM_Nav_Data_NavProcess extends CRM_Nav_Data_NavDataRecordBase {
   protected function convert_to_civi_data() {
     $nav_data = $this->get_nav_after_data();
     // get contact details
-    $this->civi_data['Contact'] = array(
+    $this->civi_data_after['Contact'] = array(
       'custom_147'              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
     );
 
     $relationship_type_id = $this->get_type_id($this->get_nav_value_if_exist($nav_data, 'Advancement'));
     // get extra data for relationship
-    $this->civi_extra_data['Relationship'] = array(
+    $this->civi_data_after['Relationship'] = array(
       'relationship_type_id'    => $relationship_type_id,
       'start_date'              => $this->get_nav_value_if_exist($nav_data, 'Förderbeginn'),
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'), // TODO: this is basically doubled data. Check if this is the correct value
@@ -56,23 +56,23 @@ class CRM_Nav_Data_NavProcess extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function get_relationship_data() {
-    return $this->civi_extra_data['Relationship'];
+    return $this->civi_data_after['Relationship'];
   }
 
   public function get_navision_id() {
-    if (empty($this->civi_data['Contact']['custom_147'])) {
+    if (empty($this->civi_data_after['Contact']['custom_147'])) {
       $this->log("Couldn't determine navision Id. Aborting.");
       throw new Exception("Couldn't determine navision Id. Aborting Process.");
     }
-    return $this->civi_data['Contact']['custom_147'];
+    return $this->civi_data_after['Contact']['custom_147'];
   }
 
   public function get_process_id() {
-    if (empty($this->civi_data['Contact']['custom_126'])) {
+    if (empty($this->civi_data_after['Contact']['custom_126'])) {
       $this->log("Couldn't determine processId. Aborting.");
       throw new Exception("Couldn't determine ProcessId. Aborting.");
     }
-    return $this->civi_data['Contact']['custom_126'];
+    return $this->civi_data_after['Contact']['custom_126'];
   }
 
   /**

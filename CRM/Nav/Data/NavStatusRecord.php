@@ -34,12 +34,12 @@ class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
    * @throws \Exception
    */
   protected function convert_to_civi_data() {
-    $nav_data = $this->get_nav_after_data();
-    $this->civi_data['Contact'] = array(
+    $nav_data                              = $this->get_nav_after_data();
+    $this->civi_data_after['Contact']      = array(
       'custom_147'        => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
     );
-    $relationship_type_id = $this->get_relationship_type_id($this->get_nav_value_if_exist($nav_data, 'Status'));
-    $this->civi_extra_data['Relationship'] = array (
+    $relationship_type_id                  = $this->get_relationship_type_id($this->get_nav_value_if_exist($nav_data, 'Status'));
+    $this->civi_data_after['Relationship'] = array (
       'relationship_type_id'    => $relationship_type_id,
       'start_date'              => $this->get_nav_value_if_exist($nav_data, 'Valid_from'),
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
@@ -48,11 +48,11 @@ class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function get_relationship_data() {
-    return $this->civi_extra_data['Relationship'];
+    return $this->civi_data_after['Relationship'];
   }
 
   public function get_Status_start_date() {
-    return $this->civi_extra_data['Relationship']['start_date'];
+    return $this->civi_data_after['Relationship']['start_date'];
   }
 
   /**

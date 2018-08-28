@@ -25,8 +25,8 @@ class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   protected function convert_to_civi_data() {
-    $nav_data = $this->get_nav_after_data();
-    $this->civi_data['Contact'] = array(
+    $nav_data                         = $this->get_nav_after_data();
+    $this->civi_data_after['Contact'] = array(
       'custom_147'              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
       'relation_code'           => $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code'),
       // TODO: how is the relation done here? :\
@@ -35,6 +35,6 @@ class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function get_contact_data() {
-    return $this->civi_data['Contact'];
+    return $this->civi_data_after['Contact'];
   }
 }

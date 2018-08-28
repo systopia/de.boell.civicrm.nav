@@ -28,8 +28,8 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
 
   protected $timestamp;
   protected $civi_data_mapping;
-  protected $civi_data;
-  protected $civi_extra_data;
+  protected $civi_data_after;
+  protected $civi_data_before;
   protected $changed_data;
 
   protected $debug;
@@ -133,8 +133,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Dumping Record");
     $dump['timestamp'] = $this->timestamp;
     $dump['nav_before'] = $this->nav_data_before;
-    $dump['civi_data']  = $this->civi_data;
-    $dump['civi_extra_data']  = $this->civi_extra_data;
+    $dump['civi_extra_data']  = $this->civi_data_after;
     $dump['changed_data']  = $this->changed_data;
     RM_Core_Error::debug_log_message(json_encode($dump));
   }
