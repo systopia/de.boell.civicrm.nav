@@ -11,3 +11,4 @@ resources/dataModel/navStatus.json
 resources/dataModel/navProcess.json
 resources/dataModel/testData/NavContact1TestData.json
 resources/dataModel/testData/NavContact2TestData.json
+resources/test_data/*
