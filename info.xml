@@ -1,26 +1,26 @@
 <?xml version="1.0"?>
 <extension key="de.boell.civicrm.nav" type="module">
   <file>nav</file>
-  <name>FIXME</name>
-  <description>FIXME</description>
+  <name>HBS Navision Interface</name>
+  <description>Extension for synchronisation between Navision and CiviCRM via SOAP</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Philipp Batroff</author>
     <email>batroff@systopia.de</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Main Extension Page">https://github.com/systopia/de.boell.civicrm.nav</url>
+    <url desc="Documentation">https://github.com/systopia/de.boell.civicrm.nav</url>
+    <url desc="Support">https://github.com/systopia/de.boell.civicrm.nav</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2018-07-31</releaseDate>
-  <version>0.1dev</version>
-  <develStage>pre-alpha</develStage>
+  <releaseDate>2018-08-29</releaseDate>
+  <version>0.2_bcd90476</version>
+  <develStage>alpha</develStage>
   <compatibility>
     <ver>4.7</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module. Currently it is only deployed for the unitTests</comments>
+  <comments>This is a new, undeveloped module in alpha status. Handle at your own risk</comments>
   <civix>
     <namespace>CRM/Nav</namespace>
   </civix>
