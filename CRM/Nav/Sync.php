@@ -55,7 +55,7 @@ class CRM_Nav_Sync {
    * @throws \Exception
    */
   private function initialize_soap_connectors() {
-    if (!isset($this->entity)) {
+    if (empty($this->entity)) {
       $this->entity = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
     }
     foreach ($this->entity as $nav_entity) {
@@ -152,13 +152,13 @@ class CRM_Nav_Sync {
   private function create_nav_data_record($data, $entity, $before = NULL) {
     switch ($entity) {
       case 'civiContact':
-        return new CRM_Nav_Data_NavContact($data, $before);
+        return new CRM_Nav_Data_NavContactRecord($data, $before);
       case 'civiProcess':
-        return new CRM_Nav_Data_NavProcess($data, $before);
+        return new CRM_Nav_Data_NavProcessRecord($data, $before);
       case 'civiContRelation':
-        return new CRM_Nav_Data_NavRelationship($data, $before);
+        return new CRM_Nav_Data_NavRelationshipRecord($data, $before);
       case 'civiContStatus':
-        return new CRM_Nav_Data_NavStatus($data, $before);
+        return new CRM_Nav_Data_NavStatusRecord($data, $before);
       default:
         throw new Exception("Invalid Navision Entity Type {$entity}. Couldn't create DataRecord.");
     }
