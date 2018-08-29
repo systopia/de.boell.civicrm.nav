@@ -16,7 +16,7 @@
 +--------------------------------------------------------*/
 
 
-class CRM_Nav_Data_NavStatus extends CRM_Nav_Data_NavDataRecordBase {
+class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiStatus";
   private $hbs_contact_id = "4";

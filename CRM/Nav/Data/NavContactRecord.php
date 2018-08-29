@@ -16,7 +16,7 @@
 +--------------------------------------------------------*/
 
 
-class CRM_Nav_Data_NavContact extends CRM_Nav_Data_NavDataRecordBase {
+class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type                       = "civiContact";
 

@@ -16,7 +16,7 @@
 +--------------------------------------------------------*/
 
 
-class CRM_Nav_Data_NavProcess extends CRM_Nav_Data_NavDataRecordBase {
+class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiProcess";
 

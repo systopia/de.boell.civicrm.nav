@@ -16,7 +16,7 @@
 +--------------------------------------------------------*/
 
 
-class CRM_Nav_Data_NavRelationship extends CRM_Nav_Data_NavDataRecordBase {
+class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiContRelation";
 

@@ -135,7 +135,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $dump['nav_before'] = $this->nav_data_before;
     $dump['civi_extra_data']  = $this->civi_data_after;
     $dump['changed_data']  = $this->changed_data;
-    RM_Core_Error::debug_log_message(json_encode($dump));
+    CRM_Core_Error::debug_log_message(json_encode($dump));
   }
 
   public function get_type() {
