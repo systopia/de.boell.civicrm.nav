@@ -10,7 +10,10 @@ use CRM_Nav_ExtensionUtil as E;
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
  */
 function _civicrm_api3_nav_Sync_spec(&$spec) {
-  $spec['magicword']['api.required'] = 1;
+  $spec['poll_size']['api.default'] = 10;
+  $spec['entity']['api.default'] = "";
+  $spec['entity']['api.description'] = "Restrict api call to nav data sources. Can be 'civiContact', 'civiContRelation', 'civiContStatus', 'civiProcess'";
+  $spec['debug']['api.defaul'] = FALSE;
 }
 
 /**
@@ -23,20 +26,19 @@ function _civicrm_api3_nav_Sync_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_nav_Sync($params) {
-  if (array_key_exists('magicword', $params) && $params['magicword'] == 'sesame') {
-    $returnValues = array(
-      // OK, return several data rows
-      12 => array('id' => 12, 'name' => 'Twelve'),
-      34 => array('id' => 34, 'name' => 'Thirty four'),
-      56 => array('id' => 56, 'name' => 'Fifty six'),
-    );
-    // ALTERNATIVE: $returnValues = array(); // OK, success
-    // ALTERNATIVE: $returnValues = array("Some value"); // OK, return a single value
+    $returnValues = array();
 
-    // Spec: civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL)
+    if (isset($params['entity'])) {
+      $valid_values = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
+      foreach ($params['entity'] as $entity) {
+        if (!in_array($entity, $valid_values)) {
+          throw new API_Exception("Invalid entity parameter {$entity}");
+        }
+      }
+    }
+    $runner = CRM_Nav_Sync($params['size'], $params['entity'], $params['debug']);
+    $runner->run();
+
     return civicrm_api3_create_success($returnValues, $params, 'NewEntity', 'NewAction');
-  }
-  else {
-    throw new API_Exception(/*errorMessage*/ 'Everyone knows that the magicword is "sesame"', /*errorCode*/ 1234);
-  }
+//    throw new API_Exception('Everyone knows that the magicword is "sesame"', 1234);
 }
