@@ -24,6 +24,7 @@ abstract class CRM_NAV_Handler_HandlerBase {
   public function __construct($record) {
     // Fixme: make configurable, probably extension wide config
     $this->debug = TRUE;
+    $this->record = $record;
   }
 
   abstract protected function check_record_type();

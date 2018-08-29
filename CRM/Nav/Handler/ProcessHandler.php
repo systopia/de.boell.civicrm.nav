@@ -17,7 +17,8 @@
 
 class CRM_Nav_Handler_ProcessHandler extends CRM_NAV_Handler_HandlerBase {
 
-  public function __construct() {
+  public function __construct($record) {
+    parent::__construct($record);
   }
 
   /**

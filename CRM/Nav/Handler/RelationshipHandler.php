@@ -21,6 +21,7 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_NAV_Handler_HandlerBase {
   private $debitor_custom_field_id  = 'custom_165';
 
   public function __construct($record) {
+    parent::__construct($record);
   }
 
   /**
