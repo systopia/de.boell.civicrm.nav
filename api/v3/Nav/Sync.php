@@ -26,8 +26,6 @@ function _civicrm_api3_nav_Sync_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_nav_Sync($params) {
-    $returnValues = array();
-
     if (isset($params['entity'])) {
       $valid_values = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
       foreach ($params['entity'] as $entity) {
@@ -37,8 +35,10 @@ function civicrm_api3_nav_Sync($params) {
       }
     }
     $runner = CRM_Nav_Sync($params['size'], $params['entity'], $params['debug']);
-    $runner->run();
-
-    return civicrm_api3_create_success($returnValues, $params, 'NewEntity', 'NewAction');
-//    throw new API_Exception('Everyone knows that the magicword is "sesame"', 1234);
+    try {
+      $number_of_parsed_entries = $runner->run();
+    } catch (Exception $e) {
+      throw new API_Exception("Error occurred while parsing Navision Records. Error Message: " . $e->getMessage());
+    }
+    return civicrm_api3_create_success(array($number_of_parsed_entries), $params, 'Nav', 'Sync');
 }

@@ -26,6 +26,7 @@ class CRM_Nav_Sync {
   private $debug;
   private $data_records;
   private $soap_connectors;
+  private $number_of_records;
 
   public function __construct($size, $debug = FALSE, $entity = NULL) {
     $this->entity = $entity;
@@ -37,12 +38,22 @@ class CRM_Nav_Sync {
   /**
    * Runner function
    * Starts soap call and migration to CiviCRM
+   * @return mixed
+   * @throws \Exception
    */
   public function run() {
     $this->get_nav_data();
     $this->sort_records();
+    $this->handle_Nav_data();
+    $this->mark_records_transferred();
+    // FixMe: return actual number of parsed/added records or some sort of statistics here.
+    //        For now we just return the number of records
+    return $this->number_of_records;
   }
 
+  /**
+   * @throws \Exception
+   */
   private function initialize_soap_connectors() {
     if (!isset($this->entity)) {
       $this->entity = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
@@ -74,15 +85,21 @@ class CRM_Nav_Sync {
     }
   }
 
+  /**
+   *  // TODO filter consumed records for each entity, and mark them as transferred after (before AND after)
+   */
   private function mark_records_transferred() {
-    // TODO filter consumed records for each entity, and mark them as transferred after (before AND after)
-
   }
 
+  /**
+   * Sort Navision records based on their timestamp
+   * @throws \Exception
+   */
   private function sort_records() {
     if (!ksort($this->data_records)) {
       throw new Exception("Failed to sort records to Timestamps");
     }
+    $this->number_of_records = count($this->data_records);
   }
 
   /**
