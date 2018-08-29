@@ -34,7 +34,7 @@ function civicrm_api3_nav_Sync($params) {
         }
       }
     }
-    $runner = CRM_Nav_Sync($params['size'], $params['entity'], $params['debug']);
+    $runner = new CRM_Nav_Sync($params['size'], $params['debug'], $params['entity']);
     try {
       $number_of_parsed_entries = $runner->run();
     } catch (Exception $e) {
