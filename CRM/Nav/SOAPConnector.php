@@ -87,9 +87,9 @@ class CRM_Nav_SOAPConnector {
   // E.g. Read(contact) Command needs location for CiviContact
 
   private function getSoapCredentials($type){
-    $this->wsdl = "resources/wsdl/{$type}.wsdl";
-    $pw_file = "resources/pw.txt";
-    $login_file = "resources/user.txt";
+    $this->wsdl = __DIR__ . "/../../resources/wsdl/{$type}.wsdl";
+    $pw_file = __DIR__ . "/../../resources/pw.txt";
+    $login_file = __DIR__ . "/../../resources/user.txt";
     $file_content = explode("\n", file_get_contents($pw_file));
     $this->password = array_pop(array_reverse($file_content));
     $file_content = explode("\n", file_get_contents($login_file));
