@@ -104,6 +104,11 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    */
   public function set_consumed(){
     $this->consumed = TRUE;
+    // TODO: set Transferred flag = 1
+    $this->nav_data_before['Transferred'] = 1;
+    if (isset($this->nav_data_before)) {
+      $this->nav_data_before['Transferred'] =1;
+    }
   }
 
   protected function get_nav_after_data(){
