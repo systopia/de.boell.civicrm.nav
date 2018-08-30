@@ -42,6 +42,30 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->convert_civi_communication_data();
   }
 
+  public function get_contact_details($contact_type = 'Individual') {
+    foreach ($this->civi_data_after['Contact'] as $contact) {
+      if ($contact['contact_type'] == $contact_type) {
+        return $contact;
+      }
+    }
+  }
+
+  public function get_civi_addresses() {
+    return $this->civi_data_after['Address'];
+  }
+
+  public function get_civi_phones() {
+    return $this->civi_data_after['Phone'];
+  }
+
+  public function get_civi_emails() {
+    return $this->civi_data_after['Email'];
+  }
+
+  public function get_civi_website() {
+    return $this->civi_data_after['Website'];
+  }
+
   /*
    * check if organisation data is set
    * if so - add 'organisation_address' to $civi_extra_data
@@ -125,11 +149,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
     // Homepage
     if (isset($nav_data_after['Home_Page'])) {
-      $this->civi_data_after['Website']  = [
+      $this->civi_data_after['Website'][] = [
         'url'             => $this->get_nav_value_if_exist($nav_data_after, 'Home_Page'),
         'website_type_id' => $this->location_type_private,
       ];
-      $this->civi_data_before['Website'] = [
+      $this->civi_data_before['Website'][] = [
         'url'             => $this->get_nav_value_if_exist($nav_data_before, 'Home_Page'),
         'website_type_id' => $this->location_type_private,
       ];
@@ -216,17 +240,32 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   }
 
-  public function get_xcm_contact_details() {
-    $result = [];
+  // TODO: Add switch for before/after array (needed if first/last name or email is changed
+  public function get_contact_lookup_details() {
+    $result['Emails'] = $this->get_contact_email();
     foreach ($this->civi_data_after['Contact'] as $contact) {
-      if ($contact['contact_type' == "Individual"]) {
-        $result = [
+      if ($contact['contact_type'] == "Individual") {
+        $result['Contact'] = array (
           'first_name' => $contact['first_name'],
           'last_name'  => $contact['last_name'],
-          'email'      => $contact['email'],
-        ];
-        return $result;
+        );
       }
+    }
+    return $result;
+  }
+
+  // TODO: add before/after switch
+  private function get_contact_email() {
+    $nav_data = $this->get_nav_after_data();
+    $result= [];
+    if (isset($nav_data['E_mail'])) {
+      $result[] = $nav_data['E_mail'];
+    }
+    if (isset($nav_data['E_mail_2'])) {
+      $result[] = $nav_data['E_mail_2'];
+    }
+    if (isset($nav_data['Private_E_Mail'])) {
+      $result[] = $nav_data['Private_E_Mail'];
     }
     return $result;
   }

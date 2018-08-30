@@ -34,8 +34,13 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
-    // get or create with XCM
-    $contact_id = $this->check_or_create_contact_id($contact_id);
+    $contact_id = $this->get_or_create_contact($contact_id);
+    if ($contact_id < '0') {
+      // TODO: Contact is created with all values (AFTER).
+      // nothing to do here anymore.
+      // TODO: mark record as consumed
+      return;
+    }
     // add NavId to Contact
     $this->add_nav_id_to_contact($contact_id, $nav_id);
 
@@ -124,15 +129,110 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
-  private function check_or_create_contact_id($contact_id) {
+  /**
+   * If contact coulddn't be identified by NavId, it will be identified by email(s)
+   * and first_name and last name. If that's not available, a new contact is created
+   * with the AFTER values and ALL provided values
+   * @param $contact_id
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_or_create_contact($contact_id) {
     // if contact_id is empty, get/create contact via XCM with first_name, last_name, email
     if ($contact_id == "") {
-      $values = $this->record->get_xcm_contact_details();
-      // get/create via XCM
-      $result = civicrm_api3('Contact', 'getorcreate', $values);
-      return $result['id'];
+      $contact_lookup_details = $this->record->get_contact_lookup_details();
+      $email_contact_ids = $this->get_contact_ids_via_emails($contact_lookup_details['Emails']);
+      $lookup_contact_id = $this->get_contact($email_contact_ids, $contact_lookup_details['Contact']);
+
+      if ($lookup_contact_id == "") {
+        // create contact with all available data, then return '-1' to abort further processing
+        try {
+          $this->create_civi_full_contact();
+        } catch (Exception $e) {
+          $this->log($e->getMessage());
+          return '-2';
+        }
+        return '-1';
+      }
+      return $lookup_contact_id;
     }
     return $contact_id;
+  }
+
+  /**
+   * @throws \Exception
+   */
+  private function create_civi_full_contact() {
+    // create Contact
+    $contact_data = $this->record->get_contact_details('Individual');
+    $contact_id = $this->create_civi_entity($contact_data, 'Contact');
+
+    foreach ($this->record->get_civi_addresses() as $address) {
+      $address['contact_id'] = $contact_id;
+      $this->create_civi_entity($address, 'Address');
+    }
+    foreach ($this->record->get_civi_phones() as $phone) {
+      $phone['contact_id'] = $contact_id;
+      $this->create_civi_entity($phone, 'Phone');
+    }
+    foreach ($this->record->get_civi_emails() as $email) {
+      $email['contact_id'] = $contact_id;
+      $this->create_civi_entity($email, 'Email');
+    }
+    foreach ($this->record->get_civi_website() as $website) {
+      $website['contact_id'] = $contact_id;
+      $this->create_civi_entity($website, 'Website');
+    }
+  }
+
+  private function create_civi_entity($values, $entity) {
+    $result = civicrm_api3($entity, 'create', $values);
+    if ($result['is_error'] == '1') {
+      throw new Exception("Couldn't create Civi Entity {$entity}. Error Message: " . $result['error_message']);
+    }
+    return $result['id'];
+  }
+
+  /**
+   * @param $contact_ids      (array with contact_ids from email lookup)
+   * @param $contact_details  (array first_name, last_name)
+   *
+   * @return string (contact_id or "")
+   */
+  private function get_contact($contact_ids, $contact_details) {
+    if (!empty($contact_ids)) {
+      $contact_details['id'] = array('IN' => $contact_ids);
+    }
+    $result = civicrm_api3('Contact', 'get', $contact_details);
+    if ($result['is_error'] == '1') {
+      $this->log("Error occured while looking up contacts. Message: " . $result['error_message']);
+      return "";
+    }
+    if ($result['count'] != '1') {
+      $this->log("Found {$result['count']} entries for contact.");
+      return "";
+    }
+    return $result['values']['contact_id'];
+  }
+
+  private function get_contact_ids_via_emails($emails) {
+    if (empty($emails)) {
+      return array();
+    }
+    $result = civicrm_api3('Email', 'get', array(
+      'sequential' => 1,
+      'email' => array('IN' => $emails),
+    ));
+    if ($result['is_error'] == '1') {
+      $this->log("Api command to get Emails Entities failed. Reason: {$result['error_message']}");
+      return array();
+    }
+    $contact_ids = array();
+    foreach ($result['values'] as $val) {
+      $contact_ids[] = $val['contact_id'];
+    }
+    return $contact_ids;
   }
 
   private function check_delete_record() {
