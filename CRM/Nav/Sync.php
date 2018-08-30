@@ -28,6 +28,8 @@ class CRM_Nav_Sync {
   private $soap_connectors;
   private $number_of_records;
 
+  private $local_debug = TRUE;
+
   public function __construct($size, $debug = FALSE, $entity = NULL) {
     $this->entity = $entity;
     $this->size   = $size;
@@ -71,14 +73,14 @@ class CRM_Nav_Sync {
     foreach ($this->data_records as $timestamp => $record) {
       try {
         $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
-        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
-        $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
-        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
+//        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
+//        $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
+//        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
 
         $contact_handler->process();
-        $process_handler->process();
-        $status_handler->process();
-        $relationship_handler->process();
+//        $process_handler->process();
+//        $status_handler->process();
+//        $relationship_handler->process();
       } catch (Exception $e) {
         throw new Exception ("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}");
       }
@@ -103,6 +105,14 @@ class CRM_Nav_Sync {
   }
 
   /**
+   * debug function - uses manual json files to emulate SOAP call result
+   */
+  private function get_local_debug_data($entity) {
+    $file_name = __DIR__ . "/../../resources/test_data/{$entity}.json";
+    return json_decode(file_get_contents($file_name), TRUE);
+  }
+
+  /**
    * get data from navision and create records
    * @throws \Exception
    */
@@ -110,26 +120,32 @@ class CRM_Nav_Sync {
     $filter = $this->get_soap_filter();
     $read_command = new CRM_Nav_SoapCommand_ReadMultiple($filter);
     foreach ($this->soap_connectors as $entity => $soap_connector) {
-      try {
-        $soap_connector->executeCommand($read_command);
-      } catch (Exception $e) {
-        throw new Exception ("SOAP Command failed for Entityt {$entity}");
+      if ($this->local_debug) {
+        $read_result = $this->get_local_debug_data($entity);
+      } else {
+        try {
+          $soap_connector->executeCommand($read_command);
+        } catch (Exception $e) {
+          throw new Exception ("SOAP Command failed for Entityt {$entity}");
+        }
+        $read_result = json_decode(json_encode($read_command->getSoapResult()), TRUE);
       }
-      $read_result = json_decode(json_encode($read_command->getSoapResult()), TRUE);
-      // temporary var to save before variable in case of a change record
-      $before = array();
+        // temporary var to save before variable in case of a change record
+      $before = [];
       foreach ($read_result['ReadMultiple_Result'][$entity] as $nav_entry) {
         // if type is cahnge and we have a before value
         // store and create record with AFTER value next
         if ($nav_entry['Change_Type'] == 'Change' && $nav_entry['Version'] == 'BEFORE') {
-          $before = array($nav_entry['_TIMESTAMP'] => $nav_entry);
+          $before = [$nav_entry['_TIMESTAMP'] => $nav_entry];
           continue;
-        } else {
+        }
+        else {
           if (!empty($before)) {
             // create record with before value as well
             $record = $this->create_nav_data_record($nav_entry, $entity, reset($before));
-            $before = array();
-          } else {
+            $before = [];
+          }
+          else {
             // TODO: verify/compare timestamps for both records??
             $record = $this->create_nav_data_record($nav_entry, $entity);
           }
