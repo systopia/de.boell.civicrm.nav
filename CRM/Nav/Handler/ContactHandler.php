@@ -39,6 +39,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       // TODO: Contact is created with all values (AFTER).
       // nothing to do here anymore.
       // TODO: mark record as consumed
+      $this->record->set_consumed();
       return;
     }
     // add NavId to Contact

@@ -111,11 +111,11 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
-  protected function get_nav_after_data(){
+  public function get_nav_after_data(){
     return $this->nav_data_after;
   }
 
-  protected function get_nav_before_data() {
+  public function get_nav_before_data() {
     return $this->nav_data_before;
   }
 

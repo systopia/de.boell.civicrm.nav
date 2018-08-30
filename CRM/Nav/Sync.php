@@ -50,6 +50,11 @@ class CRM_Nav_Sync {
     $this->mark_records_transferred();
     // FixMe: return actual number of parsed/added records or some sort of statistics here.
     //        For now we just return the number of records
+
+    $this->set_consumed_records_transferred('civiContact');
+    $this->set_consumed_records_transferred('civiContRelation');
+    $this->set_consumed_records_transferred('civiProcess');
+    $this->set_consumed_records_transferred('civiStatus');
     return $this->number_of_records;
   }
 
@@ -63,6 +68,27 @@ class CRM_Nav_Sync {
     foreach ($this->entity as $nav_entity) {
       $this->soap_connectors[$nav_entity] = new CRM_Nav_SOAPConnector($nav_entity, $this->debug);
     }
+  }
+
+  private function set_consumed_records_transferred($type){
+    $contact_records  = $this->get_records($type);
+    foreach ($contact_records as $rec) {
+      $soap_array["{$type}_list"][$type][] = $rec->get_nav_after_data();
+      $tmp_nav_data = $rec->get_nav_before_data();
+      if (isset($tmp_nav_data)) {
+        $soap_array["{$type}_list"][$type][] = $tmp_nav_data;
+      }
+    }
+    // TODO: set updateMultiple Call to SOAP with $type Command
+  }
+
+  private function get_records($type) {
+    foreach ($this->data_records as $record) {
+      if ($record->get_type() == $type) {
+        $result[] = $record;
+      }
+    }
+    return $result;
   }
 
   /**
@@ -85,12 +111,6 @@ class CRM_Nav_Sync {
         throw new Exception ("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}");
       }
     }
-  }
-
-  /**
-   *  // TODO filter consumed records for each entity, and mark them as transferred after (before AND after)
-   */
-  private function mark_records_transferred() {
   }
 
   /**
