@@ -36,7 +36,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
   protected function convert_to_civi_data() {
     $nav_data                              = $this->get_nav_after_data();
     $this->civi_data_after['Contact']      = array(
-      'custom_147'        => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+      $this->navision_custom_field        => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
     );
     $relationship_type_id                  = $this->get_relationship_type_id($this->get_nav_value_if_exist($nav_data, 'Status'));
     $this->civi_data_after['Relationship'] = array (

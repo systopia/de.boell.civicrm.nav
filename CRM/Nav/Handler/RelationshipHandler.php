@@ -15,7 +15,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-class CRM_Nav_Handler_RelationshipHandler extends CRM_NAV_Handler_HandlerBase {
+class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
 
   private $creditor_custom_field_id = 'custom_164';
   private $debitor_custom_field_id  = 'custom_165';
@@ -37,7 +37,7 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_NAV_Handler_HandlerBase {
       return;
     }
     $contact_data = $this->record->get_contact_data();
-    $contact_id = $this->get_contact_id_from_nav_id($contact_data['custom_147']);
+    $contact_id = $this->get_contact_id_from_nav_id($contact_data[$this->navision_custom_field]);
 
     // TODO:
     // How to distinguish between creditor/debitor

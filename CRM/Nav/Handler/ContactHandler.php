@@ -15,7 +15,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
+class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
   public function __construct($record) {
     parent::__construct($record);
@@ -25,7 +25,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
     if (!$this->check_record_type()) {
       return;
     }
-    $contact_id = $this->get_contact_id_from_nav_id($this->record);
+    $nav_id = $this->record->get_individual_navision_id();
+    $contact_id = $this->get_contact_id_from_nav_id($nav_id);
     if ($this->check_delete_record()) {
       $this->delete_nav_id_from_contact($contact_id);
       $this->record->set_consumed();
@@ -33,8 +34,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
       return;
     }
 
-    $nav_id = $this->record->get_navision_id();
-    $contact_id = $this->get_contact_id_from_nav_id($nav_id);
     // get or create with XCM
     $contact_id = $this->check_or_create_contact_id($contact_id);
     // add NavId to Contact
@@ -116,7 +115,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
   private function add_nav_id_to_contact($contact_id, $nav_id) {
     $values = array(
       'id'          => $contact_id,
-      'custom_147'  =>  $nav_id,
+      $this->navision_custom_field  =>  $nav_id,
     );
     $result = civicrm_api3('Contact', 'create', $values);
     if ($result['is_error'] == 1) {
@@ -145,7 +144,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_NAV_Handler_HandlerBase {
       'sequential' => 1,
       'contact_type' => "Individual",
       'id' => $contact_id,
-      'custom_147' => "",
+      $this->navision_custom_field => "",
     ));
     if ($result['is_error'] != '1') {
       throw new Exception("Error occured while removing NavisionId from Contact {$contact_id}. Error Message: {$result['error_message']}");

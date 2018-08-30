@@ -27,7 +27,7 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
   protected function convert_to_civi_data() {
     $nav_data                         = $this->get_nav_after_data();
     $this->civi_data_after['Contact'] = array(
-      'custom_147'              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+      $this->navision_custom_field              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
       'relation_code'           => $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code'),
       // TODO: how is the relation done here? :\
       'external_identifier'     => $this->get_nav_value_if_exist($nav_data, 'No'),

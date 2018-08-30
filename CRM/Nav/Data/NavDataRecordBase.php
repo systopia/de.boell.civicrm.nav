@@ -34,6 +34,8 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
 
   protected $debug;
 
+  protected $navision_custom_field = 'custom_41';
+
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
    *
@@ -64,7 +66,9 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
       return;
     }
     if (($this->nav_data_before['_TIMESTAMP'] != $this->nav_data_after['_TIMESTAMP'])){
-      throw new Exception("Timestamps of before and after don't match.");
+      // FixME: Timestamps differ a bit, throw a warning for now, implement a threshold later
+      $this->log("Timestamps of before and after don't match. '{$this->nav_data_before['_TIMESTAMP']}' != '{$this->nav_data_after['_TIMESTAMP']}'");
+      //      throw new Exception("Timestamps of before and after don't match.");
     }
     $this->timestamp = $this->nav_data_before['_TIMESTAMP'];
   }
@@ -74,6 +78,8 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    */
   protected function compare_data() {
     $this->changed_data = array_diff($this->nav_data_before, $this->nav_data_after);
+    // FixME: is this needed?
+    unset($this->changed_data['Key']);
   }
 
   // TODO: is this still needed? Should be depreciated now.
@@ -126,6 +132,18 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected function log($message) {
     if ($this->debug) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
+    }
+  }
+
+  public function get_individual_navision_id() {
+    foreach ($this->civi_data_after['Contact'] as $contact) {
+      if ($contact['contact_type'] == 'Individual') {
+        if (empty($contact[$this->navision_custom_field])) {
+          $this->log("Couldn't determine Navision Id. Aborting.");
+          throw new Exception("Couldn't determine Navision Id. Aborting Process.");
+        }
+        return $contact[$this->navision_custom_field];
+      }
     }
   }
 

@@ -15,7 +15,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-class CRM_Nav_Handler_StatusHandler extends CRM_NAV_Handler_HandlerBase {
+class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
 
   public function __construct($record) {
     parent::__construct($record);
@@ -25,7 +25,7 @@ class CRM_Nav_Handler_StatusHandler extends CRM_NAV_Handler_HandlerBase {
     if (!$this->check_record_type()) {
       return;
     }
-    $nav_id = $this->record->get_navision_id();
+    $nav_id = $this->record->get_individual_navision_id();
     $contact_id = $this->get_contact_id_from_nav_id($nav_id);
     if($contact_id == "") {
       $this->log("Couldn't find Contact for NavID {$nav_id}. ProcessRecord wont be processed.");

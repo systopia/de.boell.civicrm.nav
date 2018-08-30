@@ -18,45 +18,49 @@
 
 class CRM_Nav_Data_NavContactMatcherCivi {
 
-  private $field_mapping = array(
-    'No'                            => 'custom_147',
-    'Adress'                        => 'street_address',
-    'Adress_2'                      => 'supplemental_address_1',
-    'City'                          => 'city',
-    'Phone_No'                      => 'phone',  // phone_type_id = Phone, type organisation
-    'Country_Region_Code'           => 'country_id',
-    'Fax_No'                        => 'phone',  // phone_type_id = Fax, type Org
-    'Post_Code'                     => 'postal_code',
-    'E_mail'                        => 'email', // primary
-    'Home_Page'                     => 'url', // Entity Website,  website_type_id = private
-    'Type'                          => 'contact_type', // TODO : add this in NavContactRecord, can be Company and Person
-    'Company_No'                    => 'custom_147',
-    'Company_Name'                  => 'custom_106',
-    'First_Name'                    => 'first_name',
-    'Middle_Name'                   => 'middle_name',
-    'Surname'                       => 'last_name',
-    'Job_Title'                     => 'job_title',
-    'Mobile_Phone_No'               => 'phone', // location_type_id = org, phone_type_id = Mobile
-    'Salutation_Code'               => 'prefix_id',
-    'E_mail_2'                      => 'email', // private
-//    'Delete_Flag'                 => '', // this shouldn't be needed
-    'Company_Name_2'                => 'custom_107',
-    'Funktion'                      => '',   // TODO --> what is this?
-    'Geburtsdatum'                  => 'birth_date',
-//    'Postfach'                    => '',  TODO: how to display/import to CIviCRM
-//    'PLZ_Postfach'                => '',
-//    'Ort_Postfach'                => '',
-    'Private_Telefonnr'             => 'phone', // Phone, private
-    'Private_Faxnr'                 => 'phone', // Fax, private
-    'Private_E_Mail'                => 'email', // Email, privat
-    'Company_Adress'                => 'street_address',
-    'Company_Adress_2'              => 'supplemental_address_1',
-    'Company_Post_Code'             => 'postal_code',
-    'Company_City'                  => 'city',
-    'Company_Country_Region_Code'   => 'country_id',
-  );
+  private$navision_custom_field;
 
-  public function __construct() {
+  private $field_mapping;
+
+  public function __construct($navision_custom_id) {
+    $this->navision_custom_field = $navision_custom_id;
+    $this->field_mapping = array(
+      'No'                            => $this->navision_custom_field,
+      'Adress'                        => 'street_address',
+      'Adress_2'                      => 'supplemental_address_1',
+      'City'                          => 'city',
+      'Phone_No'                      => 'phone',  // phone_type_id = Phone, type organisation
+      'Country_Region_Code'           => 'country_id',
+      'Fax_No'                        => 'phone',  // phone_type_id = Fax, type Org
+      'Post_Code'                     => 'postal_code',
+      'E_mail'                        => 'email', // primary
+      'Home_Page'                     => 'url', // Entity Website,  website_type_id = private
+      'Type'                          => 'contact_type', // TODO : add this in NavContactRecord, can be Company and Person
+      'Company_No'                    => $this->navision_custom_field,
+      'Company_Name'                  => 'custom_106',
+      'First_Name'                    => 'first_name',
+      'Middle_Name'                   => 'middle_name',
+      'Surname'                       => 'last_name',
+      'Job_Title'                     => 'job_title',
+      'Mobile_Phone_No'               => 'phone', // location_type_id = org, phone_type_id = Mobile
+      'Salutation_Code'               => 'prefix_id',
+      'E_mail_2'                      => 'email', // private
+      //    'Delete_Flag'                 => '', // this shouldn't be needed
+      'Company_Name_2'                => 'custom_107',
+      'Funktion'                      => '',   // TODO --> what is this?
+      'Geburtsdatum'                  => 'birth_date',
+      //    'Postfach'                    => '',  TODO: how to display/import to CIviCRM
+      //    'PLZ_Postfach'                => '',
+      //    'Ort_Postfach'                => '',
+      'Private_Telefonnr'             => 'phone', // Phone, private
+      'Private_Faxnr'                 => 'phone', // Fax, private
+      'Private_E_Mail'                => 'email', // Email, privat
+      'Company_Adress'                => 'street_address',
+      'Company_Adress_2'              => 'supplemental_address_1',
+      'Company_Post_Code'             => 'postal_code',
+      'Company_City'                  => 'city',
+      'Company_Country_Region_Code'   => 'country_id',
+    );
   }
 
   public function get_contact_fields($contact_type){

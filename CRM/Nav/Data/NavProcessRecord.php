@@ -28,7 +28,7 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
     $nav_data = $this->get_nav_after_data();
     // get contact details
     $this->civi_data_after['Contact'] = array(
-      'custom_147'              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+      $this->navision_custom_field              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
     );
 
     $relationship_type_id = $this->get_type_id($this->get_nav_value_if_exist($nav_data, 'Advancement'));
@@ -57,14 +57,6 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   public function get_relationship_data() {
     return $this->civi_data_after['Relationship'];
-  }
-
-  public function get_navision_id() {
-    if (empty($this->civi_data_after['Contact']['custom_147'])) {
-      $this->log("Couldn't determine navision Id. Aborting.");
-      throw new Exception("Couldn't determine navision Id. Aborting Process.");
-    }
-    return $this->civi_data_after['Contact']['custom_147'];
   }
 
   public function get_process_id() {

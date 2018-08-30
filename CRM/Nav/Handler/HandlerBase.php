@@ -15,11 +15,13 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-abstract class CRM_NAV_Handler_HandlerBase {
+abstract class CRM_Nav_Handler_HandlerBase {
 
   protected $record;
   protected $hbs_contact_id = "4";
   private $debug;
+
+  protected $navision_custom_field = 'custom_41';
 
   public function __construct($record) {
     // Fixme: make configurable, probably extension wide config
@@ -32,7 +34,7 @@ abstract class CRM_NAV_Handler_HandlerBase {
   protected function get_contact_id_from_nav_id($navId) {
     $result = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
-      'custom_147' => $navId,
+      $this->navision_custom_field => $navId,
     ));
     if ($result['count'] != 1) {
       return "";

@@ -28,7 +28,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);
-    $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi();
+    $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field);
   }
 
   protected function convert_to_civi_data() {
@@ -158,7 +158,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       'last_name'    => $this->get_nav_value_if_exist($nav_data, 'Surname'),
       'birth_date'   => $this->get_nav_value_if_exist($nav_data, 'Geburtsdatum'),
       // NavisionID
-      'custom_147'   => $this->get_nav_value_if_exist($nav_data, 'No'),
+      $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'No'),
       'email'        => $this->get_nav_value_if_exist($nav_data, 'E_mail'),
       'job_title'    => $this->get_nav_value_if_exist($nav_data, 'Job_Title'),
       'contact_type' => $this->get_contact_type($this->get_nav_value_if_exist($nav_data, 'Type')),
@@ -200,7 +200,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return [
       // NavisionID
       'contact_type' => "Organization",
-      'custom_147'   => $this->get_nav_value_if_exist($nav_data, 'Company_No'),
+      $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'Company_No'),
       'custom_106'   => $this->get_nav_value_if_exist($nav_data, 'Company_Name'),
       'custom_107'   => $this->get_nav_value_if_exist($nav_data, 'Company_Name_2'),
       'display_name' => ($this->get_nav_value_if_exist($nav_data, 'Company_Name') . $this->get_nav_value_if_exist($nav_data, 'Company_Name_2')),
