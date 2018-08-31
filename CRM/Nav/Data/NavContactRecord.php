@@ -354,13 +354,13 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $email_fields = $this->matcher->get_email_fields('organisation');
     foreach ($email_fields as $email) {
       if (array_key_exists($email, $this->changed_data)) {
-        $result['Email'][] = $this->get_email_value($this->location_type_organisation, $this->changed_data[$email], $type);
+        $result['Email'][] = $this->get_email_value($this->location_type_organisation, $email, $type);
       }
     }
     $email_fields = $this->matcher->get_email_fields('private');
     foreach ($email_fields as $email) {
       if (array_key_exists($email, $this->changed_data)) {
-        $result['Email'][] = $this->get_email_value($this->location_type_private, $this->changed_data[$email], $type);
+        $result['Email'][] = $this->get_email_value($this->location_type_private, $email, $type);
       }
     }
     return $result;
@@ -386,18 +386,20 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
-  private function get_email_value($location_type, $email, $type) {
+  private function get_email_value($location_type, $email_key, $type) {
     switch ($type) {
       case 'after':
+        $nav_data_after = $this->get_nav_after_data();
         foreach ($this->civi_data_after['Email'] as $email_data) {
-          if ($email_data['location_type_id'] == $location_type && $email_data['email'] == $email) {
+          if ($email_data['location_type_id'] == $location_type && $email_data['email'] == $nav_data_after[$email_key]) {
             return $email_data;
           }
         }
         return "";
       case 'before':
+        $nav_data_before = $this->get_nav_before_data();
         foreach ($this->civi_data_before['Email'] as $email_data) {
-          if ($email_data['location_type_id'] == $location_type && $email_data['email'] == $email) {
+          if ($email_data['location_type_id'] == $location_type && $email_data['email'] == $nav_data_before[$email_key]) {
             return $email_data;
           }
         }
