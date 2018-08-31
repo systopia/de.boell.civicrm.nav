@@ -46,6 +46,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
 
     $contact_id = $this->get_or_create_contact($contact_id);
+    // contact is created, all new values are already added as well
     if ($contact_id < '0') {
       $this->record->set_consumed();
       return;
@@ -55,13 +56,50 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     $changed_entities = $this->get_update_values('before');
 
+    // check if before values fit to currenty civi data, if not i3Val
     if (!$this->check_nav_before_vs_civi($changed_entities, $contact_id)) {
       $this->update_values_with_i3val($contact_id);
+      return;
     }
-    
+
+    // valid change operation
+    $this->update_values($contact_id);
+    $this->record->set_consumed();
+  }
+
+  /**
+   * @param $contact_id
+   */
+  private function update_values($contact_id) {
+    $contact_data = $this->record->get_changed_contact_values('after');
+    $address_data =  $this->record->get_changed_address_values('before');
+    $mail_data =  $this->record->get_changed_mail_values('before');
+    $phone_data =  $this->record->get_changed_phone_values('before');
+    $website_data =  $this->record->get_changed_website_values('before');
 
   }
 
+  private function set_values($entity_id, $values) {
+
+  }
+
+  private function get_entity_id($values, $contact_id, $entity) {
+    $values['contact_id'] = $contact_id;
+    $result = civicrm_api3($entity, 'get', $values);
+    if ($result['is_error'] == '1') {
+      throw new Exception("Error occured while getting {$entity}-Id for Contact {$contact_id} with values " . json_encode($values) . ". Error Message: {$result['error_message']}");
+    }
+    if ( $result['count'] != '1') {
+      throw new Exception("Couldn't get {$entity}-Id for Contact {$contact_id} with values " . json_encode($values));
+    }
+    return $result['id'];
+  }
+
+  /**
+   * @param $contact_id
+   *
+   * @throws \Exception
+   */
   private function update_values_with_i3val($contact_id) {
     // indices
     $email_index = '0';

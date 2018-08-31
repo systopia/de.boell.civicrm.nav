@@ -252,9 +252,8 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
-  // TODO: add before/after switch
   private function get_contact_email() {
-    $nav_data = $this->get_nav_after_data();
+    $nav_data = $this->get_nav_before_data();
     $result= [];
     if (isset($nav_data['E_mail'])) {
       $result[] = $nav_data['E_mail'];

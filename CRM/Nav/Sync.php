@@ -47,7 +47,7 @@ class CRM_Nav_Sync {
     $this->get_nav_data();
     $this->sort_records();
     $this->handle_Nav_data();
-    $this->mark_records_transferred();
+//    $this->mark_records_transferred();
     // FixMe: return actual number of parsed/added records or some sort of statistics here.
     //        For now we just return the number of records
 
