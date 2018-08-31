@@ -34,18 +34,26 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
+    if ($this->check_new_record()) {
+      try {
+        $this->create_civi_full_contact();
+      } catch (Exception $e) {
+        $this->log($e->getMessage());
+        return;
+      }
+      $this->record->set_consumed();
+      return;
+    }
+
     $contact_id = $this->get_or_create_contact($contact_id);
     if ($contact_id < '0') {
-      // TODO: Contact is created with all values (AFTER).
-      // nothing to do here anymore.
-      // TODO: mark record as consumed
       $this->record->set_consumed();
       return;
     }
     // add NavId to Contact
     $this->add_nav_id_to_contact($contact_id, $nav_id);
 
-    $changed_entities = $this->get_update_values();
+    $changed_entities = $this->get_update_values('before');
 
     if (!$this->check_nav_before_vs_civi($changed_entities, $contact_id)) {
       // TODO: i3Val command here now for all Data!
@@ -56,18 +64,39 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
   private function check_nav_before_vs_civi($entities, $contact_id) {
     try {
+      // TODO: check Civi Organisation data?? Currently only Individual is checked!
       $this->check_civi_contact_data($entities['Contact'], $contact_id);
-      $this->check_civi_address_data($entities['Address'], $contact_id);
+      $this->check_civi_entity_data($entities['Address'], $contact_id, 'Address');
+      $this->check_civi_entity_data($entities['Phone'], $contact_id, 'Phone');
+      $this->check_civi_entity_data($entities['Email'], $contact_id, 'Email');
+      $this->check_civi_entity_data($entities['Website'], $contact_id, 'Website');
     } catch (Exception $e) {
       $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
       return FALSE;
     }
+    return TRUE;
   }
 
-  private function check_civi_address_data($data, $contact_id) {
-    // TODO: implement
+
+  private function check_civi_entity_data($navision_data, $contact_id, $entity) {
+    if (!isset($navision_data)) {
+      return;
+    }
+    foreach ($navision_data as $data) {
+      $result = civicrm_api3($entity, 'get', array(
+        'sequential' => 1,
+        'contact_id' => $contact_id,
+      ));
+      $this->verify_civi_data_against_navision_data($result, $data, $contact_id);
+    }
   }
 
+  /**
+   * @param $data
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function check_civi_contact_data($data, $contact_id) {
     // nothing to do here
     if (!isset($data)) {
@@ -80,42 +109,44 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
           'sequential' => 1,
           'id' => $contact_id,
         ));
-        if ($result['is_error'] == '1') {
-          throw new Exception("Couldn't find Contact with ID {$contact_id}");
-        }
-        $this->compare_data($contact_data, $result['values']);
+        $this->verify_civi_data_against_navision_data($result, $contact_data, $contact_id);
       }
     }
+  }
+
+  /**
+   * @param $civi_result_values
+   * @param $navision_data
+   * @param $contact_id
+   *
+   * @throws \Exception
+   */
+  private function verify_civi_data_against_navision_data($civi_result_values, $navision_data, $contact_id) {
+    if ($civi_result_values['is_error'] == '1') {
+      throw new Exception("API Error, couldn't find any data to Contact '{$contact_id}'");
+    }
+    foreach ($civi_result_values['values'] as $civi_result) {
+      if ($this->compare_data($navision_data, $civi_result)) {
+        return;
+      }
+    }
+    throw new Exception("Couldn't match any values from CiviCRM to Navision BEFORE data.");
   }
 
   /**
    * @param $nav_data
    * @param $civi_query_result
    *
-   * @throws \Exception
+   * @return bool
    */
   private function compare_data($nav_data, $civi_query_result) {
     foreach ($nav_data as $nav_civi_key => $nav_value) {
       if ($civi_query_result[$nav_civi_key] != $nav_value) {
-        throw new Exception("Value Mismatch - Nav Data: '$civi_query_result[$nav_civi_key]' != '{$nav_value}' (CiviData)");
+        $this->log("Value Mismatch - Nav Data: '$civi_query_result[$nav_civi_key]' != '{$nav_value}' (CiviData)");
+        return FALSE;
       }
     }
-  }
-
-  // FixMe: Obsolete
-  private function get_civi_entity($entity, $contact_id) {
-    // add additional custom return fields
-    if ($entity == "Contact") {
-      $values['return'] = ["custom_41"];
-      $values['id']     = $contact_id;
-    } else {
-      $values['contact_id'] = $contact_id;
-    }
-    $result = civicrm_api3($entity, 'get', $values);
-    if ($result['is_error'] == 1) {
-      return "";
-    }
-    return $result['values'];
+    return TRUE;
   }
 
   private function add_nav_id_to_contact($contact_id, $nav_id) {
@@ -238,6 +269,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
   private function check_delete_record() {
     return $this->record->get_change_type() == 'Delete';
+  }
+
+  private function check_new_record() {
+    return $this->record->get_change_type() == 'New';
   }
 
   private function delete_nav_id_from_contact($contact_id) {

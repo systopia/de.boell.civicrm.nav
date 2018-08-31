@@ -80,6 +80,7 @@ class CRM_Nav_Sync {
       }
     }
     // TODO: set updateMultiple Call to SOAP with $type Command
+
   }
 
   private function get_records($type) {
