@@ -93,12 +93,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
     $entity_ids = array();
-    foreach ($entity_values as $key => $value) {
+    foreach ($entity_values[$entity] as $key => $value) {
       $entity_ids[$key] = $this->get_entity_id($value, $contact_id, $entity);
     }
     $get_changed_value_function_name = "get_changed_{$entity}_values";
-    $after_data_records = $this->record->$get_changed_value_function_name('after');
-    foreach ($after_data_records as $key => $value) {
+    $after_data_records = $this->record->{$get_changed_value_function_name}('after');
+    foreach ($after_data_records[$entity] as $key => $value) {
       $this->set_values($entity_ids[$key], $value, $entity);
     }
   }
