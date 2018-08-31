@@ -56,10 +56,85 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $changed_entities = $this->get_update_values('before');
 
     if (!$this->check_nav_before_vs_civi($changed_entities, $contact_id)) {
-      // TODO: i3Val command here now for all Data!
+      $this->update_values_with_i3val($contact_id);
     }
-    // TODO: Add values to civiCRM
-    // set consumed
+    
+
+  }
+
+  private function update_values_with_i3val($contact_id) {
+    // indices
+    $email_index = '0';
+    $phone_index = '0';
+    $website_index = '0';
+    $address_index = array();
+
+    $contact_details = $this->record->get_changed_contact_values('after');
+    $emails = $this->record->get_changed_contact_values('after');
+    $phones = $this->record->get_changed_contact_values('after');
+    $websites = $this->record->get_changed_contact_values('after');
+
+    $this->add_value_from_additional_entity($contact_details, $emails,$email_index,'email');
+    $this->add_value_from_additional_entity($contact_details, $phones,$phone_index,'phone');
+    $this->add_value_from_additional_entity($contact_details, $websites,$website_index,'url');
+    $this->add_value_from_additional_entity($contact_details, $emails,$address_index);
+
+    $this->push_values_to_i3val('Contact', $contact_details, $contact_id);
+
+    $contact_details = array();
+    while ( $this->add_value_from_additional_entity($contact_details, $emails,$email_index,'email') &&
+            $this->add_value_from_additional_entity($contact_details, $phones,$phone_index,'phone') &&
+            $this->add_value_from_additional_entity($contact_details, $websites,$website_index,'url') &&
+            $this->add_value_from_additional_entity($contact_details, $emails,$address_index)
+    ) {
+      $this->push_values_to_i3val('Contact', $contact_details, $contact_id);
+      $contact_details = array();
+    }
+
+    $this->record->set_consumed();
+  }
+
+  /**
+   * @param $contact_data (array with contact details, will be filled up )
+   * @param $values (Email|Website|Phone)-Data array of Entities in civi
+   *   format)
+   * @param $index (Index of the to be used element, or array with address
+   *   indices. If array, the only used for addresses)
+   * @param $value_key (index for value, e.g. phone for Phone entity, url for
+   *   website, email for Email)
+   * @return bool
+   */
+  private function add_value_from_additional_entity(&$contact_data, $values, &$index, $value_key ='') {
+    if (is_array($index)) {
+      // we have the address index. Find index in values not in $index
+      foreach ($values as $key => $address) {
+        if (!in_array($key, $index)) {
+          foreach ($address as $address_key => $address_value) {
+            $contact_data[$address_key] = $address_value;
+          }
+          $index[] = $key;
+          return TRUE;
+        }
+      }
+      // nothing to do anymore
+      return FALSE;
+    }
+    // either phone, website, email
+    if (isset($values[$index])) {
+      $contact_data[$value_key] = $values[$index][$value_key];
+      $index += 1;
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  private function push_values_to_i3val($values, $contact_id) {
+    $values['id'] = $contact_id;
+    $values['i3val_note'] = "Automatically added by Navision synchronisation";
+    $result = civicrm_api3('Contact', 'request_update', $values);
+    if ($result['is_error'] == '1') {
+      throw new Exception("i3Val call error. Message: {$result['error_message']}");
+    }
   }
 
   private function check_nav_before_vs_civi($entities, $contact_id) {

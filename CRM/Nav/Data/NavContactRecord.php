@@ -239,44 +239,6 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->civi_data_before['Contact'][] = $this->create_civi_contact_data_organisation($nav_data_before);
   }
 
-  /**
-   * @param $type (either Contact|Address)
-   */
-  public function get_changed_i3val_data($type) {
-    $result = array();
-    switch ($type) {
-      case 'Contact':
-        $entity = $this->get_changed_contact_values('after');
-        foreach ($entity as $key => $value) {
-          $result[$key] = $value;
-        }
-        $entity = $this->get_changed_mail_values('after');
-        foreach ($entity as $email_entity) {
-          $result['email'] = $email_entity['email'];
-        }
-        $entity = $this->get_changed_phone_values('after');
-        foreach ($entity as $phone_entity) {
-          $result['phone'] = $phone_entity['phone'];
-        }
-        $entity = $this->get_changed_website_values('after');
-        foreach ($entity as $website_entity) {
-          $result['url'] = $website_entity['url'];
-        }
-        return $result;
-      case 'Address':
-        $entity = $this->get_changed_address_values('after');
-        foreach ($entity as $address_entity) {
-          foreach ($address_entity as $key => $value) {
-            $result[$key] = $value;
-          }
-        }
-        return $result;
-      default:
-        throw new Exception("Invalid type for i3Val data. Type {$type}");
-    }
-  }
-
-  // TODO: Add switch for before/after array (needed if first/last name or email is changed
   public function get_contact_lookup_details() {
     $result['Emails'] = $this->get_contact_email();
     foreach ($this->civi_data_after['Contact'] as $contact) {
