@@ -39,7 +39,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
     if ($result['count'] != 1) {
       return "";
     }
-    return $result['values']['contact_id'];
+    return $result['id'];
   }
 
   protected function log($message) {

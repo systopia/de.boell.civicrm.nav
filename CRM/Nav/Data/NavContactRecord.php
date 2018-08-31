@@ -288,7 +288,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
-  public function get_changed_address_values($type) {
+  public function get_changed_Address_values($type) {
     $result                 = [];
     $private_address_fields = $this->matcher->get_address_fields('private');
     if ($this->value_changed($private_address_fields)) {
@@ -300,7 +300,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
           $result['Address'][] = $this->civi_data_before['Address']['individual'];
           break;
         default:
-          throw new Exception("Invalid type '{$type}' in get_changed_address_values");
+          throw new Exception("Invalid type '{$type}' in get_changed_Address_values");
       }
     }
     $org_address_fields = $this->matcher->get_address_fields('organisation');
@@ -313,13 +313,13 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
           $result['Address'][] = $this->civi_data_before['Address']['organisation'];
           break;
         default:
-          throw new Exception("Invalid type '{$type}' in get_changed_address_values");
+          throw new Exception("Invalid type '{$type}' in get_changed_Address_values");
       }
     }
     return $result;
   }
 
-  public function get_changed_phone_values($type) {
+  public function get_changed_Phone_values($type) {
     $result = [];
     // Private Phone
     $private_phone_fields = $this->matcher->get_phone_fields('private');
@@ -349,7 +349,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
-  public function get_changed_mail_values($type) {
+  public function get_changed_Email_values($type) {
     $result       = [];
     $email_fields = $this->matcher->get_email_fields('organisation');
     foreach ($email_fields as $email) {
@@ -366,7 +366,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
-  public function get_changed_website_values($type) {
+  public function get_changed_Website_values($type) {
     $result         = [];
     $website_fields = $this->matcher->get_website_fields();
 
@@ -380,7 +380,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
           case 'before':
             $result['Website'] = $this->civi_data_before['Website'];
           default:
-            throw new Exception("Invalid Type '{$type}' in get_changed_website_values");
+            throw new Exception("Invalid Type '{$type}' in get_changed_Website_values");
         }
       }
     }

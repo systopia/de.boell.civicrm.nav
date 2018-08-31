@@ -72,15 +72,43 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    */
   private function update_values($contact_id) {
     $contact_data = $this->record->get_changed_contact_values('after');
-    $address_data =  $this->record->get_changed_address_values('before');
-    $mail_data =  $this->record->get_changed_mail_values('before');
-    $phone_data =  $this->record->get_changed_phone_values('before');
-    $website_data =  $this->record->get_changed_website_values('before');
+    $address_data =  $this->record->get_changed_Address_values('before');
+    $mail_data =  $this->record->get_changed_Email_values('before');
+    $phone_data =  $this->record->get_changed_Phone_values('before');
+    $website_data =  $this->record->get_changed_Website_values('before');
+
+    // update Contact
+    if (!empty($contact_data)) {
+      $this->set_values($contact_id, $contact_data, 'Contact');
+    }
+    $this->update_entity($address_data, $contact_id, 'Address');
+    $this->update_entity($mail_data, $contact_id, 'Email');
+    $this->update_entity($phone_data, $contact_id, 'Phone');
+    $this->update_entity($website_data, $contact_id, 'Website');
 
   }
 
-  private function set_values($entity_id, $values) {
+  private function update_entity($entity_values, $contact_id, $entity) {
+    if (empty($entity_values)) {
+      return;
+    }
+    $entity_ids = array();
+    foreach ($entity_values as $key => $value) {
+      $entity_ids[$key] = $this->get_entity_id($value, $contact_id, $entity);
+    }
+    $get_changed_value_function_name = "get_changed_{$entity}_values";
+    $after_data_records = $this->record->$get_changed_value_function_name('after');
+    foreach ($after_data_records as $key => $value) {
+      $this->set_values($entity_ids[$key], $value, $entity);
+    }
+  }
 
+  private function set_values($entity_id, $values, $entity) {
+    $values['id'] = $entity_id;
+    $result = civicrm_api3($entity, 'create', $values);
+    if ($result['is_error'] == '1') {
+      throw new Exception("Error occured while setting values for {$entity}({$entity_id}) with values (" . json_encode($values) . "). Error Message: {$result['error_message']}");
+    }
   }
 
   private function get_entity_id($values, $contact_id, $entity) {
@@ -177,12 +205,14 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
   private function check_nav_before_vs_civi($entities, $contact_id) {
     try {
-      // TODO: check Civi Organisation data?? Currently only Individual is checked!
-      $this->check_civi_contact_data($entities['Contact'], $contact_id);
-      $this->check_civi_entity_data($entities['Address'], $contact_id, 'Address');
-      $this->check_civi_entity_data($entities['Phone'], $contact_id, 'Phone');
-      $this->check_civi_entity_data($entities['Email'], $contact_id, 'Email');
-      $this->check_civi_entity_data($entities['Website'], $contact_id, 'Website');
+      foreach ($entities as $entity) {
+        // TODO: check Civi Organisation data?? Currently only Individual is checked!
+        $this->check_civi_contact_data($entity['Contact'], $contact_id);
+        $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
+        $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
+        $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
+        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
+      }
     } catch (Exception $e) {
       $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
       return FALSE;
@@ -254,7 +284,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    */
   private function compare_data($nav_data, $civi_query_result) {
     foreach ($nav_data as $nav_civi_key => $nav_value) {
-      if ($civi_query_result[$nav_civi_key] != $nav_value) {
+      if (strcasecmp($civi_query_result[$nav_civi_key], $nav_value) != 0) {
         $this->log("Value Mismatch - Nav Data: '$civi_query_result[$nav_civi_key]' != '{$nav_value}' (CiviData)");
         return FALSE;
       }
@@ -408,10 +438,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   private function get_update_values($type) {
     $changed_civi_entities   = [];
     $changed_civi_entities[] = $this->record->get_changed_contact_values($type);
-    $changed_civi_entities[] = $this->record->get_changed_address_values($type);
-    $changed_civi_entities[] = $this->record->get_changed_phone_values($type);
-    $changed_civi_entities[] = $this->record->get_changed_mail_values($type);
-    $changed_civi_entities[] = $this->record->get_changed_website_values($type);
+    $changed_civi_entities[] = $this->record->get_changed_Address_values($type);
+    $changed_civi_entities[] = $this->record->get_changed_Phone_values($type);
+    $changed_civi_entities[] = $this->record->get_changed_Email_values($type);
+    $changed_civi_entities[] = $this->record->get_changed_Website_values($type);
 
     return $changed_civi_entities;
   }

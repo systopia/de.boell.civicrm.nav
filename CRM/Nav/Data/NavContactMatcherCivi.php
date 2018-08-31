@@ -65,9 +65,9 @@ class CRM_Nav_Data_NavContactMatcherCivi {
 
   public function get_contact_fields($contact_type){
     switch ($contact_type) {
-      case 'individual':
+      case 'Individual':
         return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title');
-      case 'organisation':
+      case 'Organisation':
         return array('Company_No', 'Company_Name', 'Company_Name_2');
       default:
         throw new Exception("Invalid Contact Type {$contact_type}. Please provide valid contact Type ('individual|organisation'");
