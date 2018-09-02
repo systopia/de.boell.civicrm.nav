@@ -100,14 +100,14 @@ class CRM_Nav_Sync {
     foreach ($this->data_records as $timestamp => $record) {
       try {
 //        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
-        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
+//        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
 //        $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
-//        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
+        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
 
 //        $contact_handler->process();
-        $process_handler->process();
+//        $process_handler->process();
 //        $status_handler->process();
-//        $relationship_handler->process();
+        $relationship_handler->process();
       } catch (Exception $e) {
         throw new Exception ("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}");
       }
