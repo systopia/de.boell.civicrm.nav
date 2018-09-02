@@ -141,14 +141,13 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function get_individual_navision_id() {
-    foreach ($this->civi_data_after['Contact'] as $contact) {
-      if ($contact['contact_type'] == 'Individual') {
-        if (empty($contact[$this->navision_custom_field])) {
-          $this->log("Couldn't determine Navision Id. Aborting.");
-          throw new Exception("Couldn't determine Navision Id. Aborting Process.");
-        }
-        return $contact[$this->navision_custom_field];
-      }
+    if (!empty($this->nav_data_after['Contact_No'])) {
+      return $this->nav_data_after['Contact_No'];
+    } else if (!empty($this->nav_data_after['No']) && $this->get_type() == "civiContact") {
+      return $this->nav_data_after['No'];
+     } else {
+      $this->log("Couldn't determine Navision Id. Aborting.");
+      throw new Exception("Couldn't determine Navision Id. Aborting Process.");
     }
   }
 
