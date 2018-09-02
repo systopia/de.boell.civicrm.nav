@@ -99,13 +99,13 @@ class CRM_Nav_Sync {
   private function handle_Nav_data() {
     foreach ($this->data_records as $timestamp => $record) {
       try {
-        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
-//        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
+//        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
+        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
 //        $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
 //        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
 
-        $contact_handler->process();
-//        $process_handler->process();
+//        $contact_handler->process();
+        $process_handler->process();
 //        $status_handler->process();
 //        $relationship_handler->process();
       } catch (Exception $e) {
