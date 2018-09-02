@@ -30,14 +30,22 @@ class CRM_Nav_SOAPConnector {
   private $login;
   private $soap_options;
 
+  const types = array("civiContact","civiContRelation","civiContStatus","civiProcess",);
+
   /**
    * CRM_Nav_SOAPConnector constructor.
+   *
+   * @param string $type
+   * @param bool $debug
+   *
+   * @throws \Exception
    */
-  public function __construct($debug = TRUE) {
+  public function __construct($type = "civiContact", $debug = TRUE) {
+    $this->verify_type($type);
     // get credentials from file
-    $this->getSoapCredentials();
+    $this->getSoapCredentials($type);
     // set NAV API URLs
-    $this->setSoapLocations();
+    $this->setSoapLocations($type);
     // set SOAP options
     $this->setSoapOptions();
     // initialize SOAP Object
@@ -54,6 +62,18 @@ class CRM_Nav_SOAPConnector {
   }
 
   /**
+   * Checks if the type in constructor is valid
+   * @param $type
+   *
+   * @throws \Exception
+   */
+  private function verify_type($type) {
+    if (!in_array($type, self::types)) {
+      throw new Exception("Invalid type. Please provide a valid type of (e.g. civiContact)");
+    }
+  }
+
+  /**
    * Executes a given soap Command
    * @param $navSoapCommand
    *
@@ -66,10 +86,10 @@ class CRM_Nav_SOAPConnector {
   // TODO: function to set location for this SOAPObject (needs to be called form Command).
   // E.g. Read(contact) Command needs location for CiviContact
 
-  private function getSoapCredentials(){
-    $this->wsdl = "resources/wsdl/civiContact.wsdl";
-    $pw_file = "resources/pw.txt";
-    $login_file = "resources/user.txt";
+  private function getSoapCredentials($type){
+    $this->wsdl = __DIR__ . "/../../resources/wsdl/{$type}.wsdl";
+    $pw_file = __DIR__ . "/../../resources/pw.txt";
+    $login_file = __DIR__ . "/../../resources/user.txt";
     $file_content = explode("\n", file_get_contents($pw_file));
     $this->password = array_pop(array_reverse($file_content));
     $file_content = explode("\n", file_get_contents($login_file));
@@ -80,9 +100,8 @@ class CRM_Nav_SOAPConnector {
    * Sets locations/URLs for the SOAP API.
    * TODO: make this configurable? (config file, settings form...)
    */
-  private function setSoapLocations(){
-    // TODO: Only location for CiviContact right now. save locations in array
-    $this->location = "http://10.1.0.148:7037/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/civiContact";
+  private function setSoapLocations($type){
+    $this->location = "http://10.1.0.148:7037/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/{$type}";
   }
 
   /**
