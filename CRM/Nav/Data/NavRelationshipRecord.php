@@ -28,8 +28,8 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
 //  private $creditor_custom_field_id = 'custom_164';
 //  private $debitor_custom_field_id  = 'custom_165';
 
-  public function __construct($navision_data) {
-    parent::__construct($navision_data);
+  public function __construct($nav_data_after, $nav_data_before = NULL) {
+    parent::__construct($nav_data_after, $nav_data_before);
   }
 
 
