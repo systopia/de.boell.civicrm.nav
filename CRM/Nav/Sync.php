@@ -28,7 +28,7 @@ class CRM_Nav_Sync {
   private $soap_connectors;
   private $number_of_records;
 
-  private $local_debug = TRUE;
+  private $local_debug = FALSE;
 
   public function __construct($size, $debug = FALSE, $entity = NULL) {
     $this->entity = $entity;
@@ -99,15 +99,15 @@ class CRM_Nav_Sync {
   private function handle_Nav_data() {
     foreach ($this->data_records as $timestamp => $record) {
       try {
-//        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
-//        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
+        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
+        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
         $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
-//        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
+        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
 
-//        $contact_handler->process();
-//        $process_handler->process();
+        $contact_handler->process();
+        $process_handler->process();
         $status_handler->process();
-//        $relationship_handler->process();
+        $relationship_handler->process();
       } catch (Exception $e) {
         throw new Exception ("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}");
       }
@@ -154,8 +154,9 @@ class CRM_Nav_Sync {
         // temporary var to save before variable in case of a change record
       $before = [];
       foreach ($read_result['ReadMultiple_Result'][$entity] as $nav_entry) {
-        // if type is cahnge and we have a before value
+        // if type is change and we have a before value
         // store and create record with AFTER value next
+        // FixMe: 
         if ($nav_entry['Change_Type'] == 'Change' && $nav_entry['Version'] == 'BEFORE') {
           $before = [$nav_entry['_TIMESTAMP'] => $nav_entry];
           continue;

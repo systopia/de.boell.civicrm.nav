@@ -34,7 +34,10 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
 
   protected $debug;
 
-  protected $navision_custom_field = 'custom_41';
+  // local
+//  protected $navision_custom_field = 'custom_41';
+// hbs
+  protected $navision_custom_field = 'custom_147';
 
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
