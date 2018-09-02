@@ -17,8 +17,14 @@
 
 class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
 
-  private $creditor_custom_field_id = 'custom_164';
-  private $debitor_custom_field_id  = 'custom_165';
+  // local
+  private $creditor_custom_field_id = 'custom_42';
+  private $debitor_custom_field_id  = 'custom_43';
+
+  // HBS
+  //  private $creditor_custom_field_id = 'custom_164';
+  //  private $debitor_custom_field_id  = 'custom_165';
+
 
   public function __construct($record) {
     parent::__construct($record);
@@ -38,18 +44,16 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
     }
     $contact_data = $this->record->get_contact_data();
     $contact_id = $this->get_contact_id_from_nav_id($contact_data[$this->navision_custom_field]);
-
-    // TODO:
-    // How to distinguish between creditor/debitor
-    civicrm_api3('Contact', 'create', array(
-      'sequential'                      => 1,
-      'contact_type'                    => "Individual",
-      $this->creditor_custom_field_id   => $contact_data['relation_code'],
-      'id'                              => $contact_id,
-//      $this->debitor_custom_field_id => "",
-    ));
+    if (empty($contact_id)) {
+      throw new Exception("Couldn't get Contact to Navision id {$contact_data[$this->navision_custom_field]}");
+    }
+    $contact_data['id'] = $contact_id;
+    $result = civicrm_api3('Contact', 'create', $contact_data);
     // TODO: Activity Tracker works automatically?
 
+    if ($result['is_error'] == 1) {
+      throw new Exception("Couldn't add Relation to Contact ({$contact_id}). Error Message: {$result['error_message']}");
+    }
     // mark record as consumed
     $this->record->set_consumed();
   }

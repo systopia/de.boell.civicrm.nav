@@ -20,18 +20,38 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
 
   protected $type = "civiContRelation";
 
+  // local
+  private $creditor_custom_field_id = 'custom_42';
+  private $debitor_custom_field_id = 'custom_43';
+
+// HBS
+//  private $creditor_custom_field_id = 'custom_164';
+//  private $debitor_custom_field_id  = 'custom_165';
+
   public function __construct($navision_data) {
     parent::__construct($navision_data);
   }
 
+
+
   protected function convert_to_civi_data() {
     $nav_data                         = $this->get_nav_after_data();
+    $relation_code = $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code');
     $this->civi_data_after['Contact'] = array(
-      $this->navision_custom_field              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
-      'relation_code'           => $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code'),
-      // TODO: how is the relation done here? :\
-      'external_identifier'     => $this->get_nav_value_if_exist($nav_data, 'No'),
+      $this->navision_custom_field                             => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+      $this->parse_business_relation($relation_code)           => $this->get_nav_value_if_exist($nav_data, 'No'),
     );
+  }
+
+  private function parse_business_relation($relation_code) {
+    switch ($relation_code) {
+      case 'KREDITOR':
+        return $this->creditor_custom_field_id;
+      case 'DEBITOR':
+        return $this->debitor_custom_field_id;
+      default:
+        throw new Exception("Unknown Business Relation {$relation_code}. Couldn't parse civiContRelation");
+    }
   }
 
   public function get_contact_data() {
