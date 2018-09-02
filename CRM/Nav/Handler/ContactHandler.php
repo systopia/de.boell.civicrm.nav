@@ -135,25 +135,27 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $website_index = '0';
     $address_index = array();
 
-    $contact_details = $this->record->get_changed_contact_values('after');
-    $emails = $this->record->get_changed_contact_values('after');
-    $phones = $this->record->get_changed_contact_values('after');
-    $websites = $this->record->get_changed_contact_values('after');
+    $contact_details = $this->record->get_contact_details();
+
+    $emails = $this->record->get_i3val_values('Email');
+    $phones = $this->record->get_i3val_values('Phone');
+    $websites = $this->record->get_i3val_values('Website');
+    $addresses = $this->record->get_i3val_values('Address');
 
     $this->add_value_from_additional_entity($contact_details, $emails,$email_index,'email');
     $this->add_value_from_additional_entity($contact_details, $phones,$phone_index,'phone');
     $this->add_value_from_additional_entity($contact_details, $websites,$website_index,'url');
-    $this->add_value_from_additional_entity($contact_details, $emails,$address_index);
+    $this->add_value_from_additional_entity($contact_details, $addresses,$address_index);
 
-    $this->push_values_to_i3val('Contact', $contact_details, $contact_id);
+    $this->push_values_to_i3val($contact_details, $contact_id);
 
     $contact_details = array();
-    while ( $this->add_value_from_additional_entity($contact_details, $emails,$email_index,'email') &&
-            $this->add_value_from_additional_entity($contact_details, $phones,$phone_index,'phone') &&
-            $this->add_value_from_additional_entity($contact_details, $websites,$website_index,'url') &&
-            $this->add_value_from_additional_entity($contact_details, $emails,$address_index)
+    while ( $this->add_value_from_additional_entity($contact_details, $emails,$email_index,'email') ||
+            $this->add_value_from_additional_entity($contact_details, $phones,$phone_index,'phone') ||
+            $this->add_value_from_additional_entity($contact_details, $websites,$website_index,'url') ||
+            $this->add_value_from_additional_entity($contact_details, $addresses,$address_index)
     ) {
-      $this->push_values_to_i3val('Contact', $contact_details, $contact_id);
+      $this->push_values_to_i3val($contact_details, $contact_id);
       $contact_details = array();
     }
 
@@ -197,6 +199,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   private function push_values_to_i3val($values, $contact_id) {
     $values['id'] = $contact_id;
     $values['i3val_note'] = "Automatically added by Navision synchronisation";
+    error_log("i3Val Values: " . json_encode($values));
     $result = civicrm_api3('Contact', 'request_update', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("i3Val call error. Message: {$result['error_message']}");

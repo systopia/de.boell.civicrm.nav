@@ -241,7 +241,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   public function get_contact_lookup_details() {
     $result['Emails'] = $this->get_contact_email();
-    foreach ($this->civi_data_after['Contact'] as $contact) {
+    foreach ($this->civi_data_before['Contact'] as $contact) {
       if ($contact['contact_type'] == "Individual") {
         $result['Contact'] = array (
           'first_name' => $contact['first_name'],
@@ -265,6 +265,10 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $result[] = $nav_data['Private_E_Mail'];
     }
     return $result;
+  }
+
+  public function get_i3val_values($entity) {
+    return $this->civi_data_after[$entity];
   }
 
   public function get_changed_contact_values($type) {

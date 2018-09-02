@@ -42,8 +42,8 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
     if (!$this->check_record_type()) {
       return;
     }
-    $contact_data = $this->record->get_contact_data();
-    $contact_id = $this->get_contact_id_from_nav_id($contact_data[$this->navision_custom_field]);
+    $nav_id = $this->record->get_individual_navision_id();
+    $contact_id = $this->get_contact_id_from_nav_id($nav_id);
     if (empty($contact_id)) {
       throw new Exception("Couldn't get Contact to Navision id {$contact_data[$this->navision_custom_field]}");
     }
