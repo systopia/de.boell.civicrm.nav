@@ -54,7 +54,7 @@ class CRM_Nav_Sync {
     $this->set_consumed_records_transferred('civiContact');
     $this->set_consumed_records_transferred('civiContRelation');
     $this->set_consumed_records_transferred('civiProcess');
-    $this->set_consumed_records_transferred('civiStatus');
+    $this->set_consumed_records_transferred('civiContStatus');
     return $this->number_of_records;
   }
 
@@ -101,13 +101,13 @@ class CRM_Nav_Sync {
       try {
 //        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
 //        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
-//        $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
-        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
+        $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
+//        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
 
 //        $contact_handler->process();
 //        $process_handler->process();
-//        $status_handler->process();
-        $relationship_handler->process();
+        $status_handler->process();
+//        $relationship_handler->process();
       } catch (Exception $e) {
         throw new Exception ("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}");
       }
