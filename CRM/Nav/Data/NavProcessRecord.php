@@ -20,15 +20,20 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiProcess";
 
+  // HBS
+  //  private $process_id = $this->process_id;
+  // local test
+  private $process_id = 'custom_172';
+
   public function __construct($nav_data_after, $nav_data_before = NULL) {
-    parent::__construct($nav_data_after, $nav_data_before = NULL);
+    parent::__construct($nav_data_after, $nav_data_before);
   }
 
   protected function convert_to_civi_data() {
     $nav_data = $this->get_nav_after_data();
     // get contact details
     $this->civi_data_after['Contact'] = array(
-      'custom_147'              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+      $this->navision_custom_field              => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
     );
 
     $relationship_type_id = $this->get_type_id($this->get_nav_value_if_exist($nav_data, 'Advancement'));
@@ -38,7 +43,7 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       'start_date'              => $this->get_nav_value_if_exist($nav_data, 'Förderbeginn'),
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'), // TODO: this is basically doubled data. Check if this is the correct value
       'custom_130'              => $this->get_nav_value_if_exist($nav_data, 'Angestrebter_Studienabschluss'), // Angestrebter Studienabschluss
-      'custom_126'              => $this->get_nav_value_if_exist($nav_data, 'Process_Entry_No'), // processID
+      $this->process_id              => $this->get_nav_value_if_exist($nav_data, 'Process_Entry_No'), // processID
       'custom_127'              => $this->get_nav_value_if_exist($nav_data, 'Candidature_Process_Code'), // Bewerbung Vorgang Code
       'custom_132'              => $this->get_nav_value_if_exist($nav_data, 'Hauptfach_1'), // Hauptfach Studium
       'custom_131'              => $this->get_nav_value_if_exist($nav_data, 'Subject_Group'), // Förderbereich
@@ -51,7 +56,7 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       'custom_129'              => $this->get_nav_value_if_exist($nav_data, 'Next_Report_to'), // Nächster Bericht
       // FixME: Unklare Feldzuordnung
       'custom_141'              => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), // Studienbereich ???
-      //      'custom_126'              => $this->get_nav_value_if_exist($nav_data, 'Subsidie'), // What is a subsidie? And is this mapped in Civi?
+      //      $this->process_id              => $this->get_nav_value_if_exist($nav_data, 'Subsidie'), // What is a subsidie? And is this mapped in Civi?
     );
   }
 
@@ -59,20 +64,12 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $this->civi_data_after['Relationship'];
   }
 
-  public function get_navision_id() {
-    if (empty($this->civi_data_after['Contact']['custom_147'])) {
-      $this->log("Couldn't determine navision Id. Aborting.");
-      throw new Exception("Couldn't determine navision Id. Aborting Process.");
-    }
-    return $this->civi_data_after['Contact']['custom_147'];
-  }
-
   public function get_process_id() {
-    if (empty($this->civi_data_after['Contact']['custom_126'])) {
+    if (empty($this->civi_data_after['Relationship'][$this->process_id])) {
       $this->log("Couldn't determine processId. Aborting.");
       throw new Exception("Couldn't determine ProcessId. Aborting.");
     }
-    return $this->civi_data_after['Contact']['custom_126'];
+    return $this->civi_data_after['Relationship'][$this->process_id];
   }
 
   /**

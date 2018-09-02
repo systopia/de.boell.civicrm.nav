@@ -28,6 +28,8 @@ class CRM_Nav_Sync {
   private $soap_connectors;
   private $number_of_records;
 
+  private $local_debug = TRUE;
+
   public function __construct($size, $debug = FALSE, $entity = NULL) {
     $this->entity = $entity;
     $this->size   = $size;
@@ -45,9 +47,14 @@ class CRM_Nav_Sync {
     $this->get_nav_data();
     $this->sort_records();
     $this->handle_Nav_data();
-    $this->mark_records_transferred();
+//    $this->mark_records_transferred();
     // FixMe: return actual number of parsed/added records or some sort of statistics here.
     //        For now we just return the number of records
+
+    $this->set_consumed_records_transferred('civiContact');
+    $this->set_consumed_records_transferred('civiContRelation');
+    $this->set_consumed_records_transferred('civiProcess');
+    $this->set_consumed_records_transferred('civiContStatus');
     return $this->number_of_records;
   }
 
@@ -63,6 +70,28 @@ class CRM_Nav_Sync {
     }
   }
 
+  private function set_consumed_records_transferred($type){
+    $contact_records  = $this->get_records($type);
+    foreach ($contact_records as $rec) {
+      $soap_array["{$type}_list"][$type][] = $rec->get_nav_after_data();
+      $tmp_nav_data = $rec->get_nav_before_data();
+      if (isset($tmp_nav_data)) {
+        $soap_array["{$type}_list"][$type][] = $tmp_nav_data;
+      }
+    }
+    // TODO: set updateMultiple Call to SOAP with $type Command
+
+  }
+
+  private function get_records($type) {
+    foreach ($this->data_records as $record) {
+      if ($record->get_type() == $type) {
+        $result[] = $record;
+      }
+    }
+    return $result;
+  }
+
   /**
    * Executes Handlers for all data records
    * @throws \Exception
@@ -70,25 +99,19 @@ class CRM_Nav_Sync {
   private function handle_Nav_data() {
     foreach ($this->data_records as $timestamp => $record) {
       try {
-        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
-        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
+//        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
+//        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
         $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
-        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
+//        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
 
-        $contact_handler->process();
-        $process_handler->process();
+//        $contact_handler->process();
+//        $process_handler->process();
         $status_handler->process();
-        $relationship_handler->process();
+//        $relationship_handler->process();
       } catch (Exception $e) {
         throw new Exception ("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}");
       }
     }
-  }
-
-  /**
-   *  // TODO filter consumed records for each entity, and mark them as transferred after (before AND after)
-   */
-  private function mark_records_transferred() {
   }
 
   /**
@@ -103,6 +126,14 @@ class CRM_Nav_Sync {
   }
 
   /**
+   * debug function - uses manual json files to emulate SOAP call result
+   */
+  private function get_local_debug_data($entity) {
+    $file_name = __DIR__ . "/../../resources/test_data/{$entity}.json";
+    return json_decode(file_get_contents($file_name), TRUE);
+  }
+
+  /**
    * get data from navision and create records
    * @throws \Exception
    */
@@ -110,26 +141,32 @@ class CRM_Nav_Sync {
     $filter = $this->get_soap_filter();
     $read_command = new CRM_Nav_SoapCommand_ReadMultiple($filter);
     foreach ($this->soap_connectors as $entity => $soap_connector) {
-      try {
-        $soap_connector->executeCommand($read_command);
-      } catch (Exception $e) {
-        throw new Exception ("SOAP Command failed for Entityt {$entity}");
+      if ($this->local_debug) {
+        $read_result = $this->get_local_debug_data($entity);
+      } else {
+        try {
+          $soap_connector->executeCommand($read_command);
+        } catch (Exception $e) {
+          throw new Exception ("SOAP Command failed for Entityt {$entity}");
+        }
+        $read_result = json_decode(json_encode($read_command->getSoapResult()), TRUE);
       }
-      $read_result = json_decode(json_encode($read_command->getSoapResult()), TRUE);
-      // temporary var to save before variable in case of a change record
-      $before = array();
+        // temporary var to save before variable in case of a change record
+      $before = [];
       foreach ($read_result['ReadMultiple_Result'][$entity] as $nav_entry) {
         // if type is cahnge and we have a before value
         // store and create record with AFTER value next
         if ($nav_entry['Change_Type'] == 'Change' && $nav_entry['Version'] == 'BEFORE') {
-          $before = array($nav_entry['_TIMESTAMP'] => $nav_entry);
+          $before = [$nav_entry['_TIMESTAMP'] => $nav_entry];
           continue;
-        } else {
+        }
+        else {
           if (!empty($before)) {
             // create record with before value as well
             $record = $this->create_nav_data_record($nav_entry, $entity, reset($before));
-            $before = array();
-          } else {
+            $before = [];
+          }
+          else {
             // TODO: verify/compare timestamps for both records??
             $record = $this->create_nav_data_record($nav_entry, $entity);
           }

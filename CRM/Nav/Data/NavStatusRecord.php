@@ -18,16 +18,23 @@
 
 class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
 
-  protected $type = "civiStatus";
+  protected $type = "civiContStatus";
   private $hbs_contact_id = "4";
+  // HBS
+//  private $relationship_type_mapping = array(
+//    'Vertrauensdozent_in'       => '15',
+//    'Stipendiat_in'             => '12',
+//    'Promotionsstipendiat_in'   => '11',
+//  );
+  // local
   private $relationship_type_mapping = array(
-    'Vertrauensdozent_in'       => '15',
+    'Vertrauensdozent_in'       => '14',
     'Stipendiat_in'             => '12',
     'Promotionsstipendiat_in'   => '11',
   );
 
-  public function __construct($navision_data) {
-    parent::__construct($navision_data);
+  public function __construct($nav_data_after, $nav_data_before = NULL) {
+    parent::__construct($nav_data_after, $nav_data_before);
   }
 
   /**
@@ -36,7 +43,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
   protected function convert_to_civi_data() {
     $nav_data                              = $this->get_nav_after_data();
     $this->civi_data_after['Contact']      = array(
-      'custom_147'        => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
+      $this->navision_custom_field        => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
     );
     $relationship_type_id                  = $this->get_relationship_type_id($this->get_nav_value_if_exist($nav_data, 'Status'));
     $this->civi_data_after['Relationship'] = array (
