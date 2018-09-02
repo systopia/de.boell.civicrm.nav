@@ -31,7 +31,11 @@ class CRM_Nav_Sync {
   private $local_debug = FALSE;
 
   public function __construct($size, $debug = FALSE, $entity = NULL) {
-    $this->entity = $entity;
+    if (empty($entity)) {
+      $this->entity = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
+    } else {
+      $this->entity = array($entity);
+    }
     $this->size   = $size;
     $this->debug = $debug;
     $this->initialize_soap_connectors();
@@ -62,9 +66,6 @@ class CRM_Nav_Sync {
    * @throws \Exception
    */
   private function initialize_soap_connectors() {
-    if (empty($this->entity)) {
-      $this->entity = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
-    }
     foreach ($this->entity as $nav_entity) {
       $this->soap_connectors[$nav_entity] = new CRM_Nav_SOAPConnector($nav_entity, $this->debug);
     }
@@ -156,7 +157,7 @@ class CRM_Nav_Sync {
       foreach ($read_result['ReadMultiple_Result'][$entity] as $nav_entry) {
         // if type is change and we have a before value
         // store and create record with AFTER value next
-        // FixMe: 
+        // FixMe:
         if ($nav_entry['Change_Type'] == 'Change' && $nav_entry['Version'] == 'BEFORE') {
           $before = [$nav_entry['_TIMESTAMP'] => $nav_entry];
           continue;

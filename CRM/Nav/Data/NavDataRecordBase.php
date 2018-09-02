@@ -154,7 +154,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
-  protected function dump_record() {
+  public function dump_record() {
     CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Dumping Record");
     $dump['timestamp'] = $this->timestamp;
     $dump['nav_before'] = $this->nav_data_before;
