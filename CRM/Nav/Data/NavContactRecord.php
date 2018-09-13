@@ -74,7 +74,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $nav_data = $this->get_nav_after_data();
     if ($nav_data['Type'] == 'Company') {
       // overwrite private location type id, this is 'geschaeftlich' now
-      $this->location_type_private = '8';
+      $this->location_type_private = $this->location_type_organisation;
     }
   }
 
