@@ -26,8 +26,8 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     $this->navision_custom_field = $navision_custom_id;
     $this->field_mapping = array(
       'No'                            => $this->navision_custom_field,
-      'Adress'                        => 'street_address',
-      'Adress_2'                      => 'supplemental_address_1',
+      'Address'                        => 'street_address',
+      'Address_2'                      => 'supplemental_address_1',
       'City'                          => 'city',
       'Phone_No'                      => 'phone',  // phone_type_id = Phone, type organisation
       'Country_Region_Code'           => 'country_id',
@@ -79,7 +79,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       case 'organisation':
         return array('Company_Adress', 'Company_Adress_2','Company_Post_Code','Company_City','Company_Country_Region_Code');
       case 'private':
-        return array('Adress', 'Adress_2', 'City', 'Country_Region_Code', 'Post_Code' );
+        return array('Address', 'Address_2', 'City', 'Country_Region_Code', 'Post_Code' );
       default:
         throw new Exception("Invalid locationType {$locationType}. Please provide a valid locationType");
     }

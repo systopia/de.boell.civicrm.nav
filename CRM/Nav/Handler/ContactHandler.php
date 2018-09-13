@@ -288,6 +288,16 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   private function compare_data($nav_data, $civi_query_result) {
     foreach ($nav_data as $nav_civi_key => $nav_value) {
       if (strcasecmp($civi_query_result[$nav_civi_key], $nav_value) != 0) {
+        // extra check for country_id
+        if ($nav_civi_key == "country_id") {
+          $result = civicrm_api3('Country', 'getsingle', array(
+            'sequential' => 1,
+            'id' => $civi_query_result[$nav_civi_key],
+          ));
+          if (!strcasecmp($result['iso_code'], $nav_value)) {
+            continue;
+          }
+        }
         $this->log("Value Mismatch - Nav Data: '$civi_query_result[$nav_civi_key]' != '{$nav_value}' (CiviData)");
         return FALSE;
       }

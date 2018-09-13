@@ -40,6 +40,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->convert_civi_organisation_data();
     // Phone/Fax/Websites
     $this->convert_civi_communication_data();
+
+    $this->clean_civi_data('before');
+    $this->clean_civi_data('after');
   }
 
   public function get_contact_details($contact_type = 'Individual') {
@@ -75,18 +78,18 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $nav_data_after  = $this->get_nav_after_data();
     $nav_data_before = $this->get_nav_before_data();
 
+    // Private Address
+    $this->civi_data_after['Address']['individual']  = $this->create_civi_address_values_private($nav_data_after);
+    $this->civi_data_before['Address']['individual'] = $this->create_civi_address_values_private($nav_data_before);
     // organisationAddress
-    $this->civi_data_after['Address']['organisation']  = $this->create_civi_address_values_private($nav_data_after);
-    $this->civi_data_before['Address']['organisation'] = $this->create_civi_address_values_private($nav_data_before);
-    // Private Address (TODO)
-    $this->civi_data_after['Address']['individual']  = $this->create_civi_address_values_organisation($nav_data_after);
-    $this->civi_data_before['Address']['individual'] = $this->create_civi_address_values_organisation($nav_data_before);
+    $this->civi_data_after['Address']['organisation']  = $this->create_civi_address_values_organisation($nav_data_after);
+    $this->civi_data_before['Address']['organisation'] = $this->create_civi_address_values_organisation($nav_data_before);
   }
 
   private function create_civi_address_values_private($nav_data) {
     return [
-      'street_address'         => $this->get_nav_value_if_exist($nav_data, 'Adress'),
-      'supplemental_address_1' => $this->get_nav_value_if_exist($nav_data, 'Adress_2'),
+      'street_address'         => $this->get_nav_value_if_exist($nav_data, 'Address'),
+      'supplemental_address_1' => $this->get_nav_value_if_exist($nav_data, 'Address_2'),
       'postal_code'            => $this->get_nav_value_if_exist($nav_data, 'Post_Code'),
       'city'                   => $this->get_nav_value_if_exist($nav_data, 'City'),
       'country_id'             => $this->get_nav_value_if_exist($nav_data, 'Country_Region_Code'),
@@ -174,6 +177,44 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
+  /**
+   * @param $type
+   *
+   * @throws \Exception
+   */
+  private function clean_civi_data($type) {
+    switch ($type) {
+      case 'before':
+        if (empty($this->civi_data_before)) {
+          return;
+        }
+        $civi_data = &$this->civi_data_before;
+        break;
+      case 'after':
+        $civi_data = &$this->civi_data_after;
+        break;
+      default:
+        throw new Exception('Invalid Type {$type} in clean_civi_data');
+    }
+    foreach ($civi_data as $entity_name => &$civi_entity) {
+      foreach ($civi_entity as $key => &$values) {
+        foreach ($values as $name => &$val) {
+          if ($val == "") {
+            if ($entity_name == 'Phone' || $entity_name == 'Email') {
+              // unset parent
+              unset($civi_entity[$key]);
+              break;
+            }
+            else {
+              // unset child
+              unset($values[$name]);
+            }
+          }
+        }
+      }
+    }
+  }
+
   private function create_civi_contact_values($nav_data) {
     return [
       'contact_type' => "Individual",
@@ -213,7 +254,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   private function value_changed($fields) {
     foreach ($fields as $f) {
-      if (array_key_exists($f, $this->changed_data)) {
+      if (array_key_exists($f, $this->changed_data) && $this->changed_data[$f] != "") {
         return TRUE;
       }
     }
@@ -275,7 +316,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $result         = [];
     $contact_fields = $this->matcher->get_contact_fields('Individual');
     foreach ($contact_fields as $field) {
-      if (array_key_exists($field, $this->changed_data)) {
+      if (array_key_exists($field, $this->changed_data) && $this->changed_data[$field] != "") {
         switch ($type) {
           case 'after':
             $result['Contact'][$this->matcher->get_civi_values($field)] = $this->changed_data[$field];
@@ -307,19 +348,19 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
           throw new Exception("Invalid type '{$type}' in get_changed_Address_values");
       }
     }
-    $org_address_fields = $this->matcher->get_address_fields('organisation');
-    if ($this->value_changed($org_address_fields)) {
-      switch ($type) {
-        case 'after':
-          $result['Address'][] = $this->civi_data_after['Address']['organisation'];
-          break;
-        case 'before':
-          $result['Address'][] = $this->civi_data_before['Address']['organisation'];
-          break;
-        default:
-          throw new Exception("Invalid type '{$type}' in get_changed_Address_values");
-      }
-    }
+//    $org_address_fields = $this->matcher->get_address_fields('organisation');
+//    if ($this->value_changed($org_address_fields)) {
+//      switch ($type) {
+//        case 'after':
+//          $result['Address'][] = $this->civi_data_after['Address']['organisation'];
+//          break;
+//        case 'before':
+//          $result['Address'][] = $this->civi_data_before['Address']['organisation'];
+//          break;
+//        default:
+//          throw new Exception("Invalid type '{$type}' in get_changed_Address_values");
+//      }
+//    }
     return $result;
   }
 
@@ -328,27 +369,42 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     // Private Phone
     $private_phone_fields = $this->matcher->get_phone_fields('private');
     if ($this->value_changed($private_phone_fields)) {
-      $result['Phone'][] = $this->get_phone_values($this->location_type_private, "Phone", $type);
+      $phone_val = $this->get_phone_values($this->location_type_private, "Phone", $type);
+      if ($phone_val['phone'] != "") {
+        $result['Phone'][] = $phone_val;
+      }
     }
     // private Fax
     $private_fax_fields = $this->matcher->get_fax_fields('private');
     if ($this->value_changed($private_fax_fields)) {
-      $result['Phone'][] = $this->get_phone_values($this->location_type_private, "Fax", $type);
+      $phone_val = $this->get_phone_values($this->location_type_private, "Fax", $type);
+      if ($phone_val['phone'] != "") {
+        $result['Phone'][] = $phone_val;
+      }
     }
     // organisation Phone
     $org_phone_fields = $this->matcher->get_phone_fields('organisation');
     if ($this->value_changed($org_phone_fields)) {
-      $result['Phone'][] = $this->get_phone_values($this->location_type_organisation, "Phone", $type);
+      $phone_val = $this->get_phone_values($this->location_type_organisation, "Phone", $type);
+      if ($phone_val['phone'] != "") {
+        $result['Phone'][] = $phone_val;
+      }
     }
     // organisation Mobile
     $org_phone_fields = $this->matcher->get_phone_fields('mobile');
     if ($this->value_changed($org_phone_fields)) {
-      $result['Phone'][] = $this->get_phone_values($this->location_type_organisation, "Mobile", $type);
+      $phone_val = $this->get_phone_values($this->location_type_organisation, "Mobile", $type);
+      if ($phone_val['phone'] != "") {
+        $result['Phone'][] = $phone_val;
+      }
     }
     // organisation Phone
     $org_fax_fields = $this->matcher->get_fax_fields('organisation');
     if ($this->value_changed($org_fax_fields)) {
-      $result['Phone'][] = $this->get_phone_values($this->location_type_organisation, "Fax", $type);
+      $phone_val = $this->get_phone_values($this->location_type_organisation, "Fax", $type);
+      if ($phone_val['phone'] != "") {
+        $result['Phone'][] = $phone_val;
+      }
     }
     return $result;
   }

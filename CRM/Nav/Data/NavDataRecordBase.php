@@ -35,9 +35,9 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected $debug;
 
   // local
-//  protected $navision_custom_field = 'custom_41';
+  protected $navision_custom_field = 'custom_41';
 // hbs
-  protected $navision_custom_field = 'custom_147';
+//  protected $navision_custom_field = 'custom_147';
 
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
@@ -80,7 +80,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    * Compares before and after data, and saves changes in $changed_data
    */
   protected function compare_data() {
-    $this->changed_data = array_diff($this->nav_data_before, $this->nav_data_after);
+    $this->changed_data = array_diff($this->nav_data_after, $this->nav_data_before);
     // FixME: is this needed?
     unset($this->changed_data['Key']);
   }

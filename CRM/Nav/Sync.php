@@ -28,7 +28,7 @@ class CRM_Nav_Sync {
   private $soap_connectors;
   private $number_of_records;
 
-  private $local_debug = FALSE;
+  private $local_debug = TRUE;
 
   public function __construct($size, $debug = FALSE, $entity = NULL) {
     if (empty($entity)) {
