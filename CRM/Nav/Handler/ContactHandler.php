@@ -89,22 +89,25 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   private function update_entity($entity_values, $contact_id, $entity) {
-    if (empty($entity_values)) {
-      return;
-    }
-    $entity_ids = array();
-    foreach ($entity_values[$entity] as $key => $value) {
-      $entity_ids[$key] = $this->get_entity_id($value, $contact_id, $entity);
-    }
     $get_changed_value_function_name = "get_changed_{$entity}_values";
     $after_data_records = $this->record->{$get_changed_value_function_name}('after');
+    $entity_ids = array();
+    foreach ($entity_values[$entity] as $key => $value) {
+      $entity_id = $this->get_entity_id($value, $contact_id, $entity);
+      $entity_ids[$key] = $entity_id;
+    }
     foreach ($after_data_records[$entity] as $key => $value) {
-      $this->set_values($entity_ids[$key], $value, $entity);
+      $this->set_values($entity_ids[$key], $value, $entity, $contact_id);
     }
   }
 
-  private function set_values($entity_id, $values, $entity) {
-    $values['id'] = $entity_id;
+  private function set_values($entity_id, $values, $entity, $contact_id) {
+    if (empty($entity_id)) {
+      // add contact ID, since we add a new Entityt to a given contact_id
+      $values['contact_id'] = $contact_id;
+    } else {
+      $values['id'] = $entity_id;
+    }
     $result = civicrm_api3($entity, 'create', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("Error occured while setting values for {$entity}({$entity_id}) with values (" . json_encode($values) . "). Error Message: {$result['error_message']}");
@@ -112,12 +115,16 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   private function get_entity_id($values, $contact_id, $entity) {
+    if (empty($values)) {
+      // nothing to do here, but no error either. values need to be added/filled up
+      return "";
+    }
     $values['contact_id'] = $contact_id;
     $result = civicrm_api3($entity, 'get', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("Error occured while getting {$entity}-Id for Contact {$contact_id} with values " . json_encode($values) . ". Error Message: {$result['error_message']}");
     }
-    if ( $result['count'] != '1') {
+    if ($result['count'] >'1') {
       throw new Exception("Couldn't get {$entity}-Id for Contact {$contact_id} with values " . json_encode($values));
     }
     return $result['id'];
@@ -229,6 +236,11 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
     foreach ($navision_data as $data) {
+      if (empty($data)) {
+        // empty data here, means we have to create this field to fill up contact
+        // values will be filled later, for now we don't need i3Val
+        return;
+      }
       $result = civicrm_api3($entity, 'get', array(
         'sequential' => 1,
         'contact_id' => $contact_id,

@@ -21,14 +21,14 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   protected $type                       = "civiContact";
 
   private   $location_type_private      = "6";
-
-  private   $location_type_organisation = "8"; // maybe need geschaeftlich?
+  private   $location_type_organisation = "8";
 
   private   $matcher;
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);
     $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field);
+    $this->tmp =  array_diff($this->get_nav_before_data(), $this->get_nav_after_data());
   }
 
   protected function convert_to_civi_data() {
@@ -348,19 +348,6 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
           throw new Exception("Invalid type '{$type}' in get_changed_Address_values");
       }
     }
-//    $org_address_fields = $this->matcher->get_address_fields('organisation');
-//    if ($this->value_changed($org_address_fields)) {
-//      switch ($type) {
-//        case 'after':
-//          $result['Address'][] = $this->civi_data_after['Address']['organisation'];
-//          break;
-//        case 'before':
-//          $result['Address'][] = $this->civi_data_before['Address']['organisation'];
-//          break;
-//        default:
-//          throw new Exception("Invalid type '{$type}' in get_changed_Address_values");
-//      }
-//    }
     return $result;
   }
 
@@ -369,42 +356,27 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     // Private Phone
     $private_phone_fields = $this->matcher->get_phone_fields('private');
     if ($this->value_changed($private_phone_fields)) {
-      $phone_val = $this->get_phone_values($this->location_type_private, "Phone", $type);
-      if ($phone_val['phone'] != "") {
-        $result['Phone'][] = $phone_val;
-      }
+      $result['Phone'][] = $this->get_phone_values($this->location_type_private, "Phone", $type);
     }
     // private Fax
     $private_fax_fields = $this->matcher->get_fax_fields('private');
     if ($this->value_changed($private_fax_fields)) {
-      $phone_val = $this->get_phone_values($this->location_type_private, "Fax", $type);
-      if ($phone_val['phone'] != "") {
-        $result['Phone'][] = $phone_val;
-      }
+      $result['Phone'][] = $this->get_phone_values($this->location_type_private, "Fax", $type);
     }
     // organisation Phone
     $org_phone_fields = $this->matcher->get_phone_fields('organisation');
     if ($this->value_changed($org_phone_fields)) {
-      $phone_val = $this->get_phone_values($this->location_type_organisation, "Phone", $type);
-      if ($phone_val['phone'] != "") {
-        $result['Phone'][] = $phone_val;
-      }
+      $result['Phone'][] = $this->get_phone_values($this->location_type_organisation, "Phone", $type);
     }
     // organisation Mobile
     $org_phone_fields = $this->matcher->get_phone_fields('mobile');
     if ($this->value_changed($org_phone_fields)) {
-      $phone_val = $this->get_phone_values($this->location_type_organisation, "Mobile", $type);
-      if ($phone_val['phone'] != "") {
-        $result['Phone'][] = $phone_val;
-      }
+      $result['Phone'][] = $this->get_phone_values($this->location_type_organisation, "Mobile", $type);
     }
     // organisation Phone
     $org_fax_fields = $this->matcher->get_fax_fields('organisation');
     if ($this->value_changed($org_fax_fields)) {
-      $phone_val = $this->get_phone_values($this->location_type_organisation, "Fax", $type);
-      if ($phone_val['phone'] != "") {
-        $result['Phone'][] = $phone_val;
-      }
+      $result['Phone'][] = $this->get_phone_values($this->location_type_organisation, "Fax", $type);
     }
     return $result;
   }
@@ -444,6 +416,10 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
         }
       }
     }
+  }
+
+  public function get_new_values() {
+
   }
 
   private function get_email_value($location_type, $email_key, $type) {
