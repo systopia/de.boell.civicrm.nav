@@ -45,6 +45,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
+
+
     $contact_id = $this->get_or_create_contact($contact_id);
     // contact is created, all new values are already added as well
     if ($contact_id < '0') {
@@ -71,6 +73,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * @param $contact_id
    */
   private function update_values($contact_id) {
+    $address_id_shared = $this->create_linked_organisation_address($contact_id);
+
     $contact_data = $this->record->get_changed_contact_values('after');
     $address_data =  $this->record->get_changed_Address_values('before');
     $mail_data =  $this->record->get_changed_Email_values('before');
@@ -126,6 +130,9 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
     if ($result['count'] >'1') {
       throw new Exception("Couldn't get {$entity}-Id for Contact {$contact_id} with values " . json_encode($values));
+    }
+    if ($result['count'] == '0') {
+      return "";
     }
     return $result['id'];
   }
@@ -365,14 +372,17 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * @throws \Exception
    */
   private function create_civi_full_contact() {
+
     // create Contact
     $contact_data = $this->record->get_contact_details('Individual');
     $contact_id = $this->create_civi_entity($contact_data, 'Contact');
 
-    foreach ($this->record->get_civi_addresses() as $address) {
-      $address['contact_id'] = $contact_id;
-      $this->create_civi_entity($address, 'Address');
-    }
+    $this->create_linked_organisation_address($contact_id);
+
+    $address = $this->record->get_civi_individual_address();
+    $address['contact_id'] = $contact_id;
+    $this->create_civi_entity($address, 'Address');
+
     foreach ($this->record->get_civi_phones() as $phone) {
       $phone['contact_id'] = $contact_id;
       $this->create_civi_entity($phone, 'Phone');
@@ -387,10 +397,41 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
+  /**
+   * checks if the Organisation is found via company Nav ID
+   *     if not, create company and address
+   * adds address to contact as a shared address
+   * @param $contact_id
+   *
+   * @throws \Exception
+   */
+  private function create_linked_organisation_address($contact_id) {
+    $company_data = $this->record->get_company_data();
+    if (empty($company_data)) {
+      return;
+    }
+    $org_contact_id = $this->get_contact_id_from_nav_id($company_data['Org_nav_id']);
+    if (empty($org_contact_id)) {
+      $org_contact_id = $this->create_civi_entity($company_data['Contact'], 'Contact');
+      $company_data['Address']['contact_id'] = $org_contact_id;
+      $address_id = $this->create_civi_entity($company_data['Address'], 'Address');
+    } else {
+      $address_id = $this->get_entity_id($company_data['Address'], $org_contact_id, 'Address');
+    }
+    $company_data['Address']['contact_id'] = $contact_id;
+    $company_data['Address']['master_id'] = $address_id;
+    // check if address is already available on contact
+    $new_shared_address_id = $this->get_entity_id($company_data['Address'], $contact_id, 'Address');
+    if (empty($new_shared_address_id)) {
+      $new_shared_address_id = $this->create_civi_entity($company_data['Address'], 'Address');
+    }
+    return $new_shared_address_id;
+  }
+
   private function create_civi_entity($values, $entity) {
     $result = civicrm_api3($entity, 'create', $values);
     if ($result['is_error'] == '1') {
-      throw new Exception("Couldn't create Civi Entity {$entity}. Error Message: " . $result['error_message']);
+      throw new Exception("Couldn't create Civi Entity {$entity}. Error Message: " . $result['error_message']. ". Values: " . json_encode($values));
     }
     return $result['id'];
   }

@@ -18,11 +18,12 @@
 
 class CRM_Nav_Data_NavContactMatcherCivi {
 
-  private$navision_custom_field;
+  private $navision_custom_field;
+
 
   private $field_mapping;
 
-  public function __construct($navision_custom_id) {
+  public function __construct($navision_custom_id, $org_name_1, $org_name_2) {
     $this->navision_custom_field = $navision_custom_id;
     $this->field_mapping = array(
       'No'                            => $this->navision_custom_field,
@@ -37,7 +38,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Home_Page'                     => 'url', // Entity Website,  website_type_id = private
       'Type'                          => 'contact_type', // TODO : add this in NavContactRecord, can be Company and Person
       'Company_No'                    => $this->navision_custom_field,
-      'Company_Name'                  => 'custom_106',
+      'Company_Name'                  => $org_name_1,
       'First_Name'                    => 'first_name',
       'Middle_Name'                   => 'middle_name',
       'Surname'                       => 'last_name',
@@ -46,7 +47,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Salutation_Code'               => 'prefix_id',
       'E_mail_2'                      => 'email', // private
       //    'Delete_Flag'                 => '', // this shouldn't be needed
-      'Company_Name_2'                => 'custom_107',
+      'Company_Name_2'                => $org_name_2,
       'Funktion'                      => '',   // TODO --> what is this?
       'Geburtsdatum'                  => 'birth_date',
       //    'Postfach'                    => '',  TODO: how to display/import to CIviCRM

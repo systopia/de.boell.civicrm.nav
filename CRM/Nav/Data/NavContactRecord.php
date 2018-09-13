@@ -23,11 +23,15 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   private   $location_type_private      = "6";
   private   $location_type_organisation = "8";
 
+  // TODO: create Config file for custom field mapping
+  private $org_name_1 = 'custom_45';
+  private $org_name_2 = 'custom_46';
+
   private   $matcher;
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);
-    $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field);
+    $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field, $this->org_name_1, $this->org_name_2);
   }
 
   protected function convert_to_civi_data() {
@@ -54,8 +58,8 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
-  public function get_civi_addresses() {
-    return $this->civi_data_after['Address'];
+  public function get_civi_individual_address() {
+    return $this->civi_data_after['Address']['individual'];
   }
 
   public function get_civi_phones() {
@@ -70,12 +74,30 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $this->civi_data_after['Website'];
   }
 
-  private function nav_data_after() {
+  private function set_location_type_ids() {
     $nav_data = $this->get_nav_after_data();
     if ($nav_data['Type'] == 'Company') {
       // overwrite private location type id, this is 'geschaeftlich' now
       $this->location_type_private = $this->location_type_organisation;
     }
+  }
+
+  public function get_company_data() {
+    $nav_data = $this->get_nav_after_data();
+    if ($nav_data['Type'] == 'Company') {
+      // nothing to do here, as a company we don;t have shared addresses
+      return array();
+    }
+    foreach ($this->civi_data_before['Contact'] as $contact) {
+      if ($contact['contact_type'] == "Organization") {
+        $result['Contact'] = $this->civi_data_after['Contact'] = $contact;
+      }
+    }
+//    $result['Contact'] = $this->civi_data_after['Contact']
+    $result['Address'] = $this->civi_data_after['Address']['organisation'];
+    $result['Org_nav_id'] = $nav_data['Company_No'];
+
+    return $result;
   }
 
   /*
@@ -275,9 +297,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       // NavisionID
       'contact_type' => "Organization",
       $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'Company_No'),
-      'custom_106'   => $this->get_nav_value_if_exist($nav_data, 'Company_Name'),
-      'custom_107'   => $this->get_nav_value_if_exist($nav_data, 'Company_Name_2'),
-      'display_name' => ($this->get_nav_value_if_exist($nav_data, 'Company_Name') . $this->get_nav_value_if_exist($nav_data, 'Company_Name_2')),
+      $this->org_name_1   => $this->get_nav_value_if_exist($nav_data, 'Company_Name'),
+      $this->org_name_2   => $this->get_nav_value_if_exist($nav_data, 'Company_Name_2'),
+      'organization_name' => ($this->get_nav_value_if_exist($nav_data, 'Company_Name') ." " . $this->get_nav_value_if_exist($nav_data, 'Company_Name_2')),
     ];
   }
 
