@@ -28,10 +28,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);
     $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field);
-    $this->tmp =  array_diff($this->get_nav_before_data(), $this->get_nav_after_data());
   }
 
   protected function convert_to_civi_data() {
+    // set location data
+    $this->set_location_type_ids();
     // contact_data
     $this->convert_civi_person_data();
     // convert addresses
@@ -67,6 +68,14 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   public function get_civi_website() {
     return $this->civi_data_after['Website'];
+  }
+
+  private function nav_data_after() {
+    $nav_data = $this->get_nav_after_data();
+    if ($nav_data['Type'] == 'Company') {
+      // overwrite private location type id, this is 'geschaeftlich' now
+      $this->location_type_private = '8';
+    }
   }
 
   /*
