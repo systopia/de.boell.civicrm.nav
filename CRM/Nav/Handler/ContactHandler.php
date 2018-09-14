@@ -73,7 +73,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * @param $contact_id
    */
   private function update_values($contact_id) {
-    $address_id_shared = $this->create_linked_organisation_address($contact_id);
+    $this->create_linked_organisation_address($contact_id);
 
     $contact_data = $this->record->get_changed_contact_values('after');
     $address_data =  $this->record->get_changed_Address_values('before');
@@ -221,19 +221,22 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   private function check_nav_before_vs_civi($entities, $contact_id) {
-    try {
-      foreach ($entities as $entity) {
-        // TODO: check Civi Organisation data?? Currently only Individual is checked!
-        $this->check_civi_contact_data($entity['Contact'], $contact_id);
-        $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
-        $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
-        $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
-        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
+
+    foreach ($entities as $entity) {
+      try {
+      // TODO: check Civi Organisation data?? Currently only Individual is checked!
+      $this->check_civi_contact_data($entity['Contact'], $contact_id);
+      $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
+      $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
+      $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
+      $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
+      } catch (Exception $e) {
+        // TODO: Setup ENTITY (+ KEY) for i3VAL processing
+        $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
       }
-    } catch (Exception $e) {
-      $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
-      return FALSE;
     }
+    // TODO
+    // check against i3Val Store. If empty:
     return TRUE;
   }
 
