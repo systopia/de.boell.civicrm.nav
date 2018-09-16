@@ -339,8 +339,21 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
-  public function get_i3val_values($entity) {
-    return $this->civi_data_after[$entity];
+  public function get_i3val_values($entity, $filter = NULL) {
+    // if we don't have a filter array, or we are looking for Contact Entity,
+    // return all after values.
+    if (empty($filter) || $entity == 'Contact') {
+      return;
+    }
+    $result_values = array();
+    foreach ($filter as $filter_value) {
+      foreach ($this->civi_data_before[$entity] as $entity_key => $entity_value) {
+        if ($filter_value == $entity_value) {
+          $result_values[] = $this->civi_data_after[$entity][$entity_key];
+        }
+      }
+    }
+    return $result_values;
   }
 
   public function get_changed_contact_values($type) {

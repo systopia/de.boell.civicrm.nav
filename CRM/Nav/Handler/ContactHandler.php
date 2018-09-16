@@ -17,6 +17,8 @@
 
 class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
+  private $i3Val_values = array();
+
   public function __construct($record) {
     parent::__construct($record);
   }
@@ -45,8 +47,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
-
-
     $contact_id = $this->get_or_create_contact($contact_id);
     // contact is created, all new values are already added as well
     if ($contact_id < '0') {
@@ -58,14 +58,14 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     $changed_entities = $this->get_update_values('before');
 
-    // check if before values fit to currenty civi data, if not i3Val
-    if (!$this->check_nav_before_vs_civi($changed_entities, $contact_id)) {
-      $this->update_values_with_i3val($contact_id);
-      return;
-    }
+    // TODO: Check/filter Values first
+    // --> then update Contact data WITHOUT conflicting values
+    // --> then put values to i3Val
+    $this->check_nav_before_vs_civi($changed_entities, $contact_id);
 
     // valid change operation
     $this->update_values($contact_id);
+    $this->update_values_with_i3val($contact_id);
     $this->record->set_consumed();
   }
 
@@ -81,6 +81,11 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $phone_data =  $this->record->get_changed_Phone_values('before');
     $website_data =  $this->record->get_changed_Website_values('before');
 
+    $this->filter_i3Val_values('Contact', $contact_data );
+    $this->filter_i3Val_values('Address', $address_data );
+    $this->filter_i3Val_values('Email', $mail_data );
+    $this->filter_i3Val_values('Phone', $phone_data );
+    $this->filter_i3Val_values('Website', $website_data );
     // update Contact
     if (!empty($contact_data)) {
       $this->set_values($contact_id, $contact_data, 'Contact');
@@ -89,19 +94,50 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->update_entity($mail_data, $contact_id, 'Email');
     $this->update_entity($phone_data, $contact_id, 'Phone');
     $this->update_entity($website_data, $contact_id, 'Website');
-
   }
 
   private function update_entity($entity_values, $contact_id, $entity) {
+    if (empty($entity_values[$entity])) {
+      // FixMe: Is this correct? What happens if before value is empty, and after value is set? (e.g. fill up)
+      return;
+    }
     $get_changed_value_function_name = "get_changed_{$entity}_values";
     $after_data_records = $this->record->{$get_changed_value_function_name}('after');
     $entity_ids = array();
     foreach ($entity_values[$entity] as $key => $value) {
       $entity_id = $this->get_entity_id($value, $contact_id, $entity);
+      if ($entity_id == "") {
+        // try with after values, otherwise we always fill aditional values
+        // in case an after value is already in the system
+        // TOOD: is this only relevant for testing?
+        $entity_id = $this->get_entity_id($after_data_records[$entity][$key], $contact_id, $entity);
+      }
       $entity_ids[$key] = $entity_id;
     }
     foreach ($after_data_records[$entity] as $key => $value) {
       $this->set_values($entity_ids[$key], $value, $entity, $contact_id);
+    }
+  }
+
+  /**
+   * Filters Elements from changed data to be updated by the previously determined
+   * i3Val values. Those will be passed to i3Val afterwards
+   *
+   * @param $entity
+   * @param $data_record
+   */
+  private function filter_i3Val_values($entity, &$data_record) {
+    if (!isset($this->i3Val_values[$entity])) {
+      //nothing to do here. Entity doesn't need i3Val
+      return;
+    }
+    // iterate entity values and check against i3Val arrays
+    foreach($data_record[$entity] as $key => $value) {
+      foreach ($this->i3Val_values[$entity] as $i3_value) {
+        if ($i3_value == $value) {
+          unset($data_record[$entity][$key]);
+        }
+      }
     }
   }
 
@@ -147,14 +183,14 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $email_index = '0';
     $phone_index = '0';
     $website_index = '0';
-    $address_index = array();
+    $address_index = array(); // TODO: array not needed, only individual address is used
 
     $contact_details = $this->record->get_contact_details();
 
-    $emails = $this->record->get_i3val_values('Email');
-    $phones = $this->record->get_i3val_values('Phone');
-    $websites = $this->record->get_i3val_values('Website');
-    $addresses = $this->record->get_i3val_values('Address');
+    $emails = $this->record->get_i3val_values('Email', $this->i3Val_values['Email']);
+    $phones = $this->record->get_i3val_values('Phone', $this->i3Val_values['Phone']);
+    $websites = $this->record->get_i3val_values('Website', $this->i3Val_values['Website']);
+    $addresses = $this->record->get_i3val_values('Address', $this->i3Val_values['Address']);
 
     $this->add_value_from_additional_entity($contact_details, $emails,$email_index,'email');
     $this->add_value_from_additional_entity($contact_details, $phones,$phone_index,'phone');
@@ -172,8 +208,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       $this->push_values_to_i3val($contact_details, $contact_id);
       $contact_details = array();
     }
-
-    $this->record->set_consumed();
   }
 
   /**
@@ -224,20 +258,19 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     foreach ($entities as $entity) {
       try {
-      // TODO: check Civi Organisation data?? Currently only Individual is checked!
-      $this->check_civi_contact_data($entity['Contact'], $contact_id);
-      $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
-      $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
-      $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
-      $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
+        // TODO: check Civi Organisation data?? Currently only Individual is checked!
+        $this->check_civi_contact_data($entity['Contact'], $contact_id);
+        $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
+        $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
+        $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
+        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
       } catch (Exception $e) {
         // TODO: Setup ENTITY (+ KEY) for i3VAL processing
         $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
+        $entity_name = key($entity);
+        $this->i3Val_values[$entity_name] = $entity[$entity_name];
       }
     }
-    // TODO
-    // check against i3Val Store. If empty:
-    return TRUE;
   }
 
 
@@ -298,6 +331,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
         return;
       }
     }
+    // TODO: add to internal list
     throw new Exception("Couldn't match any values from CiviCRM to Navision BEFORE data.");
   }
 
