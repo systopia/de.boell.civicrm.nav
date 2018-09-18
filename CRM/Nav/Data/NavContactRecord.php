@@ -173,6 +173,10 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organisation, "Fax", 'Fax_No', $nav_data_after);
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organisation, "Fax", 'Fax_No', $nav_data_before);
     }
+    if (isset($nav_data_after['Private_Faxnr'])) {
+      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_after);
+      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_before);
+    }
     if (isset($nav_data_after['Private_Telefonnr'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_after);
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_before);
@@ -194,9 +198,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
     //Email
     // FixMe: Primary email is in Civi_person_data()
-    if (isset($nav_data_after['Email'])) {
-      $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_organisation, 'Email', $nav_data_after);
-      $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_organisation, 'Email', $nav_data_before);
+    if (isset($nav_data_after['E_Mail'])) {
+      $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_organisation, 'E_Mail', $nav_data_after);
+      $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_organisation, 'E_Mail', $nav_data_before);
     }
     if (isset($nav_data_after['E_Mail_2'])) {
       $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_private, 'E_Mail_2', $nav_data_after);
