@@ -21,9 +21,9 @@ abstract class CRM_Nav_Handler_HandlerBase {
   protected $hbs_contact_id = "4";
   private $debug;
 // local
-  protected $navision_custom_field = 'custom_41';
+//  protected $navision_custom_field = 'custom_41';
   // hbs
-//  protected $navision_custom_field = 'custom_147';
+  protected $navision_custom_field = 'custom_147';
 
   public function __construct($record) {
     // Fixme: make configurable, probably extension wide config
@@ -34,6 +34,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
   abstract protected function check_record_type();
 
   protected function get_contact_id_from_nav_id($navId) {
+    $this->log("PBADEBUG-NavID: " . $navId);
     $result = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
       $this->navision_custom_field => $navId,
@@ -41,6 +42,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
     if ($result['count'] != 1) {
       return "";
     }
+    $this->log("PBADEBUG: " . json_encode($result));
     return $result['id'];
   }
 
