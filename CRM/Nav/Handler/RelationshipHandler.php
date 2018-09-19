@@ -17,15 +17,6 @@
 
 class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
 
-  // local
-  private $creditor_custom_field_id = 'custom_42';
-  private $debitor_custom_field_id  = 'custom_43';
-
-  // HBS
-  //  private $creditor_custom_field_id = 'custom_164';
-  //  private $debitor_custom_field_id  = 'custom_165';
-
-
   public function __construct($record) {
     parent::__construct($record);
   }
