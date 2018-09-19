@@ -78,13 +78,13 @@ abstract class CRM_Nav_Handler_HandlerBase {
     }
   }
 
-  protected function get_civi_relationship_id($contact_a, $contact_b, $type = NULL) {
+  protected function get_civi_relationship_id($contact_a, $contact_b, $type = NULL, $type_value = NULL) {
     $values = [
       'contact_id_a' => $contact_a,
       'contact_id_b' => $contact_b,
     ];
     if (isset($type)) {
-      $values['relationship_type_id'] = $type;
+      $values[$type] = $type_value;
     }
     $result = civicrm_api3('Relationship', 'get', $values);
     if ($result['is_error'] == '1' || $result['count'] != '1') {

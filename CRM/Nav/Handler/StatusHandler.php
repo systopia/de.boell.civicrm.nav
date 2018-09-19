@@ -32,24 +32,10 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
       // TODO: set this consumed? How do we proceed with entires we cannot match?
       return;
     }
-    $relationship_id = $this->get_relationship($contact_id, $this->record->get_Status_start_date());
+    $relationship_id = $this->get_civi_relationship_id($contact_id, $this->hbs_contact_id, 'start_date', $this->record->get_Status_start_date());
     $this->write_relationship_to_db($contact_id, $relationship_id);
 
     $this->record->set_consumed();
-  }
-
-  private function get_relationship($contact_id, $start_date) {
-    $result = civicrm_api3('Relationship', 'get', array(
-      'sequential' => 1,
-      'start_date' => $start_date,
-      'contact_id_a' => $contact_id,
-    ));
-    if ($result['count'] != 1) {
-      // Couldn't find conclusive relationship. Create a new one now!
-      $this->log("Didn't find conclusive result for Contact {$contact_id} and start_date {$start_date}");
-      return "";
-    }
-    return $result['id'];
   }
 
   private function write_relationship_to_db($contact_id, $relationship_id){
