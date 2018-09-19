@@ -83,20 +83,23 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function get_company_data($type = 'after') {
-    $nav_data = $this->get_nav_after_data();
-    if ($nav_data['Type'] == 'Company') {
-      // nothing to do here, as a company we don;t have shared addresses
-      return array();
-    }
+
+
     switch ($type) {
       case 'before':
         $civi_data = &$this->civi_data_before;
+        $nav_data = $this->get_nav_before_data();
         break;
       case 'after':
         $civi_data = &$this->civi_data_after;
+        $nav_data = $this->get_nav_after_data();
         break;
       default:
         return array();
+    }
+    if ($nav_data['Type'] == 'Company') {
+      // nothing to do here, as a company we don;t have shared addresses
+      return array();
     }
     foreach ($civi_data['Contact'] as $contact) {
       if ($contact['contact_type'] == "Organization") {

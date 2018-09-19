@@ -417,18 +417,19 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
+  /**
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function remove_old_linked_organisation_address($contact_id) {
     $company_data_before = $this->record->get_company_data('before');
-    if (empty($company_data_before) || !$this->record->company_changed() || empty($company_data_before['Address'])) {
+    if (empty($company_data_before) || !$this->record->company_changed()) {
       return;
     }
     $org_contact_id = $this->get_contact_id_from_nav_id($company_data_before['Org_nav_id']);
     if (empty($org_contact_id)) {
       return;
-    }
-    $address_id = $this->get_entity_id($company_data_before['Address'], $contact_id, 'Address');
-    if (empty($address_id)) {
-      throw new Exception("Couldn't determine address ID for Address " . json_encode($company_data_before['Address']) . " for User {$contact_id}");
     }
     $relationship_id = $this->get_civi_relationship_id($contact_id, $org_contact_id);
     if (empty($relationship_id)) {
@@ -436,6 +437,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
     $this->disable_relationship($relationship_id);
+    $address_id = $this->get_entity_id($company_data_before['Address'], $contact_id, 'Address');
+    if (empty($address_id)) {
+      return;
+    }
     $this->delete_entity($address_id, 'Address');
   }
 
