@@ -44,6 +44,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Surname'                       => 'last_name',
       'Job_Title'                     => 'job_title',
       'Mobile_Phone_No'               => 'phone', // location_type_id = org, phone_type_id = Mobile
+      'Privat_Mobile_Phone_No'        => 'phone',
       'Salutation_Code'               => 'prefix_id',
       'E_mail_2'                      => 'email', // private
       //    'Delete_Flag'                 => '', // this shouldn't be needed
@@ -94,6 +95,8 @@ class CRM_Nav_Data_NavContactMatcherCivi {
         return array('Private_Telefonnr');
       case 'mobile':
         return array('Mobile_Phone_No');
+      case 'mobile_private':
+        return array('Privat_Mobile_Phone_No');
       default:
         throw new Exception("Invalid locationType for get_fax with {$locationType}. Please provide a valid locationType");
     }
