@@ -178,7 +178,6 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->civi_data_after['Phone']  = [];
     $this->civi_data_before['Phone'] = [];
 
-
     if (isset($nav_data_after['Phone_No'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organisation, "Phone", 'Phone_No', $nav_data_after);
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organisation, "Phone", 'Phone_No', $nav_data_before);
@@ -195,13 +194,13 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_after);
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_before);
     }
+    if (isset($nav_data_after['Privat_Mobile_Phone_No'])) {
+      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_after);
+      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_before);
+    }
     if (isset($nav_data_after['Private_Telefonnr'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_after);
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_before);
-    }
-    if (isset($nav_data_after['Private_Faxr'])) {
-      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_after);
-      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_before);
     }
     // Homepage
     if (isset($nav_data_after['Home_Page'])) {
@@ -438,6 +437,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $private_fax_fields = $this->matcher->get_fax_fields('private');
     if ($this->value_changed($private_fax_fields)) {
       $result['Phone'][] = $this->get_phone_values($this->location_type_private, "Fax", $type);
+    }
+    // private mobile phone
+    $org_phone_fields = $this->matcher->get_phone_fields('mobile_private');
+    if ($this->value_changed($org_phone_fields)) {
+      $result['Phone'][] = $this->get_phone_values($this->location_type_private, "Mobile", $type);
     }
     // organisation Phone
     $org_phone_fields = $this->matcher->get_phone_fields('organisation');
