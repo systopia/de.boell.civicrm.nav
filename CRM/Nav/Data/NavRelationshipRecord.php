@@ -21,12 +21,12 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
   protected $type = "civiContRelation";
 
   // local
-//  private $creditor_custom_field_id = 'custom_42';
-//  private $debitor_custom_field_id = 'custom_43';
+  private $creditor_custom_field_id = 'custom_42';
+  private $debitor_custom_field_id = 'custom_43';
 
 // HBS
-  private $creditor_custom_field_id = 'custom_164';
-  private $debitor_custom_field_id  = 'custom_165';
+//  private $creditor_custom_field_id = 'custom_164';
+//  private $debitor_custom_field_id  = 'custom_165';
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);
@@ -38,7 +38,6 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
     $nav_data                         = $this->get_nav_after_data();
     $relation_code = $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code');
     $this->civi_data_after['Contact'] = array(
-      $this->navision_custom_field                             => $this->get_nav_value_if_exist($nav_data, 'Contact_No'),
       $this->parse_business_relation($relation_code)           => $this->get_nav_value_if_exist($nav_data, 'No'),
     );
   }
