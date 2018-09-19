@@ -58,6 +58,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     $changed_entities = $this->get_update_values('before');
 
+    // remove old linked address in case company has changed
+    $this->remove_old_linked_organisation_address($contact_id);
     // TODO: Check/filter Values first
     // --> then update Contact data WITHOUT conflicting values
     // --> then put values to i3Val
@@ -152,25 +154,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     if ($result['is_error'] == '1') {
       throw new Exception("Error occured while setting values for {$entity}({$entity_id}) with values (" . json_encode($values) . "). Error Message: {$result['error_message']}");
     }
-  }
-
-  private function get_entity_id($values, $contact_id, $entity) {
-    if (empty($values)) {
-      // nothing to do here, but no error either. values need to be added/filled up
-      return "";
-    }
-    $values['contact_id'] = $contact_id;
-    $result = civicrm_api3($entity, 'get', $values);
-    if ($result['is_error'] == '1') {
-      throw new Exception("Error occured while getting {$entity}-Id for Contact {$contact_id} with values " . json_encode($values) . ". Error Message: {$result['error_message']}");
-    }
-    if ($result['count'] >'1') {
-      throw new Exception("Couldn't get {$entity}-Id for Contact {$contact_id} with values " . json_encode($values));
-    }
-    if ($result['count'] == '0') {
-      return "";
-    }
-    return $result['id'];
   }
 
   /**
@@ -345,7 +328,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     foreach ($nav_data as $nav_civi_key => $nav_value) {
       // FIXME: is rtrim necessary here? Sometimes data from navision seems to be fucked with spaces in the end
       if (strcasecmp($civi_query_result[$nav_civi_key], rtrim($nav_value, " ")) != 0) {
-        // extra check for country_id
+        // extra check for country_id - option Value Lookup
         if ($nav_civi_key == "country_id") {
           $result = civicrm_api3('Country', 'getsingle', array(
             'sequential' => 1,
@@ -434,6 +417,28 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
+  private function remove_old_linked_organisation_address($contact_id) {
+    $company_data_before = $this->record->get_company_data('before');
+    if (empty($company_data_before) || !$this->record->company_changed() || empty($company_data_before['Address'])) {
+      return;
+    }
+    $org_contact_id = $this->get_contact_id_from_nav_id($company_data_before['Org_nav_id']);
+    if (empty($org_contact_id)) {
+      return;
+    }
+    $address_id = $this->get_entity_id($company_data_before['Address'], $contact_id, 'Address');
+    if (empty($address_id)) {
+      throw new Exception("Couldn't determine address ID for Address " . json_encode($company_data_before['Address']) . " for User {$contact_id}");
+    }
+    $relationship_id = $this->get_civi_relationship_id($contact_id, $org_contact_id);
+    if (empty($relationship_id)) {
+      $this->log("Couldn't disable Relationship for user {$contact_id} and organisation {$org_contact_id}");
+      return;
+    }
+    $this->disable_relationship($relationship_id);
+    $this->delete_entity($address_id, 'Address');
+  }
+
   /**
    * checks if the Organisation is found via company Nav ID
    *     if not, create company and address
@@ -463,14 +468,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       $new_shared_address_id = $this->create_civi_entity($company_data['Address'], 'Address');
     }
     return $new_shared_address_id;
-  }
-
-  private function create_civi_entity($values, $entity) {
-    $result = civicrm_api3($entity, 'create', $values);
-    if ($result['is_error'] == '1') {
-      throw new Exception("Couldn't create Civi Entity {$entity}. Error Message: " . $result['error_message']. ". Values: " . json_encode($values));
-    }
-    return $result['id'];
   }
 
   /**
