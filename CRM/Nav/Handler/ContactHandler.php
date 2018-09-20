@@ -491,6 +491,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
     $org_contact_id = $this->get_contact_id_from_nav_id($company_data['Org_nav_id']);
     if (empty($org_contact_id)) {
+      $company_data['Contact'][$this->navision_custom_field] = $company_data['Org_nav_id'];
       $org_contact_id = $this->create_civi_entity($company_data['Contact'], 'Contact');
       $company_data['Address']['contact_id'] = $org_contact_id;
       $address_id = $this->create_civi_entity($company_data['Address'], 'Address');
