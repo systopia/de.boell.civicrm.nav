@@ -549,13 +549,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return $contact_ids;
   }
 
-  private function check_delete_record() {
-    return $this->record->get_change_type() == 'Delete';
-  }
 
-  private function check_new_record() {
-    return $this->record->get_change_type() == 'New';
-  }
 
   private function delete_nav_id_from_contact($contact_id) {
     $result = civicrm_api3('Contact', 'create', array(

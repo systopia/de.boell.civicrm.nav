@@ -52,6 +52,14 @@ abstract class CRM_Nav_Handler_HandlerBase {
     }
   }
 
+  protected function check_delete_record() {
+    return $this->record->get_change_type() == 'Delete';
+  }
+
+  protected function check_new_record() {
+    return $this->record->get_change_type() == 'New';
+  }
+
   /**
    * @param $entity_id
    * @param $entity
