@@ -116,7 +116,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
   public function get_email_fields($locationType) {
     switch ($locationType) {
       case 'organisation':
-        return array('E_mail', 'E_mail_2');
+        return array('E_Mail', 'E_Mail_2');
       case 'private':
         return array('Private_E_Mail');
       default:
@@ -124,10 +124,10 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
-  public function get_website_fields($locationType = 'organisation') {
+  public function get_website_field($locationType = 'organisation') {
     switch ($locationType) {
       case 'organisation':
-        return array('Home_Page');
+        return 'Home_Page';
       default:
         throw new Exception("Invalid locationType for get_website with {$locationType}. Please provide a valid locationType");
     }
