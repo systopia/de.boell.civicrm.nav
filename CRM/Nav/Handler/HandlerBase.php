@@ -21,9 +21,9 @@ abstract class CRM_Nav_Handler_HandlerBase {
   protected $hbs_contact_id = "4";
   private $debug;
 // local
-//  protected $navision_custom_field = 'custom_41';
+  protected $navision_custom_field = 'custom_41';
   // hbs
-  protected $navision_custom_field = 'custom_147';
+//  protected $navision_custom_field = 'custom_147';
 
   public function __construct($record) {
     // Fixme: make configurable, probably extension wide config
@@ -48,6 +48,84 @@ abstract class CRM_Nav_Handler_HandlerBase {
     if ($this->debug) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
     }
+  }
+
+  protected function check_delete_record() {
+    return $this->record->get_change_type() == 'Delete';
+  }
+
+  protected function check_new_record() {
+    return $this->record->get_change_type() == 'New';
+  }
+
+  /**
+   * @param $entity_id
+   * @param $entity
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function delete_entity($entity_id, $entity) {
+    $result = civicrm_api3($entity, 'delete', array(
+      'sequential' => 1,
+      'id' => $entity_id,
+    ));
+    if ($result['is_error'] == '1') {
+      throw new Exception("Couldn't delete {$entity} with Id {$entity_id}");
+    }
+  }
+
+  protected function disable_relationship($relationship_id) {
+    $result = civicrm_api3('Relationship', 'create', array(
+      'sequential' => 1,
+      'id' => $relationship_id,  // Relationship ID
+      'is_active' => 0,
+      'description' => "deactivated by Navision Interface",
+    ));
+    if ($result['is_error'] == '1') {
+      throw new Exception("Couldn't disable relationshipId {$relationship_id}. Message {$result['error_message']}");
+    }
+  }
+
+  protected function get_civi_relationship_id($contact_a, $contact_b, $parameters = array()) {
+    $values = [
+      'contact_id_a' => $contact_a,
+      'contact_id_b' => $contact_b,
+    ];
+    foreach ($parameters as $key => $value) {
+      $values[$key] = $value;
+    }
+    $result = civicrm_api3('Relationship', 'get', $values);
+    if ($result['is_error'] == '1' || $result['count'] != '1') {
+      return "";
+    }
+    return $result['id'];
+  }
+
+  protected function get_entity_id($values, $contact_id, $entity) {
+    if (empty($values)) {
+      // nothing to do here, but no error either. values need to be added/filled up
+      return "";
+    }
+    $values['contact_id'] = $contact_id;
+    $result = civicrm_api3($entity, 'get', $values);
+    if ($result['is_error'] == '1') {
+      throw new Exception("Error occured while getting {$entity}-Id for Contact {$contact_id} with values " . json_encode($values) . ". Error Message: {$result['error_message']}");
+    }
+    if ($result['count'] >'1') {
+      throw new Exception("Couldn't get {$entity}-Id for Contact {$contact_id} with values " . json_encode($values));
+    }
+    if ($result['count'] == '0') {
+      return "";
+    }
+    return $result['id'];
+  }
+
+  protected function create_civi_entity($values, $entity) {
+    $result = civicrm_api3($entity, 'create', $values);
+    if ($result['is_error'] == '1') {
+      throw new Exception("Couldn't create Civi Entity {$entity}. Error Message: " . $result['error_message']. ". Values: " . json_encode($values));
+    }
+    return $result['id'];
   }
 
   abstract public function process();

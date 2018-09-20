@@ -27,7 +27,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected $change_type;
 
   protected $timestamp;
-  protected $civi_data_mapping;
   protected $civi_data_after;
   protected $civi_data_before;
   protected $changed_data;
@@ -35,9 +34,9 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected $debug;
 
   // local
-//  protected $navision_custom_field = 'custom_41';
+  protected $navision_custom_field = 'custom_41';
 // hbs
-  protected $navision_custom_field = 'custom_147';
+//  protected $navision_custom_field = 'custom_147';
 
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
@@ -53,11 +52,32 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->set_timestamp();
     $this->change_type = $this->get_nav_value_if_exist($this->nav_data_after, 'Change_Type');
     $this->compare_data();
-    $this->set_navision_data_model("{$this->type}.json");
     $this->convert_to_civi_data();
 
     // FixMe:
     $this->debug = TRUE; // for now always true
+  }
+
+  /**
+   * Microsofot fills out date format when zero as '0001-01-01'. In CiviCRM this
+   * is interpreted as 01/01/2001. Therfore we need to replace it with "" in the
+   * values
+   *
+   * Fixed fields are 'start_date' and 'end_date'
+   *
+   * @param &$data
+   */
+  protected function fix_microsoft_dates(&$data) {
+    if(isset($data['start_date'])) {
+      if ($data['start_date'] == '0001-01-01') {
+        $data['start_date'] = "";
+      }
+    }
+    if(isset($data['end_date'])) {
+      if ($data['end_date'] == '0001-01-01') {
+        $data['end_date'] = "";
+      }
+    }
   }
 
   /**
@@ -80,16 +100,9 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    * Compares before and after data, and saves changes in $changed_data
    */
   protected function compare_data() {
-    $this->changed_data = array_diff($this->nav_data_before, $this->nav_data_after);
+    $this->changed_data = array_diff($this->nav_data_after, $this->nav_data_before);
     // FixME: is this needed?
     unset($this->changed_data['Key']);
-  }
-
-  // TODO: is this still needed? Should be depreciated now.
-  protected function set_navision_data_model($file_name) {
-    $nav_contact_file = "resources/dataModel/{$file_name}";
-    $file_content = file_get_contents($nav_contact_file);
-    $this->civi_data_mapping = json_decode($file_content, TRUE);
   }
 
   abstract protected function convert_to_civi_data();

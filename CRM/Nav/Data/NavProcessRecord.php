@@ -60,8 +60,15 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
     );
   }
 
-  public function get_relationship_data() {
-    return $this->civi_data_after['Relationship'];
+  public function get_relationship_data($type = 'after') {
+    switch ($type) {
+      case 'before':
+        return $this->civi_data_after['Relationship'];
+      case 'after':
+        return $this->civi_data_after['Relationship'];
+      default:
+        throw new Exception("Invalid Type {$type} in NavProcessRecord->get_relationship_data");
+    }
   }
 
   public function get_process_id() {
