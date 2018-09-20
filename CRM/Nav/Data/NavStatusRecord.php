@@ -21,19 +21,19 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
   protected $type = "civiContStatus";
   private $hbs_contact_id = "4";
   // HBS
-//  private $relationship_type_mapping = array(
-//    'Vertrauensdozent_in'       => '15',
-//    'Stipendiat_in'             => '12',
-//    'Promotionsstipendiat_in'   => '11',
-//    'Auswahlkommissionsmitglied'=> '14',
-//  );
-  // local
   private $relationship_type_mapping = array(
-    'Vertrauensdozent_in'       => '14',
+    'Vertrauensdozent_in'       => '15',
     'Stipendiat_in'             => '12',
     'Promotionsstipendiat_in'   => '11',
-    'Auswahlkommissionsmitglied'=> '13',
+    'Auswahlkommissionsmitglied'=> '14',
   );
+  // local
+//  private $relationship_type_mapping = array(
+//    'Vertrauensdozent_in'       => '14',
+//    'Stipendiat_in'             => '12',
+//    'Promotionsstipendiat_in'   => '11',
+//    'Auswahlkommissionsmitglied'=> '13',
+//  );
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);

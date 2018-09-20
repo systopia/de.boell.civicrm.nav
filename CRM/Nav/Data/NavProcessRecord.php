@@ -21,9 +21,9 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
   protected $type = "civiProcess";
 
   // HBS
-//    private $process_id = 'custom_126';
+    private $process_id = 'custom_126';
   // local test
-  private $process_id = 'custom_172';
+//  private $process_id = 'custom_172';
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);

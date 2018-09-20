@@ -25,11 +25,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   // TODO: create Config file for custom field mapping
   // local
-  private $org_name_1 = 'custom_45';
-  private $org_name_2 = 'custom_46';
+//  private $org_name_1 = 'custom_45';
+//  private $org_name_2 = 'custom_46';
   // hbs
-//  private $org_name_1 = 'custom_106';
-//  private $org_name_2 = 'custom_107';
+  private $org_name_1 = 'custom_106';
+  private $org_name_2 = 'custom_107';
 
   private   $matcher;
 
