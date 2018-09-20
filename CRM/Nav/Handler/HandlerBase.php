@@ -21,9 +21,9 @@ abstract class CRM_Nav_Handler_HandlerBase {
   protected $hbs_contact_id = "4";
   private $debug;
 // local
-//  protected $navision_custom_field = 'custom_41';
+  protected $navision_custom_field = 'custom_41';
   // hbs
-  protected $navision_custom_field = 'custom_147';
+//  protected $navision_custom_field = 'custom_147';
 
   public function __construct($record) {
     // Fixme: make configurable, probably extension wide config

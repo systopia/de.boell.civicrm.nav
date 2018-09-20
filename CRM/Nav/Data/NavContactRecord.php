@@ -25,11 +25,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   // TODO: create Config file for custom field mapping
   // local
-//  private $org_name_1 = 'custom_45';
-//  private $org_name_2 = 'custom_46';
+  private $org_name_1 = 'custom_45';
+  private $org_name_2 = 'custom_46';
   // hbs
-  private $org_name_1 = 'custom_106';
-  private $org_name_2 = 'custom_107';
+//  private $org_name_1 = 'custom_106';
+//  private $org_name_2 = 'custom_107';
 
   private   $matcher;
 
@@ -87,8 +87,6 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function get_company_data($type = 'after') {
-
-
     switch ($type) {
       case 'before':
         $civi_data = &$this->civi_data_before;
@@ -234,6 +232,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
+   *
    * @param $type
    *
    * @throws \Exception
@@ -430,6 +429,16 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
+  public function get_unchanged_Address_values() {
+    $result                 = [];
+    $private_address_fields = $this->matcher->get_address_fields('private');
+    if (!$this->value_changed($private_address_fields)) {
+      $result['Address']['after'][] = $this->civi_data_after['Address']['individual'];
+      $result['Address']['before'][] = $this->civi_data_before['Address']['individual'];
+    }
+    return $result;
+  }
+
   public function get_changed_Phone_values($type) {
     $result = [];
     // Private Phone
@@ -465,6 +474,48 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
+  public function get_unchanged_Phone_values() {
+    $result = [];
+    // Private Phone
+    $private_phone_fields = $this->matcher->get_phone_fields('private');
+    if (!$this->value_changed($private_phone_fields)) {
+      $result['Phone']['before'][] = $this->get_phone_values($this->location_type_private, "Phone", 'before');
+      $result['Phone']['after'][] = $this->get_phone_values($this->location_type_private, "Phone", 'after');
+    }
+    // private Fax
+    $private_fax_fields = $this->matcher->get_fax_fields('private');
+    if (!$this->value_changed($private_fax_fields)) {
+      $result['Phone']['before'][] = $this->get_phone_values($this->location_type_private, "Fax", 'before');
+      $result['Phone']['after'][] = $this->get_phone_values($this->location_type_private, "Fax", 'after');
+    }
+    // private mobile phone
+    $org_phone_fields = $this->matcher->get_phone_fields('mobile_private');
+    if (!$this->value_changed($org_phone_fields)) {
+      $result['Phone']['before'][] = $this->get_phone_values($this->location_type_private, "Mobile", 'before');
+      $result['Phone']['after'][] = $this->get_phone_values($this->location_type_private, "Mobile", 'after');
+
+    }
+    // organisation Phone
+    $org_phone_fields = $this->matcher->get_phone_fields('organisation');
+    if (!$this->value_changed($org_phone_fields)) {
+      $result['Phone']['before'][] = $this->get_phone_values($this->location_type_organisation, "Phone", 'before');
+      $result['Phone']['after'][] = $this->get_phone_values($this->location_type_organisation, "Phone", 'after');
+    }
+    // organisation Mobile
+    $org_phone_fields = $this->matcher->get_phone_fields('mobile');
+    if (!$this->value_changed($org_phone_fields)) {
+      $result['Phone']['before'][] = $this->get_phone_values($this->location_type_organisation, "Mobile", 'before');
+      $result['Phone']['after'][] = $this->get_phone_values($this->location_type_organisation, "Mobile", 'after');
+    }
+    // organisation Phone
+    $org_fax_fields = $this->matcher->get_fax_fields('organisation');
+    if (!$this->value_changed($org_fax_fields)) {
+      $result['Phone']['before'][] = $this->get_phone_values($this->location_type_organisation, "Fax", 'before');
+      $result['Phone']['after'][] = $this->get_phone_values($this->location_type_organisation, "Fax", 'after');
+    }
+    return $result;
+  }
+
   public function get_changed_Email_values($type) {
     $result       = [];
     $email_fields = $this->matcher->get_email_fields('organisation');
@@ -482,28 +533,43 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $result;
   }
 
-  public function get_changed_Website_values($type) {
-    $result         = [];
-    $website_fields = $this->matcher->get_website_fields();
-
-    // TODO: finish this
-    foreach ($website_fields as $website) {
-      if ($this->value_changed($website)) {
-        switch ($type) {
-          case 'after':
-            $result['Website'] = $this->civi_data_after['Website'];
-            break;
-          case 'before':
-            $result['Website'] = $this->civi_data_before['Website'];
-          default:
-            throw new Exception("Invalid Type '{$type}' in get_changed_Website_values");
-        }
+  public function get_unchanged_Email_values() {
+    $result       = [];
+    $email_fields = $this->matcher->get_email_fields('organisation');
+    foreach ($email_fields as $email) {
+      if (!array_key_exists($email, $this->changed_data)) {
+        $result['Email']['before'][] = $this->get_email_value($this->location_type_organisation, $email, 'before');
+        $result['Email']['after'][] = $this->get_email_value($this->location_type_organisation, $email, 'after');
       }
     }
+    $email_fields = $this->matcher->get_email_fields('private');
+    foreach ($email_fields as $email) {
+      if (!array_key_exists($email, $this->changed_data)) {
+        $result['Email']['before'][] = $this->get_email_value($this->location_type_private, $email, 'before');
+        $result['Email']['after'][] = $this->get_email_value($this->location_type_private, $email, 'after');
+      }
+    }
+    return $result;
   }
 
-  public function get_new_values() {
-
+  /**
+   * Just return website value, always only one website
+   * @param $type
+   *
+   * @throws \Exception
+   */
+  public function get_changed_Website_values($type) {
+    $result         = [];
+    switch ($type) {
+      case 'after':
+        $result['Website'] = $this->civi_data_after['Website'];
+        break;
+      case 'before':
+        $result['Website'] = $this->civi_data_before['Website'];
+        break;
+      default:
+        throw new Exception("Invalid Type '{$type}' in get_changed_Website_values");
+    }
   }
 
   private function get_email_value($location_type, $email_key, $type) {

@@ -67,8 +67,40 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     // valid change operation
     $this->update_values($contact_id);
+    $this->fill_unchanged_values($contact_id);
+
     $this->update_values_with_i3val($contact_id);
     $this->record->set_consumed();
+  }
+
+  private function fill_unchanged_values($contact_id) {
+    $this->fill_update_entity($contact_id, 'Phone');
+    $this->fill_update_entity($contact_id, 'Address');
+    $this->fill_update_entity($contact_id, 'Email');
+    $this->fill_update_entity($contact_id, 'Website');
+  }
+
+  /**
+   * @param $contact_id
+   * @param $entity
+   */
+  private function fill_update_entity($contact_id, $entity) {
+    $get_unchanged_value_function_name = "get_unchanged_{$entity}_values";
+    $data_records = $this->record->{$get_unchanged_value_function_name}();
+    foreach ($data_records[$entity]['before'] as $key => $data) {
+      if (empty($data)) {
+        continue;
+      }
+      $entity_id = $this->get_entity_id($data, $contact_id, $entity);
+      if (!empty($entity_id)) {
+        $data_records[$entity]['after'][$key]['id'] = $entity_id;
+      }
+      $data_records[$entity]['after'][$key]['contact_id'] = $contact_id;
+      $id = $this->create_civi_entity($data_records[$entity]['after'][$key], $entity);
+    }
+    // Lookup before values
+    // Found -> update with after
+    // not found -> create
   }
 
   /**
