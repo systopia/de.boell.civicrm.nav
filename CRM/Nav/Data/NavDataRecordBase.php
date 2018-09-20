@@ -27,7 +27,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected $change_type;
 
   protected $timestamp;
-  protected $civi_data_mapping;
   protected $civi_data_after;
   protected $civi_data_before;
   protected $changed_data;
@@ -53,7 +52,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->set_timestamp();
     $this->change_type = $this->get_nav_value_if_exist($this->nav_data_after, 'Change_Type');
     $this->compare_data();
-    $this->set_navision_data_model("{$this->type}.json");
     $this->convert_to_civi_data();
 
     // FixMe:
@@ -105,13 +103,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->changed_data = array_diff($this->nav_data_after, $this->nav_data_before);
     // FixME: is this needed?
     unset($this->changed_data['Key']);
-  }
-
-  // TODO: is this still needed? Should be depreciated now.
-  protected function set_navision_data_model($file_name) {
-    $nav_contact_file = "resources/dataModel/{$file_name}";
-    $file_content = file_get_contents($nav_contact_file);
-    $this->civi_data_mapping = json_decode($file_content, TRUE);
   }
 
   abstract protected function convert_to_civi_data();

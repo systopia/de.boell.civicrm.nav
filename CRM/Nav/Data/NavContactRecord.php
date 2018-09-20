@@ -553,6 +553,16 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
+   * not needed, but will be called. Values will be taken from other function
+   * @param $type
+   *
+   * @throws \Exception
+   */
+  public function get_unchanged_Website_values($type = 'after') {
+    return $this->get_changed_Website_values($type);
+  }
+
+  /**
    * Just return website value, always only one website
    * @param $type
    *
