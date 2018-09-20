@@ -61,6 +61,28 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
+   * Microsofot fills out date format when zero as '0001-01-01'. In CiviCRM this
+   * is interpreted as 01/01/2001. Therfore we need to replace it with "" in the
+   * values
+   *
+   * Fixed fields are 'start_date' and 'end_date'
+   *
+   * @param &$data
+   */
+  protected function fix_microsoft_dates(&$data) {
+    if(isset($data['start_date'])) {
+      if ($data['start_date'] == '0001-01-01') {
+        $data['start_date'] = "";
+      }
+    }
+    if(isset($data['end_date'])) {
+      if ($data['end_date'] == '0001-01-01') {
+        $data['end_date'] = "";
+      }
+    }
+  }
+
+  /**
    * @throws \Exception
    */
   private function set_timestamp() {

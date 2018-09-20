@@ -32,20 +32,34 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
       // TODO: set this consumed? How do we proceed with entires we cannot match?
       return;
     }
-    $relationship_id = $this->get_civi_relationship_id($contact_id, $this->hbs_contact_id, 'start_date', $this->record->get_Status_start_date());
-    $this->write_relationship_to_db($contact_id, $relationship_id);
+
+    if ($this->check_new_record()) {
+      $relationship_data = $this->record->get_relationship_data();
+      $this->write_relationship_to_db($contact_id, "", $relationship_data);
+      $this->record->set_consumed();
+      return;
+    }
+    if ($this->check_delete_record()) {
+      $relationship_data = $this->record->get_relationship_data();
+      $relationship_id = $this->get_civi_relationship_id($contact_id, $this->hbs_contact_id, array('start_date' => $this->record->get_Status_start_date(), 'relationship_type_id' =>  $relationship_data['relationship_type_id']));
+      $this->delete_entity($relationship_id, 'Relationship');
+      $this->record->set_consumed();
+      return;
+    }
+    $relationship_data_before = $this->record->get_relationship_data('before');
+    $relationship_id = $this->get_civi_relationship_id($contact_id, $this->hbs_contact_id, array('start_date' => $this->record->get_Status_start_date('before'), 'relationship_type_id' =>  $relationship_data_before['relationship_type_id']));
+    $relationship_data = $this->record->get_relationship_data('after');
+    $this->write_relationship_to_db($contact_id, $relationship_id, $relationship_data);
 
     $this->record->set_consumed();
   }
 
-  private function write_relationship_to_db($contact_id, $relationship_id){
-    $values = array(
-      'id'              => $relationship_id,
-      'contact_id_a'    => $contact_id,
-      'contact_id_b'    => $this->hbs_contact_id,
-    );
-    $values = $values + $this->record->get_relationship_data();
-    $result = civicrm_api3('Relationship', 'create', $values);
+  private function write_relationship_to_db($contact_id, $relationship_id, $relationship_data) {
+    $relationship_data['id'] = $relationship_id;
+    $relationship_data['contact_id_a'] = $contact_id;
+    $relationship_data['contact_id_b'] = $this->hbs_contact_id;
+
+    $result = civicrm_api3('Relationship', 'create', $relationship_data);
     if ($result['is_error'] == '1') {
       $this->log("[StatusHandler] Couldn't write Relationship to DB. '{$result['error_message']}'");
       throw new Exception("[StatusHandler] Couldn't write Relationship to DB. '{$result['error_message']}'");

@@ -21,12 +21,12 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
   protected $type = "civiContRelation";
 
   // local
-//  private $creditor_custom_field_id = 'custom_42';
-//  private $debitor_custom_field_id = 'custom_43';
+  private $creditor_custom_field_id = 'custom_42';
+  private $debitor_custom_field_id = 'custom_43';
 
 // HBS
-  private $creditor_custom_field_id = 'custom_164';
-  private $debitor_custom_field_id  = 'custom_165';
+//  private $creditor_custom_field_id = 'custom_164';
+//  private $debitor_custom_field_id  = 'custom_165';
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);

@@ -88,13 +88,13 @@ abstract class CRM_Nav_Handler_HandlerBase {
     }
   }
 
-  protected function get_civi_relationship_id($contact_a, $contact_b, $type = NULL, $type_value = NULL) {
+  protected function get_civi_relationship_id($contact_a, $contact_b, $parameters = array()) {
     $values = [
       'contact_id_a' => $contact_a,
       'contact_id_b' => $contact_b,
     ];
-    if (isset($type)) {
-      $values[$type] = $type_value;
+    foreach ($parameters as $key => $value) {
+      $values[$key] = $value;
     }
     $result = civicrm_api3('Relationship', 'get', $values);
     if ($result['is_error'] == '1' || $result['count'] != '1') {
