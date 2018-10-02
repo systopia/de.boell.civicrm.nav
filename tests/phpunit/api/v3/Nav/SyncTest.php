@@ -16,9 +16,9 @@ class api_v3_Nav_SyncTest extends \PHPUnit_Framework_TestCase implements Headles
    * See: https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
    */
   public function setUpHeadless() {
-    return \Civi\Test::headless()
-      ->installMe(__DIR__)
-      ->apply();
+//    return \Civi\Test::headless()
+//      ->installMe(__DIR__)
+//      ->apply();
   }
 
   /**
