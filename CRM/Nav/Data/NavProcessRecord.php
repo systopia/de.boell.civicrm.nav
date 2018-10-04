@@ -42,21 +42,21 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       'relationship_type_id'    => $relationship_type_id,
       'start_date'              => $this->get_nav_value_if_exist($nav_data, 'Förderbeginn'),
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'), // TODO: this is basically doubled data. Check if this is the correct value
-      'custom_130'              => $this->get_nav_value_if_exist($nav_data, 'Angestrebter_Studienabschluss'), // Angestrebter Studienabschluss
-      $this->process_id              => $this->get_nav_value_if_exist($nav_data, 'Process_Entry_No'), // processID
-      'custom_127'              => $this->get_nav_value_if_exist($nav_data, 'Candidature_Process_Code'), // Bewerbung Vorgang Code
+      'custom_130'              => $this->get_nav_value_if_exist($nav_data, 'Angestrebter_Studienabschluss'), // Angestrebter Studienabschluss [option val]
+      $this->process_id         => $this->get_nav_value_if_exist($nav_data, 'Process_Entry_No'), // processID
+      'custom_127'              => $this->get_nav_value_if_exist($nav_data, 'Candidature_Process_Code'), // Bewerbung Vorgang Code [option val]
       'custom_132'              => $this->get_nav_value_if_exist($nav_data, 'Hauptfach_1'), // Hauptfach Studium
-      'custom_131'              => $this->get_nav_value_if_exist($nav_data, 'Subject_Group'), // Förderbereich
-      'custom_140'              => $this->get_nav_value_if_exist($nav_data, 'Field_of_Study'), // Fächergruppe
+      'custom_140'              => $this->get_nav_value_if_exist($nav_data, 'Subject_Group'), // Fächergruppe [option val]
+      'custom_141'              => $this->get_nav_value_if_exist($nav_data, 'Field_of_Study'), // Studienbereich [option val]
       'custom_133'              => $this->get_nav_value_if_exist($nav_data, 'Promotionsfach'), // Promotionsfach
-      'custom_134'              => $this->get_nav_value_if_exist($nav_data, 'Promotionsthema'), // Bewerbung Vorgang Code
+      'custom_134'              => $this->get_nav_value_if_exist($nav_data, 'Promotionsthema'), // Promotionsthema
       'custom_137'              => $this->get_nav_value_if_exist($nav_data, 'Project_Controller'), // Projektbearbeiter/in
       'custom_138'              => $this->get_nav_value_if_exist($nav_data, 'Consultant'), // Referent/in
       'custom_139'              => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'), // Bewilligung bis
       'custom_129'              => $this->get_nav_value_if_exist($nav_data, 'Next_Report_to'), // Nächster Bericht
       // FixME: Unklare Feldzuordnung
-      'custom_141'              => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), // Studienbereich ???
-      //      $this->process_id              => $this->get_nav_value_if_exist($nav_data, 'Subsidie'), // What is a subsidie? And is this mapped in Civi?
+//      'custom_???'              => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), // Studienbereich ???
+      'custom_131'              => $this->get_nav_value_if_exist($nav_data, 'Subsidie'), // Förderbereich [option val]
     );
   }
 
