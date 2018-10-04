@@ -19,6 +19,11 @@ class CRM_Nav_Config {
 
   private static $local        = TRUE;
 
+  public static $filter = [
+    '0001-01-01',
+    '_blank_',
+  ];
+
   private static $local_config = [
     'hbs_contact_id'                => '4',
     'navision_custom_field'         => 'custom_41',

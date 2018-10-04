@@ -49,7 +49,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
       'contact_id_b'            => $this->hbs_contact_id,
     );
-    $this->fix_microsoft_dates($this->civi_data_after['Relationship']);
+//    $this->fix_microsoft_dates($this->civi_data_after['Relationship']);
 
     // before data
     $nav_data                              = $this->get_nav_before_data();
@@ -63,7 +63,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
       'contact_id_b'            => $this->hbs_contact_id,
     );
-    $this->fix_microsoft_dates($this->civi_data_before['Relationship']);
+//    $this->fix_microsoft_dates($this->civi_data_before['Relationship']);
   }
 
   public function get_relationship_data($type = 'after') {

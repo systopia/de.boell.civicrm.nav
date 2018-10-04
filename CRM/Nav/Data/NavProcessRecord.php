@@ -68,11 +68,11 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function get_process_id() {
-    if (empty($this->civi_data_after['Relationship'][$this->process_id])) {
+    if (empty($this->civi_data_after['Relationship'][CRM_Nav_Config::get('process_id')])) {
       $this->log("Couldn't determine processId. Aborting.");
       throw new Exception("Couldn't determine ProcessId. Aborting.");
     }
-    return $this->civi_data_after['Relationship'][$this->process_id];
+    return $this->civi_data_after['Relationship'][CRM_Nav_Config::get('process_id')];
   }
 
   /**
@@ -88,7 +88,7 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
         // Studienstipendiat/in
         return 12;
       // TODO: This is a wild guess. Figure out the correct value here
-      case "Doctorate":
+      case "Graduation":
         // Promotionsstipendiat/in
         return 11;
       default:

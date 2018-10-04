@@ -56,6 +56,8 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
+   * TODO:
+   *  obsolete -> should be resolved in  get_nav_value_if_exist()
    * Microsofot fills out date format when zero as '0001-01-01'. In CiviCRM this
    * is interpreted as 01/01/2001. Therfore we need to replace it with "" in the
    * values
@@ -120,7 +122,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     // TODO: set Transferred flag = 1
     $this->nav_data_before['Transferred'] = 1;
     if (isset($this->nav_data_before)) {
-      $this->nav_data_before['Transferred'] =1;
+      $this->nav_data_before['Transferred'] = 1;
     }
   }
 
@@ -141,7 +143,12 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    */
   protected function get_nav_value_if_exist(&$nav_data, $index) {
     if (isset($nav_data[$index])) {
-      return $nav_data[$index];
+      // Fix MS Date; 0001-01-01 --> means empty/zero date
+      if (in_array($nav_data[$index], CRM_Nav_Config::$filter)) {
+        return "";
+      }
+      // remove possible leading zeroes in option values (civiProcess)
+      return ltrim($nav_data[$index], '0');
     }
     $this->log("Value not set for {$index}");
     return "";
