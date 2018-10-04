@@ -39,22 +39,16 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
     }
 
     if ($this->check_delete_record()) {
-      // TODO: Shall we deactivate the relationship with the given process iD?
-      $this->log("TODO: DELETE FLAG NOT PROPERLY HANDLED FOR NOW.");
+      $this->deactivate_relationship();
       return;
     }
     if ($this->check_new_record()) {
       $this->write_relationship_to_db($contact_id, "");
       return;
     }
+    $relationship_id = $this->get_relationship($this->record->get_process_id());
+    $this->write_relationship_to_db($contact_id, $relationship_id);
 
-    try {
-      $relationship_id = $this->get_relationship($this->record->get_process_id());
-      $this->write_relationship_to_db($contact_id, $relationship_id);
-    } catch (Exception $e) {
-      $this->log($e->getMessage());
-      return;
-    }
     $this->record->set_consumed();
   }
 
@@ -71,6 +65,23 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
       return $result['id'];
     }
     return "";
+  }
+
+  private function deactivate_relationship() {
+    $process_id = $this->record->get_process_id();
+    $relationship_id = $this->get_relationship($process_id );
+    if ($relationship_id == "") {
+      throw new Exception("Couldn't Find Relationship with ProcessId {$process_id }. Abort Delete");
+    }
+    $result = civicrm_api3('Relationship', 'create', array(
+      'sequential' => 1,
+      'id' => $relationship_id,
+      'is_active' => 0,
+      'description' => "Deactivated by Nav.Sync",
+    ));
+    if ($result['is_error'] == '1') {
+      throw new Exception("Failed to deactivate Relationship {$relationship_id}. Error Message: {$result['error_message']}");
+    }
   }
 
   private function write_relationship_to_db($contact_id, $relationship_id) {
