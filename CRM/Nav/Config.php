@@ -21,7 +21,7 @@ class CRM_Nav_Config {
 
   private static $local_config = [
     'hbs_contact_id'                => '4',
-    'navision_custom_field'         => 'custom_147',
+    'navision_custom_field'         => 'custom_41',
     'process_id'                    => 'custom_172',
     'org_name_1'                    => 'custom_106',
     'org_name_2'                    => 'custom_107',
@@ -50,7 +50,7 @@ class CRM_Nav_Config {
 
   private static $hbs_config   = [
     'hbs_contact_id'                => '4',
-    'navision_custom_field'         => 'custom_41',
+    'navision_custom_field'         => 'custom_147',
     'process_id'                    => 'custom_126',
     'org_name_1'                    => 'custom_45',
     'org_name_2'                    => 'custom_46',
