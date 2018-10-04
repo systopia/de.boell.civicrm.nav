@@ -19,23 +19,17 @@
 class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiContStatus";
-  private $hbs_contact_id = "4";
-  // HBS
-  private $relationship_type_mapping = array(
-    'Vertrauensdozent_in'       => '15',
-    'Stipendiat_in'             => '12',
-    'Promotionsstipendiat_in'   => '11',
-    'Auswahlkommissionsmitglied'=> '14',
-  );
-  // local
-//  private $relationship_type_mapping = array(
-//    'Vertrauensdozent_in'       => '14',
-//    'Stipendiat_in'             => '12',
-//    'Promotionsstipendiat_in'   => '11',
-//    'Auswahlkommissionsmitglied'=> '13',
-//  );
+  private $hbs_contact_id;
+  private $relationship_type_mapping;
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
+    $this->hbs_contact_id = CRM_Nav_Config::get('hbs_contact_id');
+    $this->relationship_type_mapping = [
+    'Vertrauensdozent_in'       => CRM_Nav_Config::get('Vertrauensdozent_in'),
+    'Stipendiat_in'             => CRM_Nav_Config::get('Stipendiat_in'),
+    'Promotionsstipendiat_in'   => CRM_Nav_Config::get('Promotionsstipendiat_in'),
+    'Auswahlkommissionsmitglied'=> CRM_Nav_Config::get('Auswahlkommissionsmitglied'),
+    ];
     parent::__construct($nav_data_after, $nav_data_before);
   }
 
@@ -55,7 +49,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
       'contact_id_b'            => $this->hbs_contact_id,
     );
-    $this->fix_microsoft_dates($this->civi_data_after['Relationship']);
+//    $this->fix_microsoft_dates($this->civi_data_after['Relationship']);
 
     // before data
     $nav_data                              = $this->get_nav_before_data();
@@ -69,7 +63,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
       'contact_id_b'            => $this->hbs_contact_id,
     );
-    $this->fix_microsoft_dates($this->civi_data_before['Relationship']);
+//    $this->fix_microsoft_dates($this->civi_data_before['Relationship']);
   }
 
   public function get_relationship_data($type = 'after') {

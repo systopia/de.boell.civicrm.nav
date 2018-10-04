@@ -17,12 +17,10 @@
 
 class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
 
-  // HBS
-  private $process_id = 'custom_126';
-  // local test
-//    private $process_id = 'custom_172';
+  private $process_id;
 
   public function __construct($record) {
+    $this->process_id = CRM_Nav_Config::get('process_id');
     parent::__construct($record);
   }
 
@@ -39,13 +37,18 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
       $this->log("Couldn't find Contact for NavID {$nav_id}. ProcessRecord wont be processed.");
       return;
     }
-    try {
-      $relationship_id = $this->get_relationship($this->record->get_process_id());
-      $this->write_relationship_to_db($contact_id, $relationship_id);
-    } catch (Exception $e) {
-      $this->log($e->getMessage());
+
+    if ($this->check_delete_record()) {
+      $this->deactivate_relationship();
       return;
     }
+    if ($this->check_new_record()) {
+      $this->write_relationship_to_db($contact_id, "");
+      return;
+    }
+    $relationship_id = $this->get_relationship($this->record->get_process_id());
+    $this->write_relationship_to_db($contact_id, $relationship_id);
+
     $this->record->set_consumed();
   }
 
@@ -55,18 +58,40 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
       'is_active' => 1,
       $this->process_id => $process_id,
     ));
-    if ($result['count'] != 1) {
-      throw new Exception("Didn't find conclusive result for ProcessID {$process_id}. Aborting");
+    if ($result['count'] > 1) {
+      throw new Exception("Found {$result['count']} Results for given ProcessID {$process_id}. Aborting");
     }
-    return $result['id'];
+    if ($result['count'] == '1') {
+      return $result['id'];
+    }
+    return "";
+  }
+
+  private function deactivate_relationship() {
+    $process_id = $this->record->get_process_id();
+    $relationship_id = $this->get_relationship($process_id );
+    if ($relationship_id == "") {
+      throw new Exception("Couldn't Find Relationship with ProcessId {$process_id }. Abort Delete");
+    }
+    $result = civicrm_api3('Relationship', 'create', array(
+      'sequential' => 1,
+      'id' => $relationship_id,
+      'is_active' => 0,
+      'description' => "Deactivated by Nav.Sync",
+    ));
+    if ($result['is_error'] == '1') {
+      throw new Exception("Failed to deactivate Relationship {$relationship_id}. Error Message: {$result['error_message']}");
+    }
   }
 
   private function write_relationship_to_db($contact_id, $relationship_id) {
     $values = array(
-      'id'              => $relationship_id,
       'contact_id_a'    => $contact_id,
       'contact_id_b'    => $this->hbs_contact_id,
     );
+    if (!empty($relationship_id)) {
+      $values['id'] = $relationship_id;
+    }
     $values = $values + $this->record->get_relationship_data();
     $result = civicrm_api3('Relationship', 'create', $values);
     if ($result['is_error'] == '1') {
