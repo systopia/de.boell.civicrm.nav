@@ -39,6 +39,17 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
       $this->log("Couldn't find Contact for NavID {$nav_id}. ProcessRecord wont be processed.");
       return;
     }
+
+    if ($this->check_delete_record()) {
+      // TODO: Shall we deactivate the relationship with the given process iD?
+      $this->log("TODO: DELETE FLAG NOT PROPERLY HANDLED FOR NOW.");
+      return;
+    }
+    if ($this->check_new_record()) {
+      $this->write_relationship_to_db($contact_id, "");
+      return;
+    }
+
     try {
       $relationship_id = $this->get_relationship($this->record->get_process_id());
       $this->write_relationship_to_db($contact_id, $relationship_id);
@@ -55,18 +66,23 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
       'is_active' => 1,
       $this->process_id => $process_id,
     ));
-    if ($result['count'] != 1) {
-      throw new Exception("Didn't find conclusive result for ProcessID {$process_id}. Aborting");
+    if ($result['count'] > 1) {
+      throw new Exception("Found {$result['count']} Results for given ProcessID {$process_id}. Aborting");
     }
-    return $result['id'];
+    if ($result['count'] == '1') {
+      return $result['id'];
+    }
+    return "";
   }
 
   private function write_relationship_to_db($contact_id, $relationship_id) {
     $values = array(
-      'id'              => $relationship_id,
       'contact_id_a'    => $contact_id,
       'contact_id_b'    => $this->hbs_contact_id,
     );
+    if (!empty($relationship_id)) {
+      $values['id'] = $relationship_id;
+    }
     $values = $values + $this->record->get_relationship_data();
     $result = civicrm_api3('Relationship', 'create', $values);
     if ($result['is_error'] == '1') {
