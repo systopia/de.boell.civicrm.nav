@@ -20,20 +20,19 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type                       = "civiContact";
 
-  private   $location_type_private      = "6";
-  private   $location_type_organisation = "8";
-
-  // TODO: create Config file for custom field mapping
-  // local
-  private $org_name_1 = 'custom_45';
-  private $org_name_2 = 'custom_46';
-  // hbs
-//  private $org_name_1 = 'custom_106';
-//  private $org_name_2 = 'custom_107';
+  private   $location_type_private;
+  private   $location_type_organisation;
+  private $org_name_1;
+  private $org_name_2;
 
   private   $matcher;
 
   public function __construct($nav_data_after, $nav_data_before = NULL) {
+    $this->org_name_1 = CRM_Nav_Config::get('org_name_1');
+    $this->org_name_2 = CRM_Nav_Config::get('org_name_1');
+    $this->location_type_private = CRM_Nav_Config::get('location_type_private');
+    $this->location_type_organisation = CRM_Nav_Config::get('location_type_organisation');
+
     parent::__construct($nav_data_after, $nav_data_before);
     $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field, $this->org_name_1, $this->org_name_2);
   }

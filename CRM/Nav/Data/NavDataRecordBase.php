@@ -32,11 +32,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected $changed_data;
 
   protected $debug;
-
-  // local
-  protected $navision_custom_field = 'custom_41';
-// hbs
-//  protected $navision_custom_field = 'custom_147';
+  protected $navision_custom_field;
 
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
@@ -46,6 +42,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    * @throws \Exception if data is not valid
    */
   public function __construct($nav_data_after, $nav_data_before = NULL) {
+    $this->navision_custom_field = CRM_Nav_Config::get('navision_custom_field');
     $this->nav_data_before = $nav_data_before;
     $this->nav_data_after = $nav_data_after;
     $this->consumed = FALSE;

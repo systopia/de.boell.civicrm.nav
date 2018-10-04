@@ -28,9 +28,10 @@ class CRM_Nav_Sync {
   private $soap_connectors;
   private $number_of_records;
 
-  private $local_debug = TRUE;
+  private $local_debug;
 
   public function __construct($size, $debug = FALSE, $entity = NULL) {
+    $this->local_debug = CRM_Nav_Config::get('local_debug');
     if (empty($entity)) {
       $this->entity = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
     } else {
@@ -100,10 +101,10 @@ class CRM_Nav_Sync {
   private function handle_Nav_data() {
     foreach ($this->data_records as $timestamp => $record) {
       try {
-        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record);
-        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record);
-        $status_handler       = new CRM_Nav_Handler_StatusHandler($record);
-        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record);
+        $contact_handler      = new CRM_Nav_Handler_ContactHandler($record, $this->debug);
+        $process_handler      = new CRM_Nav_Handler_ProcessHandler($record, $this->debug);
+        $status_handler       = new CRM_Nav_Handler_StatusHandler($record, $this->debug);
+        $relationship_handler = new CRM_Nav_Handler_RelationshipHandler($record, $this->debug);
 
         $contact_handler->process();
         $process_handler->process();
