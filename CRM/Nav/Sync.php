@@ -31,7 +31,7 @@ class CRM_Nav_Sync {
   private $local_debug;
 
   public function __construct($size, $debug = FALSE, $entity = NULL) {
-    $this->local_debug = CRM_Nav_Config::get('local_debug');
+    $this->local_debug = CRM_Nav_Config::local();
     if (empty($entity)) {
       $this->entity = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
     } else {

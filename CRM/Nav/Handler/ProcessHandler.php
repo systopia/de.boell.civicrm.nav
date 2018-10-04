@@ -17,12 +17,10 @@
 
 class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
 
-  // HBS
-  private $process_id = 'custom_126';
-  // local test
-//    private $process_id = 'custom_172';
+  private $process_id;
 
   public function __construct($record) {
+    $this->process_id = CRM_Nav_Config::get('process_id');
     parent::__construct($record);
   }
 

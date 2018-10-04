@@ -89,4 +89,8 @@ class CRM_Nav_Config {
     }
     return "";
   }
+
+  public static function local() {
+    return self::$local;
+  }
 }
