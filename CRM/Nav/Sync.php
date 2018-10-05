@@ -84,6 +84,15 @@ class CRM_Nav_Sync {
         $soap_array["{$type}_List"][$type][] = $tmp_nav_data;
       }
     }
+    return; // for debugging reasons
+    $updateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
+    $soapConnector = $this->soap_connectors[$type];
+    try{
+      $soapConnector->executeCommand($updateMultipleCommand);
+    } catch (Exception $e) {
+      $this->log($e->getMessage());
+      throw new Exception("UpdateMultiple Command failed, didn't set DataRecords for type {$type} to Transferred. Message: " . $e->getMessage());
+    }
   }
 
   private function get_records($type) {
