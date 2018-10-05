@@ -15,15 +15,28 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
+/**
+ * Class CRM_Nav_Data_NavProcessRecord
+ */
 class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiProcess";
 
+  /**
+   * CRM_Nav_Data_NavProcessRecord constructor.
+   *
+   * @param      $nav_data_after
+   * @param null $nav_data_before
+   *
+   * @throws \Exception
+   */
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     parent::__construct($nav_data_after, $nav_data_before);
   }
 
+  /**
+   * convert_to_civi_data
+   */
   protected function convert_to_civi_data() {
     $nav_data = $this->get_nav_after_data();
     // get contact details
@@ -37,7 +50,6 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       'relationship_type_id'                               => $relationship_type_id,
       'start_date'                                         => $this->get_nav_value_if_exist($nav_data, 'Förderbeginn'),
       'end_date'                                           => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'),
-      // TODO: this is basically doubled data. Check if this is the correct value
       CRM_Nav_Config::get('Angestrebter_Studienabschluss') => $this->get_nav_value_if_exist($nav_data, 'Angestrebter_Studienabschluss'), // Angestrebter Studienabschluss [option val]
       CRM_Nav_Config::get('Process_Entry_No')              => $this->get_nav_value_if_exist($nav_data, 'Process_Entry_No'),// processID
       CRM_Nav_Config::get('Candidature_Process_Code')      => $this->get_nav_value_if_exist($nav_data, 'Candidature_Process_Code'),// Bewerbung Vorgang Code [option val]
@@ -56,6 +68,12 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
     ];
   }
 
+  /**
+   * @param string $type
+   *
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_relationship_data($type = 'after') {
     switch ($type) {
       case 'before':
@@ -67,6 +85,10 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
+  /**
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_process_id() {
     if (empty($this->civi_data_after['Relationship'][CRM_Nav_Config::get('process_id')])) {
       $this->log("Couldn't determine processId. Aborting.");
@@ -76,25 +98,26 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
-   * switch over $advancement, then return the corrosponding CiviCRM type_id
+   * switch over $advancement, then return the corresponding CiviCRM type_id
    * TODO: Mapping has to be done properly
    *       What values are in $advancements??
-   *
    * @param $advancement
+   *
+   * @return int
    */
   private function get_type_id($advancement) {
     switch ($advancement) {
       case "Study":
         // Studienstipendiat/in
-        return 12;
+        return CRM_Nav_Config::get('Study');
       // TODO: This is a wild guess. Figure out the correct value here
       case "Graduation":
         // Promotionsstipendiat/in
-        return 11;
+        return CRM_Nav_Config::get('Graduation');
       default:
         // default value Currently is just Studienstipendiat ?
         $this->log("Couldn't map Advancement Type {$advancement} to relationship_type_id. Default (12 - Studienstipendiat/in) is used");
-        return 12;
+        return CRM_Nav_Config::get('Study');
     }
   }
 

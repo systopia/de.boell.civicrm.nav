@@ -15,12 +15,17 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Data_NavDataRecordBase
+ */
 abstract class CRM_Nav_Data_NavDataRecordBase {
 
   private $nav_data_before;
   // in case of a new record, after is used as the ONLY record type internally
   private $nav_data_after;
   private $consumed;
+
+  private $error_message;
 
   // overwritten by subclasses
   protected $type;
@@ -41,7 +46,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    *
    * @throws \Exception if data is not valid
    */
-  public function __construct($nav_data_after, $nav_data_before = NULL) {
+  public function __construct($nav_data_after, $nav_data_before = NULL, $debug = FALSE) {
     $this->navision_custom_field = CRM_Nav_Config::get('navision_custom_field');
     $this->nav_data_before = $nav_data_before;
     $this->nav_data_after = $nav_data_after;
@@ -50,37 +55,11 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->change_type = $this->get_nav_value_if_exist($this->nav_data_after, 'Change_Type');
     $this->compare_data();
     $this->convert_to_civi_data();
-
-    // FixMe:
-    $this->debug = TRUE; // for now always true
+    $this->debug = $debug;
   }
 
   /**
-   * TODO:
-   *  obsolete -> should be resolved in  get_nav_value_if_exist()
-   * Microsofot fills out date format when zero as '0001-01-01'. In CiviCRM this
-   * is interpreted as 01/01/2001. Therfore we need to replace it with "" in the
-   * values
-   *
-   * Fixed fields are 'start_date' and 'end_date'
-   *
-   * @param &$data
-   */
-  protected function fix_microsoft_dates(&$data) {
-    if(isset($data['start_date'])) {
-      if ($data['start_date'] == '0001-01-01') {
-        $data['start_date'] = "";
-      }
-    }
-    if(isset($data['end_date'])) {
-      if ($data['end_date'] == '0001-01-01') {
-        $data['end_date'] = "";
-      }
-    }
-  }
-
-  /**
-   * @throws \Exception
+   * set_timestamp
    */
   private function set_timestamp() {
     if ($this->nav_data_after['Change_Type'] == 'New') {
@@ -90,7 +69,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     if (($this->nav_data_before['_TIMESTAMP'] != $this->nav_data_after['_TIMESTAMP'])){
       // FixME: Timestamps differ a bit, throw a warning for now, implement a threshold later
       $this->log("Timestamps of before and after don't match. '{$this->nav_data_before['_TIMESTAMP']}' != '{$this->nav_data_after['_TIMESTAMP']}'");
-      //      throw new Exception("Timestamps of before and after don't match.");
     }
     $this->timestamp = $this->nav_data_before['_TIMESTAMP'];
   }
@@ -103,8 +81,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     // FixME: is this needed?
     unset($this->changed_data['Key']);
   }
-
-  abstract protected function convert_to_civi_data();
 
   /**
    * Checks if the record is consumed
@@ -126,10 +102,16 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
+  /**
+   * @return mixed
+   */
   public function get_nav_after_data(){
     return $this->nav_data_after;
   }
 
+  /**
+   * @return mixed
+   */
   public function get_nav_before_data() {
     return $this->nav_data_before;
   }
@@ -154,12 +136,19 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     return "";
   }
 
+  /**
+   * @param $message
+   */
   protected function log($message) {
     if ($this->debug) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
     }
   }
 
+  /**
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_individual_navision_id() {
     if (!empty($this->nav_data_after['Contact_No'])) {
       return $this->nav_data_after['Contact_No'];
@@ -172,21 +161,57 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function dump_record() {
-    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Dumping Record");
     $dump['timestamp'] = $this->timestamp;
     $dump['nav_before'] = $this->nav_data_before;
     $dump['civi_extra_data']  = $this->civi_data_after;
     $dump['changed_data']  = $this->changed_data;
-    CRM_Core_Error::debug_log_message(json_encode($dump));
+    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] DUMP: ". json_encode($dump));
   }
 
+  /**
+   * @return mixed
+   */
   public function get_type() {
     return $this->type;
   }
 
+  /**
+   * @return string
+   */
   public function get_change_type() {
     return $this->change_type;
   }
 
-}
+  public function set_error_message($message) {
+    $this->error_message = $message;
+  }
 
+  /**
+   * @return mixed
+   */
+  public function get_error_message() {
+    return $this->error_message;
+  }
+
+  /**
+   * @param string $type
+   *
+   * @return false|string
+   */
+  public function get_summary($type = 'array') {
+    $dump['timestamp'] = $this->timestamp;
+    $dump['nav_before'] = $this->nav_data_before;
+    $dump['civi_extra_data']  = $this->civi_data_after;
+    $dump['changed_data']  = $this->changed_data;
+    switch ($type) {
+      case 'json':
+        return json_encode($dump);
+      case 'array':
+        return $dump;
+      default:
+      return $dump;
+    }
+  }
+
+  abstract protected function convert_to_civi_data();
+}

@@ -15,12 +15,23 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Handler_StatusHandler
+ */
 class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
 
+  /**
+   * CRM_Nav_Handler_StatusHandler constructor.
+   *
+   * @param $record
+   */
   public function __construct($record) {
     parent::__construct($record);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function process() {
     if (!$this->check_record_type()) {
       return;
@@ -28,9 +39,7 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
     $nav_id = $this->record->get_individual_navision_id();
     $contact_id = $this->get_contact_id_from_nav_id($nav_id);
     if($contact_id == "") {
-      $this->log("Couldn't find Contact for NavID {$nav_id}. StatusRecord wont be processed.");
-      // TODO: set this consumed? How do we proceed with entires we cannot match?
-      return;
+      throw new Exception("Couldn't find Contact for NavID {$nav_id}. StatusRecord wont be processed.");
     }
 
     if ($this->check_new_record()) {
@@ -39,6 +48,7 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
       $this->record->set_consumed();
       return;
     }
+
     if ($this->check_delete_record()) {
       $relationship_data = $this->record->get_relationship_data();
       $relationship_id = $this->get_civi_relationship_id($contact_id, $this->hbs_contact_id, array('start_date' => $this->record->get_Status_start_date(), 'relationship_type_id' =>  $relationship_data['relationship_type_id']));
@@ -46,6 +56,7 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
       $this->record->set_consumed();
       return;
     }
+
     $relationship_data_before = $this->record->get_relationship_data('before');
     $relationship_id = $this->get_civi_relationship_id($contact_id, $this->hbs_contact_id, array('start_date' => $this->record->get_Status_start_date('before'), 'relationship_type_id' =>  $relationship_data_before['relationship_type_id']));
     $relationship_data = $this->record->get_relationship_data('after');
@@ -54,6 +65,13 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
     $this->record->set_consumed();
   }
 
+  /**
+   * @param $contact_id
+   * @param $relationship_id
+   * @param $relationship_data
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function write_relationship_to_db($contact_id, $relationship_id, $relationship_data) {
     $relationship_data['id'] = $relationship_id;
     $relationship_data['contact_id_a'] = $contact_id;

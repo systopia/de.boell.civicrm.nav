@@ -16,7 +16,7 @@
 +--------------------------------------------------------*/
 
 /**
- * Class mySOAPClient
+ * Class CRM_Nav_SOAPDebugClient
  */
 class CRM_Nav_SOAPDebugClient extends SoapClient {
 

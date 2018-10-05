@@ -15,10 +15,10 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
 /**
- * This class will handle the SOAP communication to the
+ *  * This class will handle the SOAP communication to the
  * Navision API. All communication should go through this class
+ * Class CRM_Nav_SOAPConnector
  */
 class CRM_Nav_SOAPConnector {
 
@@ -86,6 +86,9 @@ class CRM_Nav_SOAPConnector {
   // TODO: function to set location for this SOAPObject (needs to be called form Command).
   // E.g. Read(contact) Command needs location for CiviContact
 
+  /**
+   * @param $type
+   */
   private function getSoapCredentials($type){
     $this->wsdl = __DIR__ . "/../../resources/wsdl/{$type}.wsdl";
     $pw_file = __DIR__ . "/../../resources/pw.txt";

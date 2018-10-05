@@ -15,14 +15,25 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Handler_ContactHandler
+ */
 class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
   private $i3Val_values = array();
 
+  /**
+   * CRM_Nav_Handler_ContactHandler constructor.
+   *
+   * @param $record
+   */
   public function __construct($record) {
     parent::__construct($record);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function process() {
     if (!$this->check_record_type()) {
       return;
@@ -37,12 +48,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
 
     if ($this->check_new_record()) {
-      try {
-        $this->create_civi_full_contact();
-      } catch (Exception $e) {
-        $this->log($e->getMessage());
-        return;
-      }
+      $this->create_civi_full_contact();
       $this->record->set_consumed();
       return;
     }
@@ -98,13 +104,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       $data_records[$entity]['after'][$key]['contact_id'] = $contact_id;
       $id = $this->create_civi_entity($data_records[$entity]['after'][$key], $entity);
     }
-    // Lookup before values
-    // Found -> update with after
-    // not found -> create
   }
 
   /**
    * @param $contact_id
+   *
+   * @throws \Exception
    */
   private function update_values($contact_id) {
     $this->create_linked_organisation_address($contact_id);
@@ -130,9 +135,15 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->update_entity($website_data, $contact_id, 'Website');
   }
 
+  /**
+   * @param $entity_values
+   * @param $contact_id
+   * @param $entity
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function update_entity($entity_values, $contact_id, $entity) {
     if (empty($entity_values[$entity])) {
-      // FixMe: Is this correct? What happens if before value is empty, and after value is set? (e.g. fill up)
       return;
     }
     $get_changed_value_function_name = "get_changed_{$entity}_values";
@@ -175,7 +186,15 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
-  private function set_values($entity_id, $values, $entity, $contact_id) {
+  /**
+   * @param        $entity_id
+   * @param        $values
+   * @param        $entity
+   * @param string $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function set_values($entity_id, $values, $entity, $contact_id = "") {
     if (empty($entity_id)) {
       // add contact ID, since we add a new Entityt to a given contact_id
       $values['contact_id'] = $contact_id;
@@ -259,6 +278,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return FALSE;
   }
 
+  /**
+   * @param $values
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function push_values_to_i3val($values, $contact_id) {
     $values['id'] = $contact_id;
     $values['i3val_note'] = "Automatically added by Navision synchronisation";
@@ -269,6 +294,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
+  /**
+   * @param $entities
+   * @param $contact_id
+   */
   private function check_nav_before_vs_civi($entities, $contact_id) {
 
     foreach ($entities as $entity) {
@@ -280,7 +309,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
         $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
         $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
       } catch (Exception $e) {
-        // TODO: Setup ENTITY (+ KEY) for i3VAL processing
         $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
         $entity_name = key($entity);
         $this->i3Val_values[$entity_name] = $entity[$entity_name];
@@ -288,7 +316,13 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
-
+  /**
+   * @param $navision_data
+   * @param $contact_id
+   * @param $entity
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function check_civi_entity_data($navision_data, $contact_id, $entity) {
     if (!isset($navision_data)) {
       return;
@@ -377,6 +411,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return TRUE;
   }
 
+  /**
+   * @param $contact_id
+   * @param $nav_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function add_nav_id_to_contact($contact_id, $nav_id) {
     $values = array(
       'id'          => $contact_id,
@@ -390,7 +430,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   /**
-   * If contact coulddn't be identified by NavId, it will be identified by email(s)
+   * If contact couldn't be identified by NavId, it will be identified by email(s)
    * and first_name and last name. If that's not available, a new contact is created
    * with the AFTER values and ALL provided values
    * @param $contact_id
@@ -407,12 +447,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
       if ($lookup_contact_id == "") {
         // create contact with all available data, then return '-1' to abort further processing
-        try {
-          $this->create_civi_full_contact();
-        } catch (Exception $e) {
-          $this->log($e->getMessage());
-          return '-2';
-        }
+        $this->create_civi_full_contact();
         return '-1';
       }
       return $lookup_contact_id;
@@ -482,7 +517,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * adds address to contact as a shared address
    * @param $contact_id
    *
-   * @throws \Exception
+   * @return mixed|string|void
+   * @throws \CiviCRM_API3_Exception
    */
   private function create_linked_organisation_address($contact_id) {
     $company_data = $this->record->get_company_data();
@@ -512,7 +548,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * @param $contact_ids      (array with contact_ids from email lookup)
    * @param $contact_details  (array first_name, last_name)
    *
-   * @return string (contact_id or "")
+   * @return string
+   * @throws \CiviCRM_API3_Exception
    */
   private function get_contact($contact_ids, $contact_details) {
     if (!empty($contact_ids)) {
@@ -530,6 +567,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return $result['values']['contact_id'];
   }
 
+  /**
+   * @param $emails
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   private function get_contact_ids_via_emails($emails) {
     if (empty($emails)) {
       return array();
@@ -549,8 +592,11 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return $contact_ids;
   }
 
-
-
+  /**
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function delete_nav_id_from_contact($contact_id) {
     $result = civicrm_api3('Contact', 'create', array(
       'sequential' => 1,

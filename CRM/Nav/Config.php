@@ -15,11 +15,14 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Config
+ */
 class CRM_Nav_Config {
 
   private static $local        = TRUE;
 
-  public static $filter = [
+  public static  $filter       = [
     '0001-01-01',
     '_blank_',
   ];
@@ -51,6 +54,8 @@ class CRM_Nav_Config {
     'Consultant'                    => 'custom_184',
     'Next_Report_to'                => 'custom_175',
     'Subsidie'                      => 'custom_177',
+    'Graduation'                    => '11',
+    'Study'                         => '12',
   ];
 
   private static $hbs_config   = [
@@ -80,8 +85,15 @@ class CRM_Nav_Config {
     'Consultant'                    => 'custom_138',
     'Next_Report_to'                => 'custom_129',
     'Subsidie'                      => 'custom_131',
+    'Graduation'                    => '11',
+    'Study'                         => '12',
   ];
 
+  /**
+   * @param $attribute
+   *
+   * @return mixed|string
+   */
   public static function get($attribute) {
     if (self::$local) {
       if (isset(self::$local_config[$attribute])) {
@@ -95,6 +107,9 @@ class CRM_Nav_Config {
     return "";
   }
 
+  /**
+   * @return bool
+   */
   public static function local() {
     return self::$local;
   }

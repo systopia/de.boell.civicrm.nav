@@ -111,7 +111,8 @@ class CRM_Nav_Sync {
         $status_handler->process();
         $relationship_handler->process();
       } catch (Exception $e) {
-        throw new Exception ("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}. Message: " . $e->getMessage());
+        $this->log("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}. Message: " . $e->getMessage());
+        $record->set_error_message($e->getMessage());
       }
     }
   }
@@ -192,26 +193,38 @@ class CRM_Nav_Sync {
   private function create_nav_data_record($data, $entity, $before = NULL) {
     switch ($entity) {
       case 'civiContact':
-        return new CRM_Nav_Data_NavContactRecord($data, $before);
+        return new CRM_Nav_Data_NavContactRecord($data, $before, $this->debug);
       case 'civiProcess':
-        return new CRM_Nav_Data_NavProcessRecord($data, $before);
+        return new CRM_Nav_Data_NavProcessRecord($data, $before, $this->debug);
       case 'civiContRelation':
-        return new CRM_Nav_Data_NavRelationshipRecord($data, $before);
+        return new CRM_Nav_Data_NavRelationshipRecord($data, $before, $this->debug);
       case 'civiContStatus':
-        return new CRM_Nav_Data_NavStatusRecord($data, $before);
+        return new CRM_Nav_Data_NavStatusRecord($data, $before, $this->debug);
       default:
         throw new Exception("Invalid Navision Entity Type {$entity}. Couldn't create DataRecord.");
     }
   }
 
+  /**
+   * @return array
+   */
   private function get_soap_filter() {
-    return array( 'filter' =>
-                    array(
+    return ['filter' =>
+                    [
                       "Field"     => "Transferred",
                       "Criteria"  => "0",
-                    ),
+                    ],
                   'setSize' => $this->size,
-    );
+    ];
+  }
+
+  /**
+   * @param $message
+   */
+  private function log($message) {
+    if ($this->debug) {
+      CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
+    }
   }
 
 }
