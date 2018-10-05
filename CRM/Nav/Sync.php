@@ -59,6 +59,9 @@ class CRM_Nav_Sync {
     $this->set_consumed_records_transferred('civiContRelation');
     $this->set_consumed_records_transferred('civiProcess');
     $this->set_consumed_records_transferred('civiContStatus');
+
+
+
     return $this->number_of_records;
   }
 
@@ -234,6 +237,15 @@ class CRM_Nav_Sync {
   private function log($message) {
     if ($this->debug) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
+    }
+  }
+
+  private function cleanup_handling() {
+    foreach ($this->entity as $entity) {
+      foreach ($this->get_records($entity) as $record) {
+        $error_handler  = new CRM_Nav_ErrorHandler($record, $this->debug);
+        $error_handler->process();
+      }
     }
   }
 
