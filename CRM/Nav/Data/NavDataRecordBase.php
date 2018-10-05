@@ -86,7 +86,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    * Checks if the record is consumed
    * @return mixed
    */
-  public function is_consumed() {
+    public function is_consumed() {
     return $this->consumed;
   }
 

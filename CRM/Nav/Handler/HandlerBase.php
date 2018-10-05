@@ -22,7 +22,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
 
   protected $record;
   protected $hbs_contact_id;
-  private $debug;
+  protected $debug;
 
   protected $navision_custom_field;
 

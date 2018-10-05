@@ -27,9 +27,9 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
    *
    * @param $record
    */
-  public function __construct($record) {
+  public function __construct($record, $debug = false) {
     $this->process_id = CRM_Nav_Config::get('process_id');
-    parent::__construct($record);
+    parent::__construct($record, $debug);
   }
 
   /**

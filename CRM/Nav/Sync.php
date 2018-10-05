@@ -52,7 +52,6 @@ class CRM_Nav_Sync {
     $this->get_nav_data();
     $this->sort_records();
     $this->handle_Nav_data();
-//    $this->mark_records_transferred();
     // FixMe: return actual number of parsed/added records or some sort of statistics here.
     //        For now we just return the number of records
 
@@ -75,14 +74,16 @@ class CRM_Nav_Sync {
   private function set_consumed_records_transferred($type){
     $contact_records  = $this->get_records($type);
     foreach ($contact_records as $rec) {
-      $soap_array["{$type}_list"][$type][] = $rec->get_nav_after_data();
+      // TODO: IS THIS COORECT?
+      if ($rec->is_consumed()) {
+        continue; // we don't set errors to Transferred for now?
+      }
+      $soap_array["{$type}_List"][$type][] = $rec->get_nav_after_data();
       $tmp_nav_data = $rec->get_nav_before_data();
       if (isset($tmp_nav_data)) {
-        $soap_array["{$type}_list"][$type][] = $tmp_nav_data;
+        $soap_array["{$type}_List"][$type][] = $tmp_nav_data;
       }
     }
-    // TODO: set updateMultiple Call to SOAP with $type Command
-
   }
 
   private function get_records($type) {
@@ -150,7 +151,7 @@ class CRM_Nav_Sync {
         try {
           $soap_connector->executeCommand($read_command);
         } catch (Exception $e) {
-          throw new Exception ("SOAP Command failed for Entityt {$entity}");
+          throw new Exception ("SOAP Command failed for Entity {$entity}. Error: {$e->getMessage()}");
         }
         $read_result = json_decode(json_encode($read_command->getSoapResult()), TRUE);
       }

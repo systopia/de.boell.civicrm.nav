@@ -16,45 +16,35 @@
 +--------------------------------------------------------*/
 
 /**
- * Class CRM_Nav_Handler_RelationshipHandler
+ * Class CRM_Nav_ErrorHandler
  */
-class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
+class CRM_Nav_ErrorHandler extends CRM_Nav_Handler_HandlerBase {
 
-  /**
-   * CRM_Nav_Handler_RelationshipHandler constructor.
-   *
-   * @param $record
-   */
   public function __construct($record, $debug = false) {
     parent::__construct($record, $debug);
   }
 
   /**
-   * Check if the record is a civiContRelation
-   * @return bool
-   */
-  protected function check_record_type() {
-    return $this->record->get_type() == 'civiContRelation';
-  }
-
-  /**
-   * @throws \CiviCRM_API3_Exception
+   * see #7616
    */
   public function process() {
     if (!$this->check_record_type()) {
-      return;
+      return;      // nothing to do here
     }
-    $nav_id = $this->record->get_individual_navision_id();
-    $contact_id = $this->get_contact_id_from_nav_id($nav_id);
-    if (empty($contact_id)) {
-      throw new Exception("Couldn't get Contact to Navision id {$nav_id}");
+    if ($this->debug) {
+      CRM_Core_Error::debug_log_message($this->record->get_change_type());
+      $this->record->dump_record();
     }
-    $contact_data = $this->record->get_contact_data();
-    $contact_data['id'] = $contact_id;
-    $this->create_civi_entity($contact_data, 'Contact');
-
-    // mark record as consumed
-    $this->record->set_consumed();
+    // TODO: Gather Errors from Record or report Error (Email?) See #7616
   }
 
+  /**
+   * @return bool
+   */
+  protected function check_record_type() {
+    if ($this->record->get_error_message()) {
+      return FALSE;
+    }
+    return TRUE;
+  }
 }

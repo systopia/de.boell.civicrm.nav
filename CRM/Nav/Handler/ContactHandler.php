@@ -27,8 +27,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    *
    * @param $record
    */
-  public function __construct($record) {
-    parent::__construct($record);
+  public function __construct($record, $debug = false) {
+    parent::__construct($record, $debug);
   }
 
   /**
