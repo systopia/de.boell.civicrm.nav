@@ -46,7 +46,8 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
     }
 
     if ($this->check_delete_record()) {
-      $this->deactivate_relationship();
+      $relationship_id = $this->get_relationship($this->record->get_process_id());
+      $this->delete_entity($relationship_id, 'Relationship');
       return;
     }
     if ($this->check_new_record()) {
@@ -81,26 +82,6 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   /**
-   * @throws \CiviCRM_API3_Exception
-   */
-  private function deactivate_relationship() {
-    $process_id = $this->record->get_process_id();
-    $relationship_id = $this->get_relationship($process_id );
-    if ($relationship_id == "") {
-      throw new Exception("Couldn't Find Relationship with ProcessId {$process_id }. Abort Delete");
-    }
-    $result = civicrm_api3('Relationship', 'create', array(
-      'sequential' => 1,
-      'id' => $relationship_id,
-      'is_active' => 0,
-      'description' => "Deactivated by Nav.Sync",
-    ));
-    if ($result['is_error'] == '1') {
-      throw new Exception("Failed to deactivate Relationship {$relationship_id}. Error Message: {$result['error_message']}");
-    }
-  }
-
-  /**
    * @param $contact_id
    * @param $relationship_id
    *
@@ -115,6 +96,8 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
       $values['id'] = $relationship_id;
     }
     $values = $values + $this->record->get_relationship_data();
+    // TODO: if other Option Values need creation it shall be done here
+    CRM_Nav_Config::check_or_create_option_value($values[CRM_Nav_Config::get('Candidature_Process_Code')]);
     $result = civicrm_api3('Relationship', 'create', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("[ProcessHandler] Couldn't write Relationship to DB. '{$result['error_message']}'");
