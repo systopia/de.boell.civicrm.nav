@@ -49,7 +49,11 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
     if (empty($contact_id)) {
       throw new Exception("Couldn't get Contact to Navision id {$nav_id}");
     }
-    $contact_data = $this->record->get_contact_data();
+    if ($this->check_delete_record()) {
+      $contact_data = $this->record->get_delete_record();
+    } else {
+      $contact_data = $this->record->get_contact_data();
+    }
     $contact_data['id'] = $contact_id;
     $this->create_civi_entity($contact_data, 'Contact');
 
