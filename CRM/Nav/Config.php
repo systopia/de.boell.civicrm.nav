@@ -20,7 +20,7 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = TRUE;
+  private static $local        = FALSE;
 
   public static  $filter       = [
     '0001-01-01',
