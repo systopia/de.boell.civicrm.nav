@@ -66,6 +66,22 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       //      'custom_???'              => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), // Studienbereich ???
       CRM_Nav_Config::get('Subsidie')                      => $this->get_nav_value_if_exist($nav_data, 'Subsidie'),// Förderbereich [option val]
     ];
+    $this->fix_navision_data();
+  }
+
+  /**
+   * Fix Navision Entries for Consultant and Project Controller by
+   * removing the INTRANET/ substring from the civi value
+   */
+  private function fix_navision_data() {
+    $consultant_string = $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Consultant')];
+    if(strpos($consultant_string, 'INTRANET/') !== FALSE) {
+      $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Consultant')] = explode('/', $consultant_string)[1];
+    }
+    $project_controller_string = $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Project_Controller') ];
+    if(strpos($project_controller_string, 'INTRANET/') !== FALSE) {
+      $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Project_Controller')] = explode('/', $project_controller_string)[1];
+    }
   }
 
   /**
