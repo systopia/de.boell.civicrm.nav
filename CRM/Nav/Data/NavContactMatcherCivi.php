@@ -15,7 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
+/**
+ * Class CRM_Nav_Data_NavContactMatcherCivi
+ */
 class CRM_Nav_Data_NavContactMatcherCivi {
 
   private $navision_custom_field;
@@ -23,6 +25,13 @@ class CRM_Nav_Data_NavContactMatcherCivi {
 
   private $field_mapping;
 
+  /**
+   * CRM_Nav_Data_NavContactMatcherCivi constructor.
+   *
+   * @param $navision_custom_id
+   * @param $org_name_1
+   * @param $org_name_2
+   */
   public function __construct($navision_custom_id, $org_name_1, $org_name_2) {
     $this->navision_custom_field = $navision_custom_id;
     $this->field_mapping = array(
@@ -65,6 +74,12 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     );
   }
 
+  /**
+   * @param $contact_type
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_contact_fields($contact_type){
     switch ($contact_type) {
       case 'Individual':
@@ -76,6 +91,12 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  /**
+   * @param $locationType
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_address_fields($locationType) {
     switch($locationType) {
       case 'organisation':
@@ -102,6 +123,12 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  /**
+   * @param $locationType
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_fax_fields($locationType) {
     switch ($locationType) {
       case 'organisation':
@@ -113,6 +140,12 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  /**
+   * @param $locationType
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_email_fields($locationType) {
     switch ($locationType) {
       case 'organisation':
@@ -124,6 +157,12 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  /**
+   * @param string $locationType
+   *
+   * @return string
+   * @throws \Exception
+   */
   public function get_website_field($locationType = 'organisation') {
     switch ($locationType) {
       case 'organisation':
@@ -133,6 +172,12 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  /**
+   * @param $nav_index
+   *
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_civi_values($nav_index) {
     if (!isset($this->field_mapping[$nav_index])) {
       throw new Exception("Invalid Index '{$nav_index}'. Dataset invalid or mapping has changed.");

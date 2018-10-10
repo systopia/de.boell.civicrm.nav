@@ -15,13 +15,23 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
+/**
+ * Class CRM_Nav_Data_NavStatusRecord
+ */
 class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiContStatus";
   private $hbs_contact_id;
   private $relationship_type_mapping;
 
+  /**
+   * CRM_Nav_Data_NavStatusRecord constructor.
+   *
+   * @param      $nav_data_after
+   * @param null $nav_data_before
+   *
+   * @throws \Exception
+   */
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     $this->hbs_contact_id = CRM_Nav_Config::get('hbs_contact_id');
     $this->relationship_type_mapping = [
@@ -49,7 +59,6 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
       'contact_id_b'            => $this->hbs_contact_id,
     );
-//    $this->fix_microsoft_dates($this->civi_data_after['Relationship']);
 
     // before data
     $nav_data                              = $this->get_nav_before_data();
@@ -63,9 +72,14 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
       'end_date'                => $this->get_nav_value_if_exist($nav_data, 'Valid_to'),
       'contact_id_b'            => $this->hbs_contact_id,
     );
-//    $this->fix_microsoft_dates($this->civi_data_before['Relationship']);
   }
 
+  /**
+   * @param string $type
+   *
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_relationship_data($type = 'after') {
     switch ($type) {
       case 'before':
@@ -77,6 +91,12 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
+  /**
+   * @param string $type
+   *
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_Status_start_date($type = 'after') {
     switch ($type) {
       case 'before':
