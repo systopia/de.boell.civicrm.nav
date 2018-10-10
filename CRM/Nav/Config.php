@@ -15,11 +15,16 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Config
+ */
 class CRM_Nav_Config {
 
-  private static $local        = TRUE;
+  private static $local        = FALSE;
 
-  public static $filter = [
+  private static $candidature_process_code_option_value_cache = [];
+
+  public static  $filter       = [
     '0001-01-01',
     '_blank_',
   ];
@@ -51,6 +56,9 @@ class CRM_Nav_Config {
     'Consultant'                    => 'custom_184',
     'Next_Report_to'                => 'custom_175',
     'Subsidie'                      => 'custom_177',
+    'Graduation'                    => '11',
+    'Study'                         => '12',
+    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code'
   ];
 
   private static $hbs_config   = [
@@ -80,8 +88,16 @@ class CRM_Nav_Config {
     'Consultant'                    => 'custom_138',
     'Next_Report_to'                => 'custom_129',
     'Subsidie'                      => 'custom_131',
+    'Graduation'                    => '11',
+    'Study'                         => '12',
+    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code'
   ];
 
+  /**
+   * @param $attribute
+   *
+   * @return mixed|string
+   */
   public static function get($attribute) {
     if (self::$local) {
       if (isset(self::$local_config[$attribute])) {
@@ -95,6 +111,65 @@ class CRM_Nav_Config {
     return "";
   }
 
+  /**
+   * Checks if an option_value exist, cache results locally and create
+   * Option_value if non existent
+   * @param $check_option_value
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function check_or_create_option_value($check_option_value) {
+    self::get_option_values();
+    if (in_array($check_option_value, self::$candidature_process_code_option_value_cache)) {
+      return;
+    }
+    self::create_option_value($check_option_value);
+  }
+
+  /**
+   * Create an Optionvalue to the 'bewerbungscode_option_group' group
+   * and adds the name to the local_cache
+   * @param $check_option_value
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function create_option_value($check_option_value) {
+    $result = civicrm_api3('OptionValue', 'create', array(
+      'sequential' => 1,
+      'option_group_id' => self::get('bewerbungscode_option_group'),
+      'label' => $check_option_value,
+    ));
+    if ($result['is_error'] == '1') {
+      throw new Exception("Error Occured while adding Optionvalue to group " . self::get('bewerbungscode_option_group'));
+    }
+    self::$candidature_process_code_option_value_cache[] = $check_option_value;
+  }
+
+  /**
+   * Gets option values for bewerbungscode_option_group, static for now.
+   * If other option values are needed to be checked/created this has to be rewritten
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function get_option_values() {
+    if (!empty(self::$candidature_process_code_option_value_cache)) {
+      return;
+    }
+    $option_group = self::get('bewerbungscode_option_group');
+    $result = civicrm_api3('OptionValue', 'get', array(
+      'sequential' => 1,
+      'option_group_id' => $option_group,
+    ));
+    if ($result['is_error'] != '1') {
+      self::$candidature_process_code_option_value_cache = [];  // clear cache
+      foreach ($result['values'] as $val) {
+        self::$candidature_process_code_option_value_cache[] = $val['name'];
+      }
+    }
+  }
+
+  /**
+   * @return bool
+   */
   public static function local() {
     return self::$local;
   }
