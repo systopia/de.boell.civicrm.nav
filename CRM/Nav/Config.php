@@ -43,7 +43,7 @@ class CRM_Nav_Config {
     'Stipendiat_in'                 => '12',
     'Promotionsstipendiat_in'       => '11',
     'Auswahlkommissionsmitglied'    => '13',
-    'Allowance_to'                  => 'custom_174',
+    'Advancement_to'                => 'custom_174',
     'Angestrebter_Studienabschluss' => 'custom_176',
     'Process_Entry_No'              => 'custom_172',
     'Candidature_Process_Code'      => 'custom_173',
@@ -58,39 +58,9 @@ class CRM_Nav_Config {
     'Subsidie'                      => 'custom_177',
     'Graduation'                    => '11',
     'Study'                         => '12',
-    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code'
-  ];
-
-  private static $hbs_config   = [
-    'hbs_contact_id'                => '4',
-    'navision_custom_field'         => 'custom_147',
-    'process_id'                    => 'custom_126',
-    'org_name_1'                    => 'custom_45',
-    'org_name_2'                    => 'custom_46',
-    'location_type_private'         => '6',
-    'location_type_organisation'    => '8',
-    'creditor_custom_field_id'      => 'custom_164',
-    'debitor_custom_field_id'       => 'custom_165',
-    'Vertrauensdozent_in'           => '15',
-    'Stipendiat_in'                 => '12',
-    'Promotionsstipendiat_in'       => '11',
-    'Auswahlkommissionsmitglied'    => '14',
-    'Allowance_to'                  => 'custom_139',
-    'Angestrebter_Studienabschluss' => 'custom_130',
-    'Process_Entry_No'              => 'custom_126',
-    'Candidature_Process_Code'      => 'custom_127',
-    'Hauptfach_1'                   => 'custom_132',
-    'Subject_Group'                 => 'custom_140',
-    'Field_of_Study'                => 'custom_141',
-    'Promotionsfach'                => 'custom_133',
-    'Promotionsthema'               => 'custom_134',
-    'Project_Controller'            => 'custom_137',
-    'Consultant'                    => 'custom_138',
-    'Next_Report_to'                => 'custom_129',
-    'Subsidie'                      => 'custom_131',
-    'Graduation'                    => '11',
-    'Study'                         => '12',
-    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code'
+    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
+    'Allowance_to'                  => 'end_date',
+    'Förderbeginn'                  => 'start_date',
   ];
 
   /**
@@ -110,6 +80,40 @@ class CRM_Nav_Config {
     }
     return "";
   }
+
+  private static $hbs_config   = [
+    'hbs_contact_id'                => '4',
+    'navision_custom_field'         => 'custom_147',
+    'process_id'                    => 'custom_126',
+    'org_name_1'                    => 'custom_45',
+    'org_name_2'                    => 'custom_46',
+    'location_type_private'         => '6',
+    'location_type_organisation'    => '8',
+    'creditor_custom_field_id'      => 'custom_164',
+    'debitor_custom_field_id'       => 'custom_165',
+    'Vertrauensdozent_in'           => '15',
+    'Stipendiat_in'                 => '12',
+    'Promotionsstipendiat_in'       => '11',
+    'Auswahlkommissionsmitglied'    => '14',
+    'Advancement_to'                => 'custom_139',
+    'Angestrebter_Studienabschluss' => 'custom_130',
+    'Process_Entry_No'              => 'custom_126',
+    'Candidature_Process_Code'      => 'custom_127',
+    'Hauptfach_1'                   => 'custom_132',
+    'Subject_Group'                 => 'custom_140',
+    'Field_of_Study'                => 'custom_141',
+    'Promotionsfach'                => 'custom_133',
+    'Promotionsthema'               => 'custom_134',
+    'Project_Controller'            => 'custom_137',
+    'Consultant'                    => 'custom_138',
+    'Next_Report_to'                => 'custom_129',
+    'Subsidie'                      => 'custom_131',
+    'Graduation'                    => '11',
+    'Study'                         => '12',
+    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
+    'Allowance_to'                  => 'end_date',
+    'Förderbeginn'                  => 'start_date',
+  ];
 
   /**
    * Checks if an option_value exist, cache results locally and create

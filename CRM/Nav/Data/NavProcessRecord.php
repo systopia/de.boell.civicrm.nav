@@ -60,10 +60,10 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       CRM_Nav_Config::get('Promotionsthema')               => $this->get_nav_value_if_exist($nav_data, 'Promotionsthema'),// Promotionsthema
       CRM_Nav_Config::get('Project_Controller')            => $this->get_nav_value_if_exist($nav_data, 'Project_Controller'), // Projektbearbeiter/in
       CRM_Nav_Config::get('Consultant')                    => $this->get_nav_value_if_exist($nav_data, 'Consultant'), // Referent/in
-      CRM_Nav_Config::get('Allowance_to')                  => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'), // Bewilligung bis
+      CRM_Nav_Config::get('Advancement_to')                  => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), // Bewilligung bis
       CRM_Nav_Config::get('Next_Report_to')                => $this->get_nav_value_if_exist($nav_data, 'Next_Report_to'), // Nächster Bericht
       // FixME: Unklare Feldzuordnung
-      //      'custom_???'              => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), // Studienbereich ???
+      //      'custom_???'              => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), //  ???
       CRM_Nav_Config::get('Subsidie')                      => $this->get_nav_value_if_exist($nav_data, 'Subsidie'),// Förderbereich [option val]
     ];
     $this->fix_navision_data();
