@@ -43,7 +43,7 @@ class CRM_Nav_Config {
     'Stipendiat_in'                 => '12',
     'Promotionsstipendiat_in'       => '11',
     'Auswahlkommissionsmitglied'    => '13',
-    'Advancement_to'                => 'custom_174',
+    'Allowance_to'                  => 'custom_174',
     'Angestrebter_Studienabschluss' => 'custom_176',
     'Process_Entry_No'              => 'custom_172',
     'Candidature_Process_Code'      => 'custom_173',
@@ -59,7 +59,7 @@ class CRM_Nav_Config {
     'Graduation'                    => '11',
     'Study'                         => '12',
     'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
-    'Allowance_to'                  => 'end_date',
+    'Advancement_to'                => 'end_date',
     'Förderbeginn'                  => 'start_date',
   ];
 
@@ -95,7 +95,7 @@ class CRM_Nav_Config {
     'Stipendiat_in'                 => '12',
     'Promotionsstipendiat_in'       => '11',
     'Auswahlkommissionsmitglied'    => '14',
-    'Advancement_to'                => 'custom_139',
+    'Allowance_to'                  => 'custom_139',
     'Angestrebter_Studienabschluss' => 'custom_130',
     'Process_Entry_No'              => 'custom_126',
     'Candidature_Process_Code'      => 'custom_127',
@@ -111,7 +111,7 @@ class CRM_Nav_Config {
     'Graduation'                    => '11',
     'Study'                         => '12',
     'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
-    'Allowance_to'                  => 'end_date',
+    'Advancement_to'                => 'end_date',
     'Förderbeginn'                  => 'start_date',
   ];
 

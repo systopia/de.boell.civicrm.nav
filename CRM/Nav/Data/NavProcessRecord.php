@@ -49,7 +49,7 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->civi_data_after['Relationship'] = [
       'relationship_type_id'                               => $relationship_type_id,
       'start_date'                                         => $this->get_nav_value_if_exist($nav_data, 'Förderbeginn'),
-      'end_date'                                           => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'),
+      'end_date'                                           => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'),
       CRM_Nav_Config::get('Angestrebter_Studienabschluss') => $this->get_nav_value_if_exist($nav_data, 'Angestrebter_Studienabschluss'), // Angestrebter Studienabschluss [option val]
       CRM_Nav_Config::get('Process_Entry_No')              => $this->get_nav_value_if_exist($nav_data, 'Process_Entry_No'),// processID
       CRM_Nav_Config::get('Candidature_Process_Code')      => $this->get_nav_value_if_exist($nav_data, 'Candidature_Process_Code'),// Bewerbung Vorgang Code [option val]
@@ -60,10 +60,8 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       CRM_Nav_Config::get('Promotionsthema')               => $this->get_nav_value_if_exist($nav_data, 'Promotionsthema'),// Promotionsthema
       CRM_Nav_Config::get('Project_Controller')            => $this->get_nav_value_if_exist($nav_data, 'Project_Controller'), // Projektbearbeiter/in
       CRM_Nav_Config::get('Consultant')                    => $this->get_nav_value_if_exist($nav_data, 'Consultant'), // Referent/in
-      CRM_Nav_Config::get('Advancement_to')                  => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), // Bewilligung bis
+      CRM_Nav_Config::get('Allowance_to')                  => $this->get_nav_value_if_exist($nav_data, 'Allowance_to'), // Bewilligung bis
       CRM_Nav_Config::get('Next_Report_to')                => $this->get_nav_value_if_exist($nav_data, 'Next_Report_to'), // Nächster Bericht
-      // FixME: Unklare Feldzuordnung
-      //      'custom_???'              => $this->get_nav_value_if_exist($nav_data, 'Advancement_to'), //  ???
       CRM_Nav_Config::get('Subsidie')                      => $this->get_nav_value_if_exist($nav_data, 'Subsidie'),// Förderbereich [option val]
     ];
     $this->fix_navision_data();
