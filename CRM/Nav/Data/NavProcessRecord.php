@@ -73,12 +73,12 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
    */
   private function fix_navision_data() {
     $consultant_string = $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Consultant')];
-    if(strpos($consultant_string, 'INTRANET/') !== FALSE) {
-      $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Consultant')] = explode('/', $consultant_string)[1];
+    if(strpos($consultant_string, 'INTRANET\\') !== FALSE) {
+      $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Consultant')] = explode('\\', $consultant_string)[1];
     }
     $project_controller_string = $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Project_Controller') ];
-    if(strpos($project_controller_string, 'INTRANET/') !== FALSE) {
-      $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Project_Controller')] = explode('/', $project_controller_string)[1];
+    if(strpos($project_controller_string, 'INTRANET\\') !== FALSE) {
+      $this->civi_data_after['Relationship'][CRM_Nav_Config::get('Project_Controller')] = explode('\\', $project_controller_string)[1];
     }
   }
 
