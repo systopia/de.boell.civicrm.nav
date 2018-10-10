@@ -358,11 +358,12 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
         'last_name'    => $this->get_nav_value_if_exist($nav_data, 'Surname'),
         'birth_date'   => $this->get_nav_value_if_exist($nav_data, 'Geburtsdatum'),
         // NavisionID
-        $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'No'),
-        'email'        => $this->get_nav_value_if_exist($nav_data, 'E_mail'),
-        'job_title'    => $this->get_nav_value_if_exist($nav_data, 'Job_Title'),
-        'contact_type' => $this->get_contact_type($this->get_nav_value_if_exist($nav_data, 'Type')),
-        'prefix_id'    => $this->get_nav_value_if_exist($nav_data, 'Salutation_Code'),
+        $this->navision_custom_field => $this->get_nav_value_if_exist($nav_data, 'No'),
+        'email'                      => $this->get_nav_value_if_exist($nav_data, 'E_mail'),
+        'formal_title'               => $this->get_nav_value_if_exist($nav_data, 'Job_Title'),
+        'contact_type'               => $this->get_contact_type($this->get_nav_value_if_exist($nav_data, 'Type')),
+        'prefix_id'                  => $this->get_nav_value_if_exist($nav_data, 'Salutation_Code'),
+        'job_title'                  => $this->get_nav_value_if_exist($nav_data, 'Funktion'),
       ];
       default:
         throw new Exception("Invalid Contact Type {$contact_type}. Couldn't convert Navision Data to CiviCRM data.");
