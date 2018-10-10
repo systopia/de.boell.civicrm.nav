@@ -127,7 +127,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->filter_i3Val_values('Website', $website_data );
     // update Contact
     if (!empty($contact_data)) {
-      $this->set_values($contact_id, $contact_data, 'Contact');
+      $this->set_values($contact_id, $contact_data['Contact'], 'Contact');
     }
     $this->update_entity($address_data, $contact_id, 'Address');
     $this->update_entity($mail_data, $contact_id, 'Email');
@@ -307,7 +307,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
         $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
         $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
         $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
-        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
+        //TODO:
+        // Don't check website for now, we just overwrite the value from navision
+        // since i3Val doesn't support Entity Website
+        //        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
       } catch (Exception $e) {
         $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
         $entity_name = key($entity);

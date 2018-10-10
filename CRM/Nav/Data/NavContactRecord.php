@@ -726,6 +726,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       default:
         throw new Exception("Invalid Type '{$type}' in get_changed_Website_values");
     }
+    return $result;
   }
 
   /**
