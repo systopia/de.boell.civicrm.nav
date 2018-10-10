@@ -67,7 +67,10 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
     }
   }
 
-
+  /**
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_delete_record() {
     $contact_data = $this->get_contact_data();
     // just to be safe
