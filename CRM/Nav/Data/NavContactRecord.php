@@ -83,9 +83,17 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   /**
    * @return mixed
+   * @throws \Exception
    */
   public function get_civi_individual_address() {
-    return $this->civi_data_after['Address']['individual'];
+    switch ($this->contactType) {
+      case 'Individual':
+        return $this->civi_data_after['Address']['individual'];
+      case 'Organization':
+        return $this->civi_data_after['Address']['organization'];
+      default:
+        throw new Exception("Invalid contactType {$this->contactType}");
+    }
   }
 
   /**
