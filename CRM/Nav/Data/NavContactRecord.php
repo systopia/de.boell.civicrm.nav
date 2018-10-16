@@ -146,8 +146,10 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       default:
         return array();
     }
-    if ($nav_data['Type'] == 'Company') {
+    if ($nav_data['Type'] == 'Company' || $nav_data['Company_No'] == $nav_data['No']) {
       // nothing to do here, as a company we don't have shared addresses
+      // we also don't share addresses if the No & Company_No don't differ
+      //    (no linked company that way)
       return array();
     }
     foreach ($civi_data['Contact'] as $contact) {
