@@ -20,7 +20,7 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = FALSE;
+  private static $local        = TRUE;
 
   private static $candidature_process_code_option_value_cache = [];
 
@@ -36,7 +36,7 @@ class CRM_Nav_Config {
     'org_name_1'                    => 'custom_106',
     'org_name_2'                    => 'custom_107',
     'location_type_private'         => '6',
-    'location_type_organisation'    => '8',
+    'location_type_organization'    => '8',
     'creditor_custom_field_id'      => 'custom_42',
     'debitor_custom_field_id'       => 'custom_43',
     'Vertrauensdozent_in'           => '14',
@@ -68,7 +68,7 @@ class CRM_Nav_Config {
     'org_name_1'                    => 'custom_45',
     'org_name_2'                    => 'custom_46',
     'location_type_private'         => '6',
-    'location_type_organisation'    => '8',
+    'location_type_organization'    => '8',
     'creditor_custom_field_id'      => 'custom_164',
     'debitor_custom_field_id'       => 'custom_165',
     'Vertrauensdozent_in'           => '15',

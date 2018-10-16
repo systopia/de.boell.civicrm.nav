@@ -65,7 +65,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $changed_entities = $this->get_update_values('before');
 
     // remove old linked address in case company has changed
-    $this->remove_old_linked_organisation_address($contact_id);
+    $this->remove_old_linked_organization_address($contact_id);
     // TODO: Check/filter Values first
     // --> then update Contact data WITHOUT conflicting values
     // --> then put values to i3Val
@@ -112,7 +112,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * @throws \Exception
    */
   private function update_values($contact_id) {
-    $this->create_linked_organisation_address($contact_id);
+    $this->create_linked_organization_address($contact_id);
 
     $contact_data = $this->record->get_changed_contact_values('after');
     $address_data =  $this->record->get_changed_Address_values('before');
@@ -302,7 +302,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     foreach ($entities as $entity) {
       try {
-        // TODO: check Civi Organisation data?? Currently only Individual is checked!
+        // TODO: check Civi Organization data?? Currently only Individual is checked!
         $this->check_civi_contact_data($entity['Contact'], $contact_id);
         $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
         $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
@@ -461,10 +461,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   private function create_civi_full_contact() {
 
     // create Contact
-    $contact_data = $this->record->get_contact_details('Individual');
+    $contact_data = $this->record->get_contact_details();
     $contact_id = $this->create_civi_entity($contact_data, 'Contact');
 
-    $this->create_linked_organisation_address($contact_id);
+    $this->create_linked_organization_address($contact_id);
 
     $address = $this->record->get_civi_individual_address();
     $address['contact_id'] = $contact_id;
@@ -489,7 +489,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  private function remove_old_linked_organisation_address($contact_id) {
+  private function remove_old_linked_organization_address($contact_id) {
     $company_data_before = $this->record->get_company_data('before');
     if (empty($company_data_before) || !$this->record->company_changed()) {
       return;
@@ -500,7 +500,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
     $relationship_id = $this->get_civi_relationship_id($contact_id, $org_contact_id);
     if (empty($relationship_id)) {
-      $this->log("Couldn't disable Relationship for user {$contact_id} and organisation {$org_contact_id}");
+      $this->log("Couldn't disable Relationship for user {$contact_id} and organization {$org_contact_id}");
       return;
     }
     $this->disable_relationship($relationship_id);
@@ -512,7 +512,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   /**
-   * checks if the Organisation is found via company Nav ID
+   * checks if the Organization is found via company Nav ID
    *     if not, create company and address
    * adds address to contact as a shared address
    * @param $contact_id
@@ -520,7 +520,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * @return mixed|string|void
    * @throws \CiviCRM_API3_Exception
    */
-  private function create_linked_organisation_address($contact_id) {
+  private function create_linked_organization_address($contact_id) {
     $company_data = $this->record->get_company_data();
     if (empty($company_data)) {
       return;

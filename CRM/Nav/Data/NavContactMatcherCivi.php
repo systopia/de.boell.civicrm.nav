@@ -39,7 +39,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Address'                        => 'street_address',
       'Address_2'                      => 'supplemental_address_1',
       'City'                          => 'city',
-      'Phone_No'                      => 'phone',  // phone_type_id = Phone, type organisation
+      'Phone_No'                      => 'phone',  // phone_type_id = Phone, type organization
       'Country_Region_Code'           => 'country_id',
       'Fax_No'                        => 'phone',  // phone_type_id = Fax, type Org
       'Post_Code'                     => 'postal_code',
@@ -84,10 +84,10 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     switch ($contact_type) {
       case 'Individual':
         return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title');
-      case 'Organisation':
+      case 'Organization':
         return array('Company_No', 'Company_Name', 'Company_Name_2');
       default:
-        throw new Exception("Invalid Contact Type {$contact_type}. Please provide valid contact Type ('individual|organisation'");
+        throw new Exception("Invalid Contact Type {$contact_type}. Please provide valid contact Type ('individual|organization'");
     }
   }
 
@@ -99,7 +99,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
    */
   public function get_address_fields($locationType) {
     switch($locationType) {
-      case 'organisation':
+      case 'organization':
         return array('Company_Adress', 'Company_Adress_2','Company_Post_Code','Company_City','Company_Country_Region_Code');
       case 'private':
         return array('Address', 'Address_2', 'City', 'Country_Region_Code', 'Post_Code' );
@@ -110,7 +110,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
 
   public function get_phone_fields($locationType) {
     switch ($locationType) {
-      case 'organisation':
+      case 'organization':
         return array('Phone_No');
       case 'private':
         return array('Private_Telefonnr');
@@ -131,7 +131,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
    */
   public function get_fax_fields($locationType) {
     switch ($locationType) {
-      case 'organisation':
+      case 'organization':
         return array('Fax_No');
       case 'private':
         return array('Private_Faxnr');
@@ -148,7 +148,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
    */
   public function get_email_fields($locationType) {
     switch ($locationType) {
-      case 'organisation':
+      case 'organization':
         return array('E_Mail', 'E_Mail_2');
       case 'private':
         return array('Private_E_Mail');
@@ -163,9 +163,9 @@ class CRM_Nav_Data_NavContactMatcherCivi {
    * @return string
    * @throws \Exception
    */
-  public function get_website_field($locationType = 'organisation') {
+  public function get_website_field($locationType = 'organization') {
     switch ($locationType) {
-      case 'organisation':
+      case 'organization':
         return 'Home_Page';
       default:
         throw new Exception("Invalid locationType for get_website with {$locationType}. Please provide a valid locationType");
