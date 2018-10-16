@@ -539,9 +539,29 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     // check if address is already available on contact
     $new_shared_address_id = $this->get_entity_id($company_data['Address'], $contact_id, 'Address');
     if (empty($new_shared_address_id)) {
-      $new_shared_address_id = $this->create_civi_entity($company_data['Address'], 'Address');
+      if ($this->has_primary_address($contact_id)) {
+        $company_data['Address']['is_primary'] = '1';
+      }
+      $this->create_civi_entity($company_data['Address'], 'Address');
     }
-    return $new_shared_address_id;
+  }
+
+  /**
+   * Checks if contact has primary address.
+   * @param $contact_id
+   *
+   * @return bool
+   */
+  private function has_primary_address($contact_id) {
+    $result = civicrm_api3('Address', 'get', array(
+      'sequential' => 1,
+      'contact_id' => $contact_id,
+      'is_primary' => 1,
+    ));
+    if ($result['count'] != '0') {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
