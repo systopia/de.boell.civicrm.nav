@@ -127,7 +127,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->filter_i3Val_values('Website', $website_data );
     // update Contact
     if (!empty($contact_data)) {
-      $this->set_values($contact_id, $contact_data, 'Contact');
+      $this->set_values($contact_id, $contact_data['Contact'], 'Contact');
     }
     $this->update_entity($address_data, $contact_id, 'Address');
     $this->update_entity($mail_data, $contact_id, 'Email');
@@ -196,7 +196,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    */
   private function set_values($entity_id, $values, $entity, $contact_id = "") {
     if (empty($entity_id)) {
-      // add contact ID, since we add a new Entityt to a given contact_id
+      // add contact ID, since we add a new Entity to a given contact_id
       $values['contact_id'] = $contact_id;
     } else {
       $values['id'] = $entity_id;

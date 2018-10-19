@@ -369,15 +369,16 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
         return;
       case 'Person':
       return [
+        // TODO: Iterate over fields from NavContactMatcher and make this more generic!
         'contact_type' => "Individual",
         'first_name'   => $this->get_nav_value_if_exist($nav_data, 'First_Name'),
         'middle_name'  => $this->get_nav_value_if_exist($nav_data, 'Middle_Name'),
         'last_name'    => $this->get_nav_value_if_exist($nav_data, 'Surname'),
         'birth_date'   => $this->get_nav_value_if_exist($nav_data, 'Geburtsdatum'),
-        // NavisionID
-        $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'No'),
+        $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'No'),        // NavisionID
         'email'        => $this->get_nav_value_if_exist($nav_data, 'E_mail'),
-        'job_title'    => $this->get_nav_value_if_exist($nav_data, 'Job_Title'),
+        'formal_title' => $this->get_nav_value_if_exist($nav_data, 'Job_Title'),
+        'job_title'    => $this->get_nav_value_if_exist($nav_data, 'Funktion'),
         'contact_type' => $this->get_contact_type($this->get_nav_value_if_exist($nav_data, 'Type')),
         'prefix_id'    => $this->get_nav_value_if_exist($nav_data, 'Salutation_Code'),
       ];

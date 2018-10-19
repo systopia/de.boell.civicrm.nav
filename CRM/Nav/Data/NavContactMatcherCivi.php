@@ -51,14 +51,14 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'First_Name'                    => 'first_name',
       'Middle_Name'                   => 'middle_name',
       'Surname'                       => 'last_name',
-      'Job_Title'                     => 'job_title',
+      'Job_Title'                     => 'formal_title',
       'Mobile_Phone_No'               => 'phone', // location_type_id = org, phone_type_id = Mobile
       'Privat_Mobile_Phone_No'        => 'phone',
       'Salutation_Code'               => 'prefix_id',
       'E_mail_2'                      => 'email', // private
       //    'Delete_Flag'                 => '', // this shouldn't be needed
       'Company_Name_2'                => $org_name_2,
-      'Funktion'                      => '',   // TODO --> what is this?
+      'Funktion'                      => 'job_title',
       'Geburtsdatum'                  => 'birth_date',
       //    'Postfach'                    => '',  TODO: how to display/import to CIviCRM
       //    'PLZ_Postfach'                => '',
@@ -83,7 +83,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
   public function get_contact_fields($contact_type){
     switch ($contact_type) {
       case 'Individual':
-        return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title');
+        return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum');
       case 'Organization':
         return array('Company_No', 'Company_Name', 'Company_Name_2');
       default:
