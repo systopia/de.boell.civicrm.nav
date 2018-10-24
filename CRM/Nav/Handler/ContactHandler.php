@@ -124,7 +124,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->filter_i3Val_values('Address', $address_data );
     $this->filter_i3Val_values('Email', $mail_data );
     $this->filter_i3Val_values('Phone', $phone_data );
-    $this->filter_i3Val_values('Website', $website_data );
+//    $this->filter_i3Val_values('Website', $website_data );
     // update Contact
     if (!empty($contact_data)) {
       $this->set_values($contact_id, $contact_data['Contact'], 'Contact');
@@ -151,6 +151,11 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $entity_ids = array();
     foreach ($entity_values[$entity] as $key => $value) {
       $entity_id = $this->get_entity_id($value, $contact_id, $entity);
+      // we have some edge cases here. Website might need a LIKE condition for URl = (array(%value))
+      if ($entity_id == "" && $entity == 'Website') {
+        $value['url'] = ['LIKE' => "%{$value['url']}"];
+        $entity_id = $this->get_entity_id($value, $contact_id, $entity);
+      }
       if ($entity_id == "") {
         // try with after values, otherwise we always fill aditional values
         // in case an after value is already in the system
@@ -307,7 +312,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
         $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
         $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
         $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
-        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
+//        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
       } catch (Exception $e) {
         $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
         $entity_name = key($entity);

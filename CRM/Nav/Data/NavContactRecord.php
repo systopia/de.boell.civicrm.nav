@@ -24,6 +24,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   private   $location_type_private;
   private   $location_type_organization;
+  private   $website_type_id;
   private $org_name_1;
   private $org_name_2;
 
@@ -44,6 +45,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->org_name_2 = CRM_Nav_Config::get('org_name_1');
     $this->location_type_private = CRM_Nav_Config::get('location_type_private');
     $this->location_type_organization = CRM_Nav_Config::get('location_type_organization');
+    $this->website_type_id = CRM_Nav_Config::get('website_type_id');
 
     parent::__construct($nav_data_after, $nav_data_before);
     $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field, $this->org_name_1, $this->org_name_2);
@@ -288,11 +290,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     if (isset($nav_data_after['Home_Page'])) {
       $this->civi_data_after['Website'][] = [
         'url'             => $this->get_nav_value_if_exist($nav_data_after, 'Home_Page'),
-        'website_type_id' => $this->location_type_private,
+        'website_type_id' => $this->website_type_id,
       ];
       $this->civi_data_before['Website'][] = [
         'url'             => $this->get_nav_value_if_exist($nav_data_before, 'Home_Page'),
-        'website_type_id' => $this->location_type_private,
+        'website_type_id' => $this->website_type_id,
       ];
     }
     //Email
@@ -715,7 +717,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
-   * not needed, but will be called. Values will be taken from other function
+   * Check if Website is available in changed data, otherwise take data from nav_after_data
    * @param $type
    *
    * @throws \Exception
@@ -735,10 +737,10 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     switch ($type) {
       case 'after':
         $result['Website'] = $this->civi_data_after['Website'];
-        break;
+        return $result;
       case 'before':
         $result['Website'] = $this->civi_data_before['Website'];
-        break;
+        return $result;
       default:
         throw new Exception("Invalid Type '{$type}' in get_changed_Website_values");
     }
