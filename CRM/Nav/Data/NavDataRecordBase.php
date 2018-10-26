@@ -35,6 +35,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   protected $civi_data_after;
   protected $civi_data_before;
   protected $changed_data;
+  protected $delete_data;
 
   protected $debug;
   protected $navision_custom_field;
@@ -77,9 +78,49 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    * Compares before and after data, and saves changes in $changed_data
    */
   protected function compare_data() {
-    $this->changed_data = array_diff($this->nav_data_after, $this->nav_data_before);
-    // FixME: is this needed?
-    unset($this->changed_data['Key']);
+    $this->changed_data = $this->check_changed_data($this->nav_data_before, $this->nav_data_after);
+    $this->delete_data  = $this->check_delete_data($this->nav_data_before, $this->nav_data_after);
+//    // FixME: is this needed?
+//    unset($this->changed_data['Key']);
+  }
+
+  /**
+   * Compare after to before data,
+   * checks if key exists in before, and if value is different
+   * @param $before
+   * @param $after
+   *
+   * @return array
+   */
+  private function check_changed_data($before, $after) {
+    $changed_data = [];
+    foreach ($after as $key => $value) {
+      if (!isset($before[$key])) {
+        $changed_data[$key] = $value;
+        continue;
+      }
+      if ($value != $before[$key]) {
+        $changed_data[$key] = $value;
+      }
+    }
+    return $changed_data;
+  }
+
+  /**
+   * Checks for elements in before that aren't available in after.
+   * @param $before
+   * @param $after
+   *
+   * @return array
+   */
+  private function check_delete_data($before, $after) {
+    $delete_data = [];
+    foreach ($before as $key => $value) {
+      if (!isset($after[$key])) {
+        $delete_data[$key] = $value;
+      }
+    }
+    return $delete_data;
   }
 
   /**
