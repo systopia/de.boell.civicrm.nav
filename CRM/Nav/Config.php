@@ -58,8 +58,28 @@ class CRM_Nav_Config {
     'Subsidie'                      => 'custom_177',
     'Graduation'                    => '11',
     'Study'                         => '12',
-    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code'
+    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
+    'Advancement_to'                => 'end_date',
+    'Förderbeginn'                  => 'start_date',
   ];
+
+  /**
+   * @param $attribute
+   *
+   * @return mixed|string
+   */
+  public static function get($attribute) {
+    if (self::$local) {
+      if (isset(self::$local_config[$attribute])) {
+        return self::$local_config[$attribute];
+      }
+      return "";
+    }
+    if (isset(self::$local_config[$attribute])) {
+      return self::$hbs_config[$attribute];
+    }
+    return "";
+  }
 
   private static $hbs_config   = [
     'hbs_contact_id'                => '4',
@@ -90,26 +110,10 @@ class CRM_Nav_Config {
     'Subsidie'                      => 'custom_131',
     'Graduation'                    => '11',
     'Study'                         => '12',
-    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code'
+    'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
+    'Advancement_to'                => 'end_date',
+    'Förderbeginn'                  => 'start_date',
   ];
-
-  /**
-   * @param $attribute
-   *
-   * @return mixed|string
-   */
-  public static function get($attribute) {
-    if (self::$local) {
-      if (isset(self::$local_config[$attribute])) {
-        return self::$local_config[$attribute];
-      }
-      return "";
-    }
-    if (isset(self::$local_config[$attribute])) {
-      return self::$hbs_config[$attribute];
-    }
-    return "";
-  }
 
   /**
    * Checks if an option_value exist, cache results locally and create

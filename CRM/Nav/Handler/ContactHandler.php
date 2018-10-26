@@ -312,6 +312,9 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
         $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
         $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
         $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
+        //TODO:
+        // Don't check website for now, we just overwrite the value from navision
+        // since i3Val doesn't support Entity Website
 //        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
       } catch (Exception $e) {
         $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");

@@ -67,13 +67,16 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
     }
   }
 
-
+  /**
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_delete_record() {
     $contact_data = $this->get_contact_data();
     // just to be safe
-    $nav_data                         = $this->get_nav_after_data();
-    $relation_code = $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code');
-    $contact_data[$this->parse_business_relation($relation_code)]  = "";
+    $nav_data                                                     = $this->get_nav_after_data();
+    $relation_code                                                = $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code');
+    $contact_data[$this->parse_business_relation($relation_code)] = "";
     return $contact_data;
   }
 
