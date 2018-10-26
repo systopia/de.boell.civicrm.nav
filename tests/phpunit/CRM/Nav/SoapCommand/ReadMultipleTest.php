@@ -27,13 +27,13 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
-    return \Civi\Test::headless()
-      ->installMe(__DIR__)
-      ->apply();
+//    return \Civi\Test::headless()
+//      ->installMe(__DIR__)
+//      ->apply();
   }
 
   public function setUp() {
-    $this->soapConnector = new CRM_Nav_SOAPConnector(FALSE);
+    $this->soapConnector = new CRM_Nav_SOAPConnector('civiContact', FALSE);
     parent::setUp();
   }
 
@@ -52,7 +52,7 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
         "Field"     => "Transferred",
         "Criteria"  => "0",
       ),
-      'setSize' => '5',
+      'setSize' => '2',
     );
     $testReadCommand = new CRM_Nav_SoapCommand_ReadMultiple($params);
     try{

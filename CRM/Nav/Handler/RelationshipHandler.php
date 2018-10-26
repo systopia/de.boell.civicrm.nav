@@ -15,19 +15,18 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Handler_RelationshipHandler
+ */
 class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
 
-  // local
-  private $creditor_custom_field_id = 'custom_42';
-  private $debitor_custom_field_id  = 'custom_43';
-
-  // HBS
-  //  private $creditor_custom_field_id = 'custom_164';
-  //  private $debitor_custom_field_id  = 'custom_165';
-
-
-  public function __construct($record) {
-    parent::__construct($record);
+  /**
+   * CRM_Nav_Handler_RelationshipHandler constructor.
+   *
+   * @param $record
+   */
+  public function __construct($record, $debug = false) {
+    parent::__construct($record, $debug);
   }
 
   /**
@@ -38,6 +37,9 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
     return $this->record->get_type() == 'civiContRelation';
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function process() {
     if (!$this->check_record_type()) {
       return;
@@ -47,13 +49,14 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
     if (empty($contact_id)) {
       throw new Exception("Couldn't get Contact to Navision id {$nav_id}");
     }
-    $contact_data = $this->record->get_contact_data();
-    $contact_data['id'] = $contact_id;
-    $result = civicrm_api3('Contact', 'create', $contact_data);
-
-    if ($result['is_error'] == 1) {
-      throw new Exception("Couldn't add Relation to Contact ({$contact_id}). Error Message: {$result['error_message']}");
+    if ($this->check_delete_record()) {
+      $contact_data = $this->record->get_delete_record();
+    } else {
+      $contact_data = $this->record->get_contact_data();
     }
+    $contact_data['id'] = $contact_id;
+    $this->create_civi_entity($contact_data, 'Contact');
+
     // mark record as consumed
     $this->record->set_consumed();
   }

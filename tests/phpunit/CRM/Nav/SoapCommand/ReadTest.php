@@ -27,9 +27,9 @@ class CRM_Nav_SoapCommand_ReadTest extends \PHPUnit_Framework_TestCase {
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
-    return \Civi\Test::headless()
-      ->installMe(__DIR__)
-      ->apply();
+//    return \Civi\Test::headless()
+//      ->installMe(__DIR__)
+//      ->apply();
   }
 
   public function setUp() {

@@ -15,7 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
+/**
+ * Class CRM_Nav_Data_NavContactMatcherCivi
+ */
 class CRM_Nav_Data_NavContactMatcherCivi {
 
   private $navision_custom_field;
@@ -23,6 +25,13 @@ class CRM_Nav_Data_NavContactMatcherCivi {
 
   private $field_mapping;
 
+  /**
+   * CRM_Nav_Data_NavContactMatcherCivi constructor.
+   *
+   * @param $navision_custom_id
+   * @param $org_name_1
+   * @param $org_name_2
+   */
   public function __construct($navision_custom_id, $org_name_1, $org_name_2) {
     $this->navision_custom_field = $navision_custom_id;
     $this->field_mapping = array(
@@ -30,7 +39,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Address'                        => 'street_address',
       'Address_2'                      => 'supplemental_address_1',
       'City'                          => 'city',
-      'Phone_No'                      => 'phone',  // phone_type_id = Phone, type organisation
+      'Phone_No'                      => 'phone',  // phone_type_id = Phone, type organization
       'Country_Region_Code'           => 'country_id',
       'Fax_No'                        => 'phone',  // phone_type_id = Fax, type Org
       'Post_Code'                     => 'postal_code',
@@ -42,14 +51,14 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'First_Name'                    => 'first_name',
       'Middle_Name'                   => 'middle_name',
       'Surname'                       => 'last_name',
-      'Job_Title'                     => 'job_title',
+      'Job_Title'                     => 'formal_title',
       'Mobile_Phone_No'               => 'phone', // location_type_id = org, phone_type_id = Mobile
       'Privat_Mobile_Phone_No'        => 'phone',
       'Salutation_Code'               => 'prefix_id',
       'E_mail_2'                      => 'email', // private
       //    'Delete_Flag'                 => '', // this shouldn't be needed
       'Company_Name_2'                => $org_name_2,
-      'Funktion'                      => '',   // TODO --> what is this?
+      'Funktion'                      => 'job_title',
       'Geburtsdatum'                  => 'birth_date',
       //    'Postfach'                    => '',  TODO: how to display/import to CIviCRM
       //    'PLZ_Postfach'                => '',
@@ -65,20 +74,32 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     );
   }
 
+  /**
+   * @param $contact_type
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_contact_fields($contact_type){
     switch ($contact_type) {
       case 'Individual':
-        return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title');
-      case 'Organisation':
+        return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum');
+      case 'Organization':
         return array('Company_No', 'Company_Name', 'Company_Name_2');
       default:
-        throw new Exception("Invalid Contact Type {$contact_type}. Please provide valid contact Type ('individual|organisation'");
+        throw new Exception("Invalid Contact Type {$contact_type}. Please provide valid contact Type ('individual|organization'");
     }
   }
 
+  /**
+   * @param $locationType
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_address_fields($locationType) {
     switch($locationType) {
-      case 'organisation':
+      case 'organization':
         return array('Company_Adress', 'Company_Adress_2','Company_Post_Code','Company_City','Company_Country_Region_Code');
       case 'private':
         return array('Address', 'Address_2', 'City', 'Country_Region_Code', 'Post_Code' );
@@ -89,7 +110,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
 
   public function get_phone_fields($locationType) {
     switch ($locationType) {
-      case 'organisation':
+      case 'organization':
         return array('Phone_No');
       case 'private':
         return array('Private_Telefonnr');
@@ -102,9 +123,15 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  /**
+   * @param $locationType
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_fax_fields($locationType) {
     switch ($locationType) {
-      case 'organisation':
+      case 'organization':
         return array('Fax_No');
       case 'private':
         return array('Private_Faxnr');
@@ -113,10 +140,16 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
+  /**
+   * @param $locationType
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function get_email_fields($locationType) {
     switch ($locationType) {
-      case 'organisation':
-        return array('E_mail', 'E_mail_2');
+      case 'organization':
+        return array('E_Mail', 'E_Mail_2');
       case 'private':
         return array('Private_E_Mail');
       default:
@@ -124,15 +157,27 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     }
   }
 
-  public function get_website_fields($locationType = 'organisation') {
+  /**
+   * @param string $locationType
+   *
+   * @return string
+   * @throws \Exception
+   */
+  public function get_website_field($locationType = 'organization') {
     switch ($locationType) {
-      case 'organisation':
-        return array('Home_Page');
+      case 'organization':
+        return 'Home_Page';
       default:
         throw new Exception("Invalid locationType for get_website with {$locationType}. Please provide a valid locationType");
     }
   }
 
+  /**
+   * @param $nav_index
+   *
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_civi_values($nav_index) {
     if (!isset($this->field_mapping[$nav_index])) {
       throw new Exception("Invalid Index '{$nav_index}'. Dataset invalid or mapping has changed.");

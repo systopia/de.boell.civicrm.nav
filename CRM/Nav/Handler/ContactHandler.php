@@ -15,14 +15,25 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Handler_ContactHandler
+ */
 class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
   private $i3Val_values = array();
 
-  public function __construct($record) {
-    parent::__construct($record);
+  /**
+   * CRM_Nav_Handler_ContactHandler constructor.
+   *
+   * @param $record
+   */
+  public function __construct($record, $debug = false) {
+    parent::__construct($record, $debug);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function process() {
     if (!$this->check_record_type()) {
       return;
@@ -37,12 +48,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
 
     if ($this->check_new_record()) {
-      try {
-        $this->create_civi_full_contact();
-      } catch (Exception $e) {
-        $this->log($e->getMessage());
-        return;
-      }
+      $this->create_civi_full_contact();
       $this->record->set_consumed();
       return;
     }
@@ -59,7 +65,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $changed_entities = $this->get_update_values('before');
 
     // remove old linked address in case company has changed
-    $this->remove_old_linked_organisation_address($contact_id);
+    $this->remove_old_linked_organization_address($contact_id);
     // TODO: Check/filter Values first
     // --> then update Contact data WITHOUT conflicting values
     // --> then put values to i3Val
@@ -67,15 +73,46 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     // valid change operation
     $this->update_values($contact_id);
+    $this->fill_unchanged_values($contact_id);
+
     $this->update_values_with_i3val($contact_id);
     $this->record->set_consumed();
   }
 
+  private function fill_unchanged_values($contact_id) {
+    $this->fill_update_entity($contact_id, 'Phone');
+    $this->fill_update_entity($contact_id, 'Address');
+    $this->fill_update_entity($contact_id, 'Email');
+    $this->fill_update_entity($contact_id, 'Website');
+  }
+
   /**
    * @param $contact_id
+   * @param $entity
+   */
+  private function fill_update_entity($contact_id, $entity) {
+    $get_unchanged_value_function_name = "get_unchanged_{$entity}_values";
+    $data_records = $this->record->{$get_unchanged_value_function_name}();
+    foreach ($data_records[$entity]['before'] as $key => $data) {
+      if (empty($data)) {
+        continue;
+      }
+      $entity_id = $this->get_entity_id($data, $contact_id, $entity);
+      if (!empty($entity_id)) {
+        $data_records[$entity]['after'][$key]['id'] = $entity_id;
+      }
+      $data_records[$entity]['after'][$key]['contact_id'] = $contact_id;
+      $id = $this->create_civi_entity($data_records[$entity]['after'][$key], $entity);
+    }
+  }
+
+  /**
+   * @param $contact_id
+   *
+   * @throws \Exception
    */
   private function update_values($contact_id) {
-    $this->create_linked_organisation_address($contact_id);
+    $this->create_linked_organization_address($contact_id);
 
     $contact_data = $this->record->get_changed_contact_values('after');
     $address_data =  $this->record->get_changed_Address_values('before');
@@ -87,10 +124,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->filter_i3Val_values('Address', $address_data );
     $this->filter_i3Val_values('Email', $mail_data );
     $this->filter_i3Val_values('Phone', $phone_data );
-    $this->filter_i3Val_values('Website', $website_data );
+//    $this->filter_i3Val_values('Website', $website_data );
     // update Contact
     if (!empty($contact_data)) {
-      $this->set_values($contact_id, $contact_data, 'Contact');
+      $this->set_values($contact_id, $contact_data['Contact'], 'Contact');
     }
     $this->update_entity($address_data, $contact_id, 'Address');
     $this->update_entity($mail_data, $contact_id, 'Email');
@@ -98,9 +135,15 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->update_entity($website_data, $contact_id, 'Website');
   }
 
+  /**
+   * @param $entity_values
+   * @param $contact_id
+   * @param $entity
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function update_entity($entity_values, $contact_id, $entity) {
     if (empty($entity_values[$entity])) {
-      // FixMe: Is this correct? What happens if before value is empty, and after value is set? (e.g. fill up)
       return;
     }
     $get_changed_value_function_name = "get_changed_{$entity}_values";
@@ -108,6 +151,11 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $entity_ids = array();
     foreach ($entity_values[$entity] as $key => $value) {
       $entity_id = $this->get_entity_id($value, $contact_id, $entity);
+      // we have some edge cases here. Website might need a LIKE condition for URl = (array(%value))
+      if ($entity_id == "" && $entity == 'Website') {
+        $value['url'] = ['LIKE' => "%{$value['url']}"];
+        $entity_id = $this->get_entity_id($value, $contact_id, $entity);
+      }
       if ($entity_id == "") {
         // try with after values, otherwise we always fill aditional values
         // in case an after value is already in the system
@@ -143,9 +191,17 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
-  private function set_values($entity_id, $values, $entity, $contact_id) {
+  /**
+   * @param        $entity_id
+   * @param        $values
+   * @param        $entity
+   * @param string $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function set_values($entity_id, $values, $entity, $contact_id = "") {
     if (empty($entity_id)) {
-      // add contact ID, since we add a new Entityt to a given contact_id
+      // add contact ID, since we add a new Entity to a given contact_id
       $values['contact_id'] = $contact_id;
     } else {
       $values['id'] = $entity_id;
@@ -227,6 +283,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return FALSE;
   }
 
+  /**
+   * @param $values
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function push_values_to_i3val($values, $contact_id) {
     $values['id'] = $contact_id;
     $values['i3val_note'] = "Automatically added by Navision synchronisation";
@@ -237,18 +299,21 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
+  /**
+   * @param $entities
+   * @param $contact_id
+   */
   private function check_nav_before_vs_civi($entities, $contact_id) {
 
     foreach ($entities as $entity) {
       try {
-        // TODO: check Civi Organisation data?? Currently only Individual is checked!
+        // TODO: check Civi Organization data?? Currently only Individual is checked!
         $this->check_civi_contact_data($entity['Contact'], $contact_id);
         $this->check_civi_entity_data($entity['Address'], $contact_id, 'Address');
         $this->check_civi_entity_data($entity['Phone'], $contact_id, 'Phone');
         $this->check_civi_entity_data($entity['Email'], $contact_id, 'Email');
-        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
+//        $this->check_civi_entity_data($entity['Website'], $contact_id, 'Website');
       } catch (Exception $e) {
-        // TODO: Setup ENTITY (+ KEY) for i3VAL processing
         $this->log("Navision Data (before) doesn't match Civi Data. Proceeding with i3Val. Message: {$e->getMessage()}");
         $entity_name = key($entity);
         $this->i3Val_values[$entity_name] = $entity[$entity_name];
@@ -256,7 +321,13 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
   }
 
-
+  /**
+   * @param $navision_data
+   * @param $contact_id
+   * @param $entity
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function check_civi_entity_data($navision_data, $contact_id, $entity) {
     if (!isset($navision_data)) {
       return;
@@ -345,6 +416,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return TRUE;
   }
 
+  /**
+   * @param $contact_id
+   * @param $nav_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function add_nav_id_to_contact($contact_id, $nav_id) {
     $values = array(
       'id'          => $contact_id,
@@ -358,7 +435,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   /**
-   * If contact coulddn't be identified by NavId, it will be identified by email(s)
+   * If contact couldn't be identified by NavId, it will be identified by email(s)
    * and first_name and last name. If that's not available, a new contact is created
    * with the AFTER values and ALL provided values
    * @param $contact_id
@@ -375,12 +452,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
       if ($lookup_contact_id == "") {
         // create contact with all available data, then return '-1' to abort further processing
-        try {
-          $this->create_civi_full_contact();
-        } catch (Exception $e) {
-          $this->log($e->getMessage());
-          return '-2';
-        }
+        $this->create_civi_full_contact();
         return '-1';
       }
       return $lookup_contact_id;
@@ -394,10 +466,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   private function create_civi_full_contact() {
 
     // create Contact
-    $contact_data = $this->record->get_contact_details('Individual');
+    $contact_data = $this->record->get_contact_details();
     $contact_id = $this->create_civi_entity($contact_data, 'Contact');
 
-    $this->create_linked_organisation_address($contact_id);
+    $this->create_linked_organization_address($contact_id);
 
     $address = $this->record->get_civi_individual_address();
     $address['contact_id'] = $contact_id;
@@ -422,7 +494,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  private function remove_old_linked_organisation_address($contact_id) {
+  private function remove_old_linked_organization_address($contact_id) {
     $company_data_before = $this->record->get_company_data('before');
     if (empty($company_data_before) || !$this->record->company_changed()) {
       return;
@@ -433,7 +505,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
     $relationship_id = $this->get_civi_relationship_id($contact_id, $org_contact_id);
     if (empty($relationship_id)) {
-      $this->log("Couldn't disable Relationship for user {$contact_id} and organisation {$org_contact_id}");
+      $this->log("Couldn't disable Relationship for user {$contact_id} and organization {$org_contact_id}");
       return;
     }
     $this->disable_relationship($relationship_id);
@@ -445,41 +517,64 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   /**
-   * checks if the Organisation is found via company Nav ID
+   * checks if the Organization is found via company Nav ID
    *     if not, create company and address
    * adds address to contact as a shared address
    * @param $contact_id
    *
-   * @throws \Exception
+   * @return mixed|string|void
+   * @throws \CiviCRM_API3_Exception
    */
-  private function create_linked_organisation_address($contact_id) {
+  private function create_linked_organization_address($contact_id) {
     $company_data = $this->record->get_company_data();
     if (empty($company_data)) {
       return;
     }
     $org_contact_id = $this->get_contact_id_from_nav_id($company_data['Org_nav_id']);
     if (empty($org_contact_id)) {
+      $company_data['Contact'][$this->navision_custom_field] = $company_data['Org_nav_id'];
       $org_contact_id = $this->create_civi_entity($company_data['Contact'], 'Contact');
       $company_data['Address']['contact_id'] = $org_contact_id;
       $address_id = $this->create_civi_entity($company_data['Address'], 'Address');
     } else {
-      $address_id = $this->get_entity_id($company_data['Address'], $org_contact_id, 'Address');
+      $address_id = $this->get_entity_id(array('is_primary' => 1), $org_contact_id, 'Address');
     }
     $company_data['Address']['contact_id'] = $contact_id;
     $company_data['Address']['master_id'] = $address_id;
     // check if address is already available on contact
     $new_shared_address_id = $this->get_entity_id($company_data['Address'], $contact_id, 'Address');
     if (empty($new_shared_address_id)) {
-      $new_shared_address_id = $this->create_civi_entity($company_data['Address'], 'Address');
+      if ($this->has_primary_address($contact_id)) {
+        $company_data['Address']['is_primary'] = '1';
+      }
+      $this->create_civi_entity($company_data['Address'], 'Address');
     }
-    return $new_shared_address_id;
+  }
+
+  /**
+   * Checks if contact has primary address.
+   * @param $contact_id
+   *
+   * @return bool
+   */
+  private function has_primary_address($contact_id) {
+    $result = civicrm_api3('Address', 'get', array(
+      'sequential' => 1,
+      'contact_id' => $contact_id,
+      'is_primary' => 1,
+    ));
+    if ($result['count'] != '0') {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
    * @param $contact_ids      (array with contact_ids from email lookup)
    * @param $contact_details  (array first_name, last_name)
    *
-   * @return string (contact_id or "")
+   * @return string
+   * @throws \CiviCRM_API3_Exception
    */
   private function get_contact($contact_ids, $contact_details) {
     if (!empty($contact_ids)) {
@@ -497,6 +592,12 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return $result['values']['contact_id'];
   }
 
+  /**
+   * @param $emails
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   private function get_contact_ids_via_emails($emails) {
     if (empty($emails)) {
       return array();
@@ -516,14 +617,11 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     return $contact_ids;
   }
 
-  private function check_delete_record() {
-    return $this->record->get_change_type() == 'Delete';
-  }
-
-  private function check_new_record() {
-    return $this->record->get_change_type() == 'New';
-  }
-
+  /**
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function delete_nav_id_from_contact($contact_id) {
     $result = civicrm_api3('Contact', 'create', array(
       'sequential' => 1,

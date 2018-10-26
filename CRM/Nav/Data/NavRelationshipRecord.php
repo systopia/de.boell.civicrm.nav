@@ -15,25 +15,33 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
+/**
+ * Class CRM_Nav_Data_NavRelationshipRecord
+ */
 class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase {
 
   protected $type = "civiContRelation";
 
-  // local
-  private $creditor_custom_field_id = 'custom_42';
-  private $debitor_custom_field_id = 'custom_43';
+  private $creditor_custom_field_id;
+  private $debitor_custom_field_id;
 
-// HBS
-//  private $creditor_custom_field_id = 'custom_164';
-//  private $debitor_custom_field_id  = 'custom_165';
-
+  /**
+   * CRM_Nav_Data_NavRelationshipRecord constructor.
+   *
+   * @param      $nav_data_after
+   * @param null $nav_data_before
+   *
+   * @throws \Exception
+   */
   public function __construct($nav_data_after, $nav_data_before = NULL) {
+    $this->creditor_custom_field_id = CRM_Nav_Config::get('creditor_custom_field_id');
+    $this->debitor_custom_field_id = CRM_Nav_Config::get('debitor_custom_field_id');
     parent::__construct($nav_data_after, $nav_data_before);
   }
 
-
-
+  /**
+   * @throws \Exception
+   */
   protected function convert_to_civi_data() {
     $nav_data                         = $this->get_nav_after_data();
     $relation_code = $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code');
@@ -42,6 +50,12 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
     );
   }
 
+  /**
+   * @param $relation_code
+   *
+   * @return mixed|string
+   * @throws \Exception
+   */
   private function parse_business_relation($relation_code) {
     switch ($relation_code) {
       case 'KREDITOR':
@@ -53,6 +67,19 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
     }
   }
 
+
+  public function get_delete_record() {
+    $contact_data = $this->get_contact_data();
+    // just to be safe
+    $nav_data                         = $this->get_nav_after_data();
+    $relation_code = $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code');
+    $contact_data[$this->parse_business_relation($relation_code)]  = "";
+    return $contact_data;
+  }
+
+  /**
+   * @return mixed
+   */
   public function get_contact_data() {
     return $this->civi_data_after['Contact'];
   }

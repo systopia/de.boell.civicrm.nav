@@ -13,7 +13,7 @@ function _civicrm_api3_nav_Sync_spec(&$spec) {
   $spec['poll_size']['api.default'] = 10;
   $spec['entity']['api.default'] = "";
   $spec['entity']['api.description'] = "Restrict api call to nav data sources. Can be 'civiContact', 'civiContRelation', 'civiContStatus', 'civiProcess'";
-  $spec['debug']['api.defaul'] = FALSE;
+  $spec['debug']['api.default'] = FALSE;
 }
 
 /**

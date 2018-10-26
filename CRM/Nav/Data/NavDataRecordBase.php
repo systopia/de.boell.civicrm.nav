@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Data_NavDataRecordBase
+ */
 abstract class CRM_Nav_Data_NavDataRecordBase {
 
   private $nav_data_before;
@@ -22,22 +25,19 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   private $nav_data_after;
   private $consumed;
 
+  private $error_message;
+
   // overwritten by subclasses
   protected $type;
   protected $change_type;
 
   protected $timestamp;
-  protected $civi_data_mapping;
   protected $civi_data_after;
   protected $civi_data_before;
   protected $changed_data;
 
   protected $debug;
-
-  // local
-  protected $navision_custom_field = 'custom_41';
-// hbs
-//  protected $navision_custom_field = 'custom_147';
+  protected $navision_custom_field;
 
   /**
    * CRM_Nav_Data_NavDataRepresentationBase constructor.
@@ -46,22 +46,20 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    *
    * @throws \Exception if data is not valid
    */
-  public function __construct($nav_data_after, $nav_data_before = NULL) {
+  public function __construct($nav_data_after, $nav_data_before = NULL, $debug = FALSE) {
+    $this->navision_custom_field = CRM_Nav_Config::get('navision_custom_field');
     $this->nav_data_before = $nav_data_before;
     $this->nav_data_after = $nav_data_after;
     $this->consumed = FALSE;
     $this->set_timestamp();
     $this->change_type = $this->get_nav_value_if_exist($this->nav_data_after, 'Change_Type');
     $this->compare_data();
-    $this->set_navision_data_model("{$this->type}.json");
     $this->convert_to_civi_data();
-
-    // FixMe:
-    $this->debug = TRUE; // for now always true
+    $this->debug = $debug;
   }
 
   /**
-   * @throws \Exception
+   * set_timestamp
    */
   private function set_timestamp() {
     if ($this->nav_data_after['Change_Type'] == 'New') {
@@ -71,7 +69,6 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     if (($this->nav_data_before['_TIMESTAMP'] != $this->nav_data_after['_TIMESTAMP'])){
       // FixME: Timestamps differ a bit, throw a warning for now, implement a threshold later
       $this->log("Timestamps of before and after don't match. '{$this->nav_data_before['_TIMESTAMP']}' != '{$this->nav_data_after['_TIMESTAMP']}'");
-      //      throw new Exception("Timestamps of before and after don't match.");
     }
     $this->timestamp = $this->nav_data_before['_TIMESTAMP'];
   }
@@ -85,20 +82,11 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     unset($this->changed_data['Key']);
   }
 
-  // TODO: is this still needed? Should be depreciated now.
-  protected function set_navision_data_model($file_name) {
-    $nav_contact_file = "resources/dataModel/{$file_name}";
-    $file_content = file_get_contents($nav_contact_file);
-    $this->civi_data_mapping = json_decode($file_content, TRUE);
-  }
-
-  abstract protected function convert_to_civi_data();
-
   /**
    * Checks if the record is consumed
    * @return mixed
    */
-  public function is_consumed() {
+    public function is_consumed() {
     return $this->consumed;
   }
 
@@ -110,14 +98,20 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     // TODO: set Transferred flag = 1
     $this->nav_data_before['Transferred'] = 1;
     if (isset($this->nav_data_before)) {
-      $this->nav_data_before['Transferred'] =1;
+      $this->nav_data_before['Transferred'] = 1;
     }
   }
 
+  /**
+   * @return mixed
+   */
   public function get_nav_after_data(){
     return $this->nav_data_after;
   }
 
+  /**
+   * @return mixed
+   */
   public function get_nav_before_data() {
     return $this->nav_data_before;
   }
@@ -131,18 +125,30 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    */
   protected function get_nav_value_if_exist(&$nav_data, $index) {
     if (isset($nav_data[$index])) {
-      return $nav_data[$index];
+      // Fix MS Date; 0001-01-01 --> means empty/zero date
+      if (in_array($nav_data[$index], CRM_Nav_Config::$filter)) {
+        return "";
+      }
+      // remove possible leading zeroes in option values (civiProcess)
+      return ltrim($nav_data[$index], '0');
     }
     $this->log("Value not set for {$index}");
     return "";
   }
 
+  /**
+   * @param $message
+   */
   protected function log($message) {
     if ($this->debug) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
     }
   }
 
+  /**
+   * @return mixed
+   * @throws \Exception
+   */
   public function get_individual_navision_id() {
     if (!empty($this->nav_data_after['Contact_No'])) {
       return $this->nav_data_after['Contact_No'];
@@ -155,21 +161,57 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function dump_record() {
-    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Dumping Record");
     $dump['timestamp'] = $this->timestamp;
     $dump['nav_before'] = $this->nav_data_before;
     $dump['civi_extra_data']  = $this->civi_data_after;
     $dump['changed_data']  = $this->changed_data;
-    CRM_Core_Error::debug_log_message(json_encode($dump));
+    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] DUMP: ". json_encode($dump));
   }
 
+  /**
+   * @return mixed
+   */
   public function get_type() {
     return $this->type;
   }
 
+  /**
+   * @return string
+   */
   public function get_change_type() {
     return $this->change_type;
   }
 
-}
+  public function set_error_message($message) {
+    $this->error_message = $message;
+  }
 
+  /**
+   * @return mixed
+   */
+  public function get_error_message() {
+    return $this->error_message;
+  }
+
+  /**
+   * @param string $type
+   *
+   * @return false|string
+   */
+  public function get_summary($type = 'array') {
+    $dump['timestamp'] = $this->timestamp;
+    $dump['nav_before'] = $this->nav_data_before;
+    $dump['civi_extra_data']  = $this->civi_data_after;
+    $dump['changed_data']  = $this->changed_data;
+    switch ($type) {
+      case 'json':
+        return json_encode($dump);
+      case 'array':
+        return $dump;
+      default:
+      return $dump;
+    }
+  }
+
+  abstract protected function convert_to_civi_data();
+}
