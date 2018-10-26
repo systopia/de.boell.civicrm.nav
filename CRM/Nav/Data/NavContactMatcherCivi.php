@@ -55,7 +55,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Mobile_Phone_No'               => 'phone', // location_type_id = org, phone_type_id = Mobile
       'Privat_Mobile_Phone_No'        => 'phone',
       'Salutation_Code'               => 'prefix_id',
-      'E_mail_2'                      => 'email', // private
+      'E_Mail_2'                      => 'email', // private
       //    'Delete_Flag'                 => '', // this shouldn't be needed
       'Company_Name_2'                => $org_name_2,
       'Funktion'                      => 'job_title',
