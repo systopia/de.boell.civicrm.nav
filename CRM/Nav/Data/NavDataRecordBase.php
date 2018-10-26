@@ -130,7 +130,11 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
         return "";
       }
       // remove possible leading zeroes in option values (civiProcess)
-      return ltrim($nav_data[$index], '0');
+      // TODO: this necessary for all values, or maybe filter for just the option group values?
+      if ($this->type == 'civiProcess') {
+        return ltrim($nav_data[$index], '0');
+      }
+      return $nav_data[$index];
     }
     $this->log("Value not set for {$index}");
     return "";
