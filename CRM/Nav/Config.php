@@ -61,6 +61,12 @@ class CRM_Nav_Config {
     'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
     'Advancement_to'                => 'end_date',
     'Förderbeginn'                  => 'start_date',
+    // phone_type_id mapping
+    'Phone'                         => '1',
+    'Mobile'                        => '2',
+    'Fax'                           => '3',
+    'Pager'                         => '4',
+    'Voicemail'                     => '5',
   ];
 
   /**
@@ -113,6 +119,12 @@ class CRM_Nav_Config {
     'bewerbungscode_option_group'   => 'bewerbung_vorgang_code',
     'Advancement_to'                => 'end_date',
     'Förderbeginn'                  => 'start_date',
+    // phone_type_id mapping
+    'Phone'                         => '1',
+    'Mobile'                        => '2',
+    'Fax'                           => '3',
+    'Pager'                         => '4',
+    'Voicemail'                     => '5',
   ];
 
   /**

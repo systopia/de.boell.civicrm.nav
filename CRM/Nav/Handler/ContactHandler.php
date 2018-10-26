@@ -339,7 +339,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       if (empty($data)) {
         // empty data here, means we have to create this field to fill up contact
         // values will be filled later, for now we don't need i3Val
-        return;
+        continue;
       }
       $result = civicrm_api3($entity, 'get', array(
         'sequential' => 1,
@@ -400,6 +400,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    */
   private function compare_data($nav_data, $civi_query_result) {
     foreach ($nav_data as $nav_civi_key => $nav_value) {
+      // phone type mapping:
+      if ($nav_civi_key == 'phone_type_id') {
+        $nav_value = CRM_Nav_Config::get($nav_value);
+      }
       // FIXME: is rtrim necessary here? Sometimes data from navision seems to be fucked with spaces in the end
       if (strcasecmp($civi_query_result[$nav_civi_key], rtrim($nav_value, " ")) != 0) {
         // extra check for country_id - option Value Lookup
