@@ -389,24 +389,36 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
     //Email
     // FixMe: Primary email is in Civi_person_data()
+    $email_org_1 = [];
+    $email_priv = [];
+    $email_priv_2 = [];
     if (isset($nav_data_after['E_Mail'])) {
-      $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_organization, 'E_Mail', $nav_data_after);
+      $email_org_1['after']  = $this->create_civi_mail_values($this->location_type_organization, 'E_Mail', $nav_data_after);
     }
     if (isset($nav_data_before['E_Mail'])) {
-      $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_organization, 'E_Mail', $nav_data_before);
+      $email_org_1['before'] = $this->create_civi_mail_values($this->location_type_organization, 'E_Mail', $nav_data_before);
     }
     if (isset($nav_data_after['E_Mail_2'])) {
-      $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_private, 'E_Mail_2', $nav_data_after);
+      $email_priv_2['after'] = $this->create_civi_mail_values($this->location_type_private, 'E_Mail_2', $nav_data_after);
     }
     if (isset($nav_data_before['E_Mail_2'])) {
-      $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_private, 'E_Mail_2', $nav_data_before);
+      $email_priv_2['before'] = $this->create_civi_mail_values($this->location_type_private, 'E_Mail_2', $nav_data_before);
     }
     if (isset($nav_data_after['Private_E_Mail'])) {
-      $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_private, 'Private_E_Mail', $nav_data_after);
+      $email_priv['after'] = $this->create_civi_mail_values($this->location_type_private, 'Private_E_Mail', $nav_data_after);
     }
     if (isset($nav_data_before['Private_E_Mail'])) {
-      $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_private, 'Private_E_Mail', $nav_data_before);
+      $email_priv['before'] = $this->create_civi_mail_values($this->location_type_private, 'Private_E_Mail', $nav_data_before);
     }
+    $this->Email = new CRM_Nav_Data_EntityData_Email(
+      $email_org_1,
+      $email_priv,
+      $email_priv_2,
+      $this->location_type_private,
+      $this->location_type_organization,
+      $this->Contact->get_contact_id()
+    );
+
   }
 
   /**
