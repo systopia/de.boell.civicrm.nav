@@ -237,22 +237,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
-  /*
-   * check if organization data is set
-   * if so - add 'organization_address' to $civi_extra_data
-   * and fill in data from compare
-   */
-  private function convert_civi_addresses() {
-    $nav_data_after  = $this->get_nav_after_data();
-    $nav_data_before = $this->get_nav_before_data();
 
-    // Private Address
-    $this->civi_data_after['Address']['individual']  = $this->create_civi_address_values_private($nav_data_after);
-    $this->civi_data_before['Address']['individual'] = $this->create_civi_address_values_private($nav_data_before);
-    // organizationAddress
-    $this->civi_data_after['Address']['organization']  = $this->create_civi_address_values_organization($nav_data_after);
-    $this->civi_data_before['Address']['organization'] = $this->create_civi_address_values_organization($nav_data_before);
-  }
 
   /**
    * @param $nav_data
@@ -515,6 +500,35 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $this->get_individual_navision_id()
     );
 
+  }
+
+  /*
+ * check if organization data is set
+ * if so - add 'organization_address' to $civi_extra_data
+ * and fill in data from compare
+ */
+  private function convert_civi_addresses() {
+    $nav_data_after  = $this->get_nav_after_data();
+    $nav_data_before = $this->get_nav_before_data();
+
+    // Private Address
+    $private_before = $this->create_civi_address_values_private($nav_data_before);
+    $private_after  = $this->create_civi_address_values_private($nav_data_after);
+    // organizationAddress
+    $organization_before  = $this->create_civi_address_values_organization($nav_data_before);
+    $organization_after  = $this->create_civi_address_values_organization($nav_data_after);
+
+    $contact_id = $this->Contact->get_contact_id();
+
+    $this->Address = new CRM_Nav_Data_EntityData_Address(
+      $private_before,
+      $private_after,
+      $organization_before,
+      $organization_after,
+      $contact_id,
+      $this->location_type_private,
+      $this->location_type_organization
+    );
   }
 
 
