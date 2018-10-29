@@ -48,7 +48,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
 
     if ($this->check_new_record()) {
-      $this->create_civi_full_contact();
+      $this->record->create_full_contact();
       $this->record->set_consumed();
       return;
     }

@@ -55,6 +55,13 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  public function create_full($contact_id) {
+    foreach ($this->iterate_values('after') as $phone_value) {
+      $phone_value['contact_id'] = $contact_id;
+      $this->create_entity('Phone', $phone_value);
+    }
+  }
+
   protected function get_civi_data() {
     $result = civicrm_api3('Phone', 'get', array(
       'sequential' => 1,
@@ -70,6 +77,29 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     foreach ($result['values'] as $civi_phone) {
       $this->assign_civi_phone_type($civi_phone);
     }
+  }
+
+  private function iterate_values($type) {
+    $result = [];
+    if(isset($this->_phone_org[$type])) {
+      $result[] = $this->_phone_org[$type];
+    }
+    if(isset($this->_mobile_org[$type])) {
+      $result[] = $this->_mobile_org[$type];
+    }
+    if(isset($this->$fax_org[$type])) {
+      $result[] = $this->_fax_org[$type];
+    }
+    if(isset($this->_phone_priv[$type])) {
+      $result[] = $this->_phone_priv[$type];
+    }
+    if(isset($this->_mobile_priv[$type])) {
+      $result[] = $this->_mobile_priv[$type];
+    }
+    if(isset($this->_fax_priv[$type])) {
+      $result[] = $this->_fax_priv[$type];
+    }
+    return $result;
   }
 
   private function assign_civi_phone_type($civi_phone_data) {

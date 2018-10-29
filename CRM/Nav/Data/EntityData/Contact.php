@@ -26,7 +26,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
   private $_navision_id;
   private $_nav_custom_field;
   private $_contact_id;
-  private $_organisation_id;
+  private $_organisation_id;    // TODO
 
   // Civi Data
   private $civi_contact_data;
@@ -39,8 +39,6 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->_navision_id         = $nav_id;
     $this->_nav_custom_field    = CRM_Nav_Config::get('navision_custom_field');
 
-    // get live civi data
-//            return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum');
     $this->get_civi_ids();
     $this->get_civi_data();
   }
@@ -49,22 +47,57 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     return $this->_contact_id;
   }
 
+  public function get_org_id() {
+    return $this->_organisation_id;
+  }
+
+  /**
+   * create Contact for Person, and if set for Company as well
+   */
+  public function create_full() {
+    $this->create_entity('Contact', $this->_individual_after);
+    $this->create_entity('Contact', $this->_organisation_after);
+  }
+
   // Helper
   private function get_civi_ids() {
-    $result = civicrm_api3('Contact', 'get', array(
-      'sequential'             => 1,
-      $this->_nav_custom_field => $this->_navision_id,
-    ));
-    if ($result['count'] != 1) {
-      $this->_contact_id = "";
-      $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts");
-      // TODO: Create Contact now!! $_contact_id is needed
+    $values = [$this->_nav_custom_field => $this->_navision_id,];
+    $result = $this->get_entity('Contact', $values);
 
+    if ($result['count'] == '0') {
+      $this->_contact_id = $this->create_contact();
+    }
+    if ($result['count'] > '1') {
+      $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
       return;
     }
     $this->_contact_id = $result['id'];
 
-    // TODO: get organisation ID here as well
+    if ($this->_organisation_before[$this->_nav_custom_field] == $this->_navision_id) {
+      // we don't have organization data yet
+      return;
+    }
+
+    if (isset($this->_organisation_before[$this->_nav_custom_field])) {
+      $values = [$this->_nav_custom_field => $this->_organisation_before[$this->_nav_custom_field],];
+      $result = $this->get_entity('Contact', $values);
+      if ($result['count'] == '0') {
+        $this->_organisation_id = $this->create_organization();
+      }
+      if ($result['count'] > '1') {
+        $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
+        return;
+      }
+      $this->_organisation_id = $result['id'];
+    }
+  }
+
+  private function create_contact() {
+    return $this->create_entity('Contact', $this->_individual_after)['id'];
+  }
+
+  private function create_organization() {
+    return $this->create_entity('Contact', $this->_organisation_after)['id'];
   }
 
   /**

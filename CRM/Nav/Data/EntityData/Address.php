@@ -44,6 +44,22 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  public function create_full($contact_id, $organization_id) {
+    if (isset($this->_organisation_after)) {
+      $org_values = $this->_organisation_after;
+      $org_values['contact_id'] = $organization_id;
+      $org_addr_id = $this->create_entity('Address', $org_values);
+    }
+    if (isset($this->_private_after)) {
+      $contact_values = $this->_private_after;
+      $contact_values['contact_id'] = $contact_id;
+      if (isset($org_addr_id)) {
+        $contact_values['master_id'] = $org_addr_id;
+      }
+      $this->create_entity('Address', $contact_values);
+    }
+  }
+
   protected function get_civi_data() {
     $result = civicrm_api3('Address', 'get', array(
       'sequential' => 1,

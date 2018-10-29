@@ -17,12 +17,9 @@
 
 class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
 
-  private $_email_org_1_before;
-  private $_email_org_1_after;
-  private $_email_priv_before;
-  private $_email_priv_after;
-  private $_email_priv_2_before;
-  private $_email_priv_2_after;
+  private $_email_org_1;
+  private $_email_priv;
+  private $_email_priv_2;
   private $_location_type_private;
   private $_location_type_organization;
   private $_contact_id;
@@ -33,18 +30,22 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
 
   public function __construct($email_1_org, $email_priv, $email_2_priv,
                               $private_location_type, $organization_location_type, $contact_id) {
-    $this->_email_org_1_before         = $email_1_org['before'];
-    $this->_email_org_1_after          = $email_1_org['after'];
-    $this->_email_priv_before          = $email_priv['before'];
-    $this->_email_priv_after           = $email_priv['after'];
-    $this->_email_priv_2_before        = $email_2_priv['before'];
-    $this->_email_priv_2_after         = $email_2_priv['after'];
+    $this->_email_org_1                = $email_1_org;
+    $this->_email_priv                 = $email_priv;
+    $this->_email_priv_2               = $email_2_priv;
     $this->_location_type_private      = $private_location_type;
     $this->_location_type_organization = $organization_location_type;
 
     $this->_contact_id = $contact_id;
 
     $this->get_civi_data();
+  }
+
+  public function create_full($contact_id) {
+    foreach ($this->iterate_values('after') as $email_value) {
+      $email_value['contact_id'] = $contact_id;
+      $this->create_entity('Email', $email_value);
+    }
   }
 
   protected function get_civi_data() {
@@ -62,18 +63,32 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  private function iterate_values($type) {
+    $result = [];
+    if(isset($this->_email_org_1[$type])) {
+      $result[] = $this->_email_org_1[$type];
+    }
+    if(isset($this->_email_priv[$type])) {
+      $result[] = $this->_email_priv[$type];
+    }
+    if(isset($this->_email_priv_2[$type])) {
+      $result[] = $this->_email_priv_2[$type];
+    }
+    return $result;
+  }
+
   private function map_email($email){
     if ($email['location_type_id'] == $this->_location_type_private) {
-      if ($email['email'] == $this->_email_priv_before['email']) {
+      if ($email['email'] == $this->_email_priv['before']['email']) {
         $this->civi_email_priv = $email;
       }
-      if ($email['email'] == $this->_email_priv_2_before['email']) {
+      if ($email['email'] == $this->_email_priv_2['before']['email']) {
         $this->civi_email_priv_2 = $email;
       }
       return;
     }
     if ($email['location_type_id'] == $this->_location_type_organization) {
-      if ($email['email'] == $this->_email_org_1_before['email']) {
+      if ($email['email'] == $this->_email_org_1['before']['email']) {
         $this->civi_email_org_1 = $email;
       }
       return;
