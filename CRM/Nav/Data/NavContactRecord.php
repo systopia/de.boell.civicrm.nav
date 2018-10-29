@@ -310,42 +310,61 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->civi_data_after['Phone']  = [];
     $this->civi_data_before['Phone'] = [];
 
+    $phone_org   = [];
+    $mobile_org  = [];
+    $fax_org     = [];
+    $fax_priv    = [];
+    $mobile_priv = [];
+    $phone_priv  = [];
     if (isset($nav_data_after['Phone_No'])) {
-      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organization, "Phone", 'Phone_No', $nav_data_after);
+      $phone_org['after'] = $this->create_civi_phone_values($this->location_type_organization, "Phone", 'Phone_No', $nav_data_after);
     }
     if (isset($nav_data_before['Phone_No'])) {
-      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organization, "Phone", 'Phone_No', $nav_data_before);
+      $phone_org['before'] = $this->create_civi_phone_values($this->location_type_organization, "Phone", 'Phone_No', $nav_data_before);
     }
     if (isset($nav_data_after['Mobile_Phone_No'])) {
-      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organization, "Mobile", 'Mobile_Phone_No', $nav_data_after);
+      $mobile_org['after'] = $this->create_civi_phone_values($this->location_type_organization, "Mobile", 'Mobile_Phone_No', $nav_data_after);
     }
     if (isset($nav_data_before['Mobile_Phone_No'])) {
-      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organization, "Mobile", 'Mobile_Phone_No', $nav_data_before);
+      $mobile_org['before'] = $this->create_civi_phone_values($this->location_type_organization, "Mobile", 'Mobile_Phone_No', $nav_data_before);
     }
     if (isset($nav_data_after['Fax_No'])) {
-      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organization, "Fax", 'Fax_No', $nav_data_after);
+      $fax_org['after'] = $this->create_civi_phone_values($this->location_type_organization, "Fax", 'Fax_No', $nav_data_after);
     }
     if (isset($nav_data_before['Fax_No'])) {
-      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organization, "Fax", 'Fax_No', $nav_data_before);
+      $fax_org['before'] = $this->create_civi_phone_values($this->location_type_organization, "Fax", 'Fax_No', $nav_data_before);
     }
     if (isset($nav_data_after['Private_Faxnr'])) {
-      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_after);
+      $fax_priv['after'] = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_after);
     }
     if (isset($nav_data_before['Private_Faxnr'])) {
-      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_before);
+      $fax_priv['before'] = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_before);
     }
     if (isset($nav_data_after['Privat_Mobile_Phone_No'])) {
-      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_after);
+      $mobile_priv['after'] = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_after);
     }
     if (isset($nav_data_before['Privat_Mobile_Phone_No'])) {
-      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_before);
+      $mobile_priv['before'] = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_before);
     }
     if (isset($nav_data_after['Private_Telefonnr'])) {
-      $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_after);
+      $phone_priv['after']  = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_after);
     }
     if (isset($nav_data_before['Private_Telefonnr'])) {
-      $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_before);
+      $phone_priv['before'] = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_before);
     }
+    $this->Address = new CRM_Nav_Data_EntityData_Phone(
+      $phone_org,
+      $mobile_org,
+      $fax_org,
+      $phone_priv,
+      $mobile_priv,
+      $fax_priv,
+      $this->location_type_private,
+      $this->location_type_organization,
+      $this->Contact->get_contact_id()
+    );
+
+
     // Homepage
     if (isset($nav_data_after['Home_Page'])) {
       $this->civi_data_after['Website'][] = [
