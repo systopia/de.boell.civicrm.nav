@@ -352,7 +352,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     if (isset($nav_data_before['Private_Telefonnr'])) {
       $phone_priv['before'] = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_before);
     }
-    $this->Address = new CRM_Nav_Data_EntityData_Phone(
+    $this->Phone = new CRM_Nav_Data_EntityData_Phone(
       $phone_org,
       $mobile_org,
       $fax_org,
@@ -366,18 +366,27 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
 
     // Homepage
+    $website_before = [];
+    $website_after = [];
     if (isset($nav_data_after['Home_Page'])) {
-      $this->civi_data_after['Website'][] = [
+      $website_after = [
         'url'             => $this->get_nav_value_if_exist($nav_data_after, 'Home_Page'),
         'website_type_id' => $this->website_type_id,
       ];
     }
     if (isset($nav_data_before['Home_Page'])) {
-      $this->civi_data_before['Website'][] = [
+      $website_before = [
         'url'             => $this->get_nav_value_if_exist($nav_data_before, 'Home_Page'),
         'website_type_id' => $this->website_type_id,
       ];
     }
+
+    $this->Website = new CRM_Nav_Data_EntityData_Website(
+      $website_before,
+      $website_after,
+      $this->Contact->get_contact_id()
+    );
+
     //Email
     // FixMe: Primary email is in Civi_person_data()
     if (isset($nav_data_after['E_Mail'])) {
