@@ -20,7 +20,7 @@
  */
 class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
-  private $i3Val_values = array();
+  private $i3Val_values = [];
 
   /**
    * CRM_Nav_Handler_ContactHandler constructor.
@@ -62,6 +62,9 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     // add NavId to Contact
     $this->add_nav_id_to_contact($contact_id, $nav_id);
 
+    // delete values:
+    $deleted_entities = $this->record->get_delete_entities();
+    // get changed entitites
     $changed_entities = $this->get_update_values('before');
 
     // remove old linked address in case company has changed
@@ -76,9 +79,64 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     $this->fill_unchanged_values($contact_id);
 
     $this->update_values_with_i3val($contact_id);
+
+    // delete Entity_values
+    $this->delete_entity_values($deleted_entities, $contact_id);
     $this->record->set_consumed();
   }
 
+  /**
+   * @param $delete_entites
+   * @param $contact_id
+   */
+  private function delete_entity_values($delete_entites, $contact_id) {
+    foreach ($delete_entites['lookup_values'] as $entity_index => $values) {
+      $civi_entity = key($delete_entites['lookup_values']);
+      foreach ($values as $entity_key => $entity_values) {
+        // we don't need lookup for entity Id in case of Contact
+        if ($civi_entity != 'Contact') {
+          try {
+            $entity_id = $this->get_entity_id($entity_values, $contact_id, $civi_entity);
+            if (empty($entity_id)) {
+              // value probably has been changed already, no deletion needed
+              continue;
+            }
+          } catch (Exception $e) {
+            $this->log("Couldn't Find Entity for before Values. Nothing has been deleted.");
+            continue;
+          }
+        }
+        // if Entity is not Address or Contact we delete, otherwise we update
+        if ($civi_entity != 'Contact' && $civi_entity != 'Address') {
+          $this->delete_entity($entity_id, $civi_entity);
+          continue;
+        }
+        $update_values = $delete_entites[$entity_index][$entity_key];
+        // set all values to zero for deletion
+        foreach ($update_values as $key => $value) {
+          if ($key == 'location_type_id' || $key == 'contact_type') {
+            unset($update_values[$key]);
+          } else {
+            $update_values[$key] = '';
+          }
+        }
+        if ($civi_entity == 'Contact') {
+          $update_values['id'] = $contact_id;
+        } else {
+          $update_values['id'] = $entity_id;
+        }
+        try {
+          $this->create_civi_entity($update_values, $civi_entity);
+        } catch (Exception $e) {
+          $this->log("Counldn't delete Entity Values for {$contact_id} -> {$civi_entity} with ID {$entity_id}");
+        }
+      }
+    }
+  }
+
+  /**
+   * @param $contact_id
+   */
   private function fill_unchanged_values($contact_id) {
     $this->fill_update_entity($contact_id, 'Phone');
     $this->fill_update_entity($contact_id, 'Address');

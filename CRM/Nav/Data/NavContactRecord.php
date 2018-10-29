@@ -174,6 +174,61 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $nav_data_before['Company_No'] !== $nav_data_after['Company_No'];
   }
 
+  /**
+   * @return array
+   * @throws \Exception
+   */
+  public function get_delete_entities() {
+    $entities = [];
+    foreach ($this->delete_data as $key => $value) {
+      $mapping = $this->matcher->get_entity($key);
+      $tmp_value = reset($mapping);
+      if (isset($tmp_value['location_type_id'])) {
+        if ($tmp_value['location_type_id'] == 'private') {
+          $tmp_value['location_type_id'] = $this->location_type_private;
+        } else {
+          $tmp_value['location_type_id'] = $this->location_type_organization;
+        }
+      }
+      $tmp_value[$this->matcher->get_civi_values($key)] = $value;
+      $entities[key($mapping)][] = $tmp_value;
+    }
+    $this->get_delete_lookup_values($entities);
+    return $entities;
+  }
+
+  /**
+   * Get whole entities from before and add them to $entities array
+   * @param $entities
+   */
+  private function get_delete_lookup_values(&$entities) {
+    $civi_before_entities = [];
+    foreach ($entities as $entity) {
+      $civi_entity = key($entities);
+      foreach ($entity as $entry => $value) {
+        $result = $this->find_civi_entity($civi_entity, $value);
+        $civi_before_entities[$civi_entity][$entry] = $result;
+      }
+    }
+    $entities['lookup_values'] = $civi_before_entities;
+  }
+
+  private function find_civi_entity($entity, $del_values) {
+    foreach ($this->civi_data_before[$entity] as $e => $val) {
+      $match = FALSE;
+      foreach ($del_values as $del_key => $del_value) {
+        if (isset($val[$del_key]) && $val[$del_key] == $del_value) {
+          $match = TRUE;
+        } else {
+          $match = FALSE;
+        }
+      }
+      if ($match) {
+        return $val;
+      }
+    }
+  }
+
   /*
    * check if organization data is set
    * if so - add 'organization_address' to $civi_extra_data
@@ -264,26 +319,38 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
 
     if (isset($nav_data_after['Phone_No'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organization, "Phone", 'Phone_No', $nav_data_after);
+    }
+    if (isset($nav_data_before['Phone_No'])) {
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organization, "Phone", 'Phone_No', $nav_data_before);
     }
     if (isset($nav_data_after['Mobile_Phone_No'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organization, "Mobile", 'Mobile_Phone_No', $nav_data_after);
+    }
+    if (isset($nav_data_before['Mobile_Phone_No'])) {
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organization, "Mobile", 'Mobile_Phone_No', $nav_data_before);
     }
     if (isset($nav_data_after['Fax_No'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_organization, "Fax", 'Fax_No', $nav_data_after);
+    }
+    if (isset($nav_data_before['Fax_No'])) {
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_organization, "Fax", 'Fax_No', $nav_data_before);
     }
     if (isset($nav_data_after['Private_Faxnr'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_after);
+    }
+    if (isset($nav_data_before['Private_Faxnr'])) {
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Fax", 'Private_Faxnr', $nav_data_before);
     }
     if (isset($nav_data_after['Privat_Mobile_Phone_No'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_after);
+    }
+    if (isset($nav_data_before['Privat_Mobile_Phone_No'])) {
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Mobile", 'Privat_Mobile_Phone_No', $nav_data_before);
     }
     if (isset($nav_data_after['Private_Telefonnr'])) {
       $this->civi_data_after['Phone'][]  = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_after);
+    }
+    if (isset($nav_data_before['Private_Telefonnr'])) {
       $this->civi_data_before['Phone'][] = $this->create_civi_phone_values($this->location_type_private, "Phone", 'Private_Telefonnr', $nav_data_before);
     }
     // Homepage
@@ -292,6 +359,8 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
         'url'             => $this->get_nav_value_if_exist($nav_data_after, 'Home_Page'),
         'website_type_id' => $this->website_type_id,
       ];
+    }
+    if (isset($nav_data_before['Home_Page'])) {
       $this->civi_data_before['Website'][] = [
         'url'             => $this->get_nav_value_if_exist($nav_data_before, 'Home_Page'),
         'website_type_id' => $this->website_type_id,
@@ -301,14 +370,20 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     // FixMe: Primary email is in Civi_person_data()
     if (isset($nav_data_after['E_Mail'])) {
       $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_organization, 'E_Mail', $nav_data_after);
+    }
+    if (isset($nav_data_before['E_Mail'])) {
       $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_organization, 'E_Mail', $nav_data_before);
     }
     if (isset($nav_data_after['E_Mail_2'])) {
       $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_private, 'E_Mail_2', $nav_data_after);
+    }
+    if (isset($nav_data_before['E_Mail_2'])) {
       $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_private, 'E_Mail_2', $nav_data_before);
     }
     if (isset($nav_data_after['Private_E_Mail'])) {
       $this->civi_data_after['Email'][]  = $this->create_civi_mail_values($this->location_type_private, 'Private_E_Mail', $nav_data_after);
+    }
+    if (isset($nav_data_before['Private_E_Mail'])) {
       $this->civi_data_before['Email'][] = $this->create_civi_mail_values($this->location_type_private, 'Private_E_Mail', $nav_data_before);
     }
   }

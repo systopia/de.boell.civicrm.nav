@@ -25,6 +25,14 @@ class CRM_Nav_Data_NavContactMatcherCivi {
 
   private $field_mapping;
 
+  private $contact_fields = ['No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum'];
+  private $org_fields = ['Company_No', 'Company_Name', 'Company_Name_2'];
+  private $email_fields = ['E_Mail', 'E_Mail_2', 'Private_E_Mail'];
+  private $address_fields = ['Address', 'Address_2', 'City', 'Country_Region_Code', 'Post_Code'];
+  private $company_address_fields = ['Company_Adress', 'Company_Adress_2','Company_Post_Code','Company_City','Company_Country_Region_Code'];
+  private $phone_fields = ['Phone_No', 'Private_Telefonnr', 'Mobile_Phone_No', 'Privat_Mobile_Phone_No', 'Private_Faxnr', 'Fax_No'];
+  private $website_fields = ['Home_Page'];
+
   /**
    * CRM_Nav_Data_NavContactMatcherCivi constructor.
    *
@@ -72,6 +80,8 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Company_City'                  => 'city',
       'Company_Country_Region_Code'   => 'country_id',
     );
+
+
   }
 
   /**
@@ -183,6 +193,43 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       throw new Exception("Invalid Index '{$nav_index}'. Dataset invalid or mapping has changed.");
     }
     return $this->field_mapping[$nav_index];
+  }
+
+//$contact_fields = ['No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum'];
+//$org_fields = ['Company_No', 'Company_Name', 'Company_Name_2'];
+//$email_fields = ['E_Mail', 'E_Mail_2', 'Private_E_Mail'];
+//$address_fields = ['Company_Adress', 'Company_Adress_2','Company_Post_Code','Company_City','Company_Country_Region_Code'];
+//$company_address_fields = ['Address', 'Address_2', 'City', 'Country_Region_Code', 'Post_Code'];
+//$phone_fields = ['Phone_No', 'Private_Telefonnr', 'Mobile_Phone_No', 'Privat_Mobile_Phone_No', 'Private_Faxnr', 'Fax_No'];
+//$website_fields = ['Home_Page'];
+  /**
+   * @param $nav_index
+   *
+   * @return array
+   */
+  public function get_entity($nav_index) {
+    if (in_array($nav_index, $this->contact_fields)) {
+      return ['Contact' => ['contact_type' => 'Individual']];
+    }
+    if (in_array($nav_index, $this->org_fields)) {
+      return ['Contact' => ['contact_type' => 'Organization']];
+    }
+    if (in_array($nav_index, $this->email_fields)) {
+      return ['Email' => []];
+    }
+    if (in_array($nav_index, $this->address_fields)) {
+      return ['Address' => ['location_type_id' => 'private']];
+    }
+    if (in_array($nav_index, $this->company_address_fields)) {
+      return ['Address' => ['location_type_id' => 'organization']];
+    }
+
+    if (in_array($nav_index, $this->phone_fields)) {
+      return ['Phone' => []];
+    }
+    if (in_array($nav_index, $this->website_fields)) {
+      return ['Website' => []];
+    }
   }
 
 }
