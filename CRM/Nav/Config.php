@@ -67,6 +67,7 @@ class CRM_Nav_Config {
     'Fax'                           => '3',
     'Pager'                         => '4',
     'Voicemail'                     => '5',
+    'website_type_id'               => 'Work',
   ];
 
   /**
