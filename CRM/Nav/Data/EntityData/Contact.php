@@ -24,7 +24,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
   private $_organisation_after;
 
   private $_navision_id;
-  private $nav_custom_field;
+  private $_nav_custom_field;
   private $_contact_id;
   private $_organisation_id;
 
@@ -32,29 +32,35 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
   private $civi_contact_data;
 
   public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id) {
-    $this->_individual_before = $before_individual;
-    $this->_individual_after = $after_individual;
+    $this->_individual_before   = $before_individual;
+    $this->_individual_after    = $after_individual;
     $this->_organisation_before = $before_company;
-    $this->_organisation_after = $after_company;
-    $this->_navision_id = $nav_id;
-    $this->nav_custom_field = CRM_Nav_Config::get('navision_custom_field');
+    $this->_organisation_after  = $after_company;
+    $this->_navision_id         = $nav_id;
+    $this->_nav_custom_field    = CRM_Nav_Config::get('navision_custom_field');
 
     // get live civi data
 //            return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum');
     $this->get_civi_ids();
     $this->get_civi_data();
-    echo "hallo World";
+  }
+
+  public function get_contact_id() {
+    return $this->_contact_id;
   }
 
   // Helper
   private function get_civi_ids() {
     $result = civicrm_api3('Contact', 'get', array(
-      'sequential' => 1,
-      $this->nav_custom_field => $this->_navision_id,
+      'sequential'             => 1,
+      $this->_nav_custom_field => $this->_navision_id,
     ));
     if ($result['count'] != 1) {
       $this->_contact_id = "";
       $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts");
+      // TODO: Create Contact now!! $_contact_id is needed
+
+      return;
     }
     $this->_contact_id = $result['id'];
 
@@ -69,7 +75,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       'sequential' => 1,
       'id' => $this->_contact_id,
       'return' => array("id",
-                        $this->nav_custom_field,
+                        $this->_nav_custom_field,
                         'first_name',
                         'middle_name',
                         'last_name',
