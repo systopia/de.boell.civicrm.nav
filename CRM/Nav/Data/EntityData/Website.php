@@ -31,6 +31,15 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  public function calc_differences() {
+    $this->changed_data = $this->compare_data_arrays($this->_website_before, $this->_website_after);
+    $this->delete_data = $this->compare_delete_data($this->_website_before, $this->_website_after);
+    $this->conflict_data= $this->compare_conflicting_data(
+      $this->civi_website, $this->_website_before,
+      $this->changed_data, 'Website'
+    );
+  }
+
   public function create_full($contact_id) {
     if (isset($this->_website_after)) {
       $website_data = $this->_website_after;

@@ -82,13 +82,37 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $contact_id = $this->Contact->get_contact_id();
     $org_id = $this->Contact->get_org_id();
     $this->Address->create_full($contact_id, $org_id);
-    $this->Email->create_full($contact_id);
     $this->Phone->create_full($contact_id);
+    $this->Email->create_full($contact_id);
     $this->Website->create_full($contact_id);
   }
 
   public function get_or_create_contact() {
     return $this->Contact->get_or_create_contact();
+  }
+
+  public function calc_differences() {
+    $this->Contact->calc_differences();
+    $this->Address->calc_differences();
+    $this->Phone->calc_differences();
+    $this->Email->calc_differences();
+    $this->Website->calc_differences();
+  }
+
+  public function update() {
+    $this->Contact->update();
+    $this->Address->update();
+    $this->Phone->update();
+    $this->Email->update();
+    $this->Website->update();
+  }
+
+  public function delete() {
+    $this->Contact->delete();
+    $this->Address->delete();
+    $this->Phone->delete();
+    $this->Email->delete();
+    $this->Website->delete();
   }
 
   /**

@@ -66,6 +66,17 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     // add NavId to Contact
     $this->add_nav_id_to_contact($contact_id, $nav_id);
 
+    // Calculate stuff to do
+    $this->record->calc_differences();
+
+
+    // update
+
+    // delete
+
+    // i3val
+
+
     // delete values:
     $deleted_entities = $this->record->get_delete_entities();
     // get changed entitites

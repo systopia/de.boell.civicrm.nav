@@ -28,7 +28,6 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   private $civi_private_address;
   private $civi_organization_address;
 
-
   public function __construct($before_private, $after_private, $before_organization,
                               $after_organization, $contact_id,
                               $private_location_type, $organization_location_type) {
@@ -43,6 +42,24 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  public function calc_differences() {
+    // get changed stuff
+    $this->changed_data['private'] = $this->compare_data_arrays($this->_private_before, $this->_private_after);
+    $this->changed_data['organization'] = $this->compare_data_arrays($this->_organisation_before, $this->_organisation_after);
+    // deleted stuff
+    $this->delete_data['private'] = $this->compare_delete_data($this->_private_before, $this->_private_after);
+    $this->delete_data['organization'] = $this->compare_delete_data($this->_organisation_before, $this->_organisation_after);
+    // conflicting stuff
+    $this->conflict_data['private'] = $this->compare_conflicting_data(
+      $this->civi_private_address, $this->_private_before,
+      $this->changed_data['private'], 'Address'
+    );
+    $this->conflict_data['organization'] = $this->compare_conflicting_data(
+      $this->civi_organization_address, $this->_private_before,
+      $this->changed_data['organization'], 'Address'
+    );
+  }
+
   public function create_full($contact_id, $organization_id) {
     // create company address
     if (isset($this->_organisation_after)) {
@@ -52,7 +69,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
     // create shared company address
     if (isset($this->_private_after)) {
-      $contact_values = $this->_private_after;
+      $contact_values = $this->_organisation_after;
       $contact_values['contact_id'] = $contact_id;
       if (isset($org_addr_id)) {
         $contact_values['master_id'] = $org_addr_id;

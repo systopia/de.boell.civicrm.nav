@@ -27,7 +27,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
   private $_nav_custom_field;
   private $_organisation_id;
 
-  private $_parent;
+  private $_nav_data_record;
 
   // ['emails' => xx, 'Contact' => xx]
   private $_lookup_data;
@@ -42,7 +42,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->_organisation_after  = $after_company;
     $this->_navision_id         = $nav_id;
     $this->_lookup_data         = $lookup_data;
-    $this->_parent              = $parent;
+    $this->_nav_data_record     = $parent;
     $this->_nav_custom_field    = CRM_Nav_Config::get('navision_custom_field');
 
     $this->get_civi_ids();
@@ -55,6 +55,50 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
 
   public function get_org_id() {
     return $this->_organisation_id;
+  }
+
+  public function update() {
+    if (empty($this->conflict_data['updates'])) {
+      return;
+    }
+    $values = $this->conflict_data['updates'];
+    $values['id'] = $this->_contact_id;
+    $this->create_entity('Contact', $values);
+  }
+
+  public function delete() {
+    if (!empty($this->delete_data['individual'])) {
+      $values = $this->delete_data['individual'];
+      foreach ($values as $key => $val) {
+        // set to empty
+        $values[$key] = '';
+      }
+      $values['id'] = $this->_contact_id;
+      $this->create_entity('Contact', $values);
+    }
+    if (!empty($this->delete_data['organization'])) {
+      $values = $this->delete_data['organization'];
+      foreach ($values as $key => $val) {
+        // set to empty
+        $values[$key] = '';
+      }
+      $values['id'] = $this->_contact_id;
+      $this->create_entity('Contact', $values);
+    }
+  }
+
+  public function calc_differences() {
+    // get changed stuff
+    $this->changed_data['individual'] = $this->compare_data_arrays($this->_individual_before, $this->_individual_after);
+    $this->changed_data['organization'] = $this->compare_data_arrays($this->_organisation_before, $this->_organisation_after);
+    // deleted stuff
+    $this->delete_data['individual'] = $this->compare_delete_data($this->_individual_before, $this->_individual_after);
+    $this->delete_data['organization'] = $this->compare_delete_data($this->_organisation_before, $this->_organisation_after);
+    // conflicting stuff (only for individual - we shoudln't change company values here!
+    $this->conflict_data = $this->compare_conflicting_data(
+      $this->civi_contact_data, $this->_individual_before,
+      $this->changed_data['individual'], 'Contact'
+      );
   }
 
   /**
@@ -116,7 +160,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $email_contact_ids = $this->get_contact_ids_via_emails($this->_lookup_data['Emails']);
     $lookup_contact_id = $this->get_contact_via_emails($email_contact_ids, $this->_lookup_data['Contact']);
     if ($lookup_contact_id == "") {
-      $this->_parent->create_full_contact();
+      $this->_nav_data_record->create_full_contact();
       return '-1';
     }
     return $lookup_contact_id;

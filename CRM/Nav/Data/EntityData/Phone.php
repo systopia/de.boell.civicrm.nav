@@ -53,6 +53,29 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  public function calc_differences() {
+    $phones = $this->iterate_all_phones();
+    foreach ($phones as $phone) {
+      if (empty($phone)) {
+        continue;
+      }
+      $tmp_changed_data = $this->compare_data_arrays($phone['before'], $phone['after']);
+      if (!empty($tmp_changed_data)) {
+        $this->changed_data[] = $phone['after'];
+        $tmp_changed_data = $phone['after']; // for later we need the whole entity
+      }
+      $delete_data = $this->compare_delete_data($phone['before'], $phone['after']);
+      if (!empty($delete_data)) {
+        $this->delete_data[] = $phone['before'];
+      }
+      $civi_data = $this->get_civi_phone($phone);
+      $this->conflict_data[] = $this->compare_conflicting_data(
+        $civi_data, $phone['before'],
+        $tmp_changed_data, 'Phone'
+      );
+    }
+  }
+
   public function create_full($contact_id) {
     foreach ($this->iterate_values('after') as $phone_value) {
       $phone_value['contact_id'] = $contact_id;
@@ -78,6 +101,40 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     foreach ($result['values'] as $civi_phone) {
       $this->assign_civi_phone_type($civi_phone);
     }
+  }
+
+  private function get_civi_phone($nav_phone) {
+    foreach ($this->iterate_civi_phones() as $phone) {
+      if ($phone['phone'] == $nav_phone['before']['phone']) {
+        return $phone;
+      }
+      if ($phone['phone'] == $nav_phone['after']['phone']) {
+        return $phone;
+      }
+    }
+    return [];
+  }
+
+  private function iterate_all_phones() {
+    $result = [];
+    $result[] = $this->_phone_org;
+    $result[] = $this->_mobile_org;
+    $result[] = $this->_fax_org;
+    $result[] = $this->_phone_priv;
+    $result[] = $this->_mobile_priv;
+    $result[] = $this->_fax_priv;
+    return $result;
+  }
+
+  private function iterate_civi_phones() {
+    $result = [];
+    $result[] = $this->civi_phone_org;
+    $result[] = $this->civi_mobile_org;
+    $result[] = $this->civi_fax_org;
+    $result[] = $this->civi_phone_priv;
+    $result[] = $this->civi_mobile_priv;
+    $result[] = $this->civi_fax_priv;
+    return $result;
   }
 
   private function iterate_values($type) {
