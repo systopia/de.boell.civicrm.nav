@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Data_EntityData_Contact
+ */
 class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
 
   // civi data structures
@@ -35,6 +38,19 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
   // Civi Data
   private $civi_contact_data;
 
+  /**
+   * CRM_Nav_Data_EntityData_Contact constructor.
+   *
+   * @param $before_individual
+   * @param $after_individual
+   * @param $before_company
+   * @param $after_company
+   * @param $nav_id
+   * @param $lookup_data
+   * @param $parent
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id, $lookup_data, &$parent) {
     $this->_individual_before   = $before_individual;
     $this->_individual_after    = $after_individual;
@@ -49,14 +65,23 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  /**
+   * @return mixed
+   */
   public function get_contact_id() {
     return $this->_contact_id;
   }
 
+  /**
+   * @return mixed
+   */
   public function get_org_id() {
     return $this->_organisation_id;
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function update() {
     if (empty($this->conflict_data['updates'])) {
       return;
@@ -66,6 +91,9 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->create_entity('Contact', $values);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function apply_changes() {
     if (empty($this->conflict_data['valid_changes'])) {
       return;
@@ -75,6 +103,9 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->create_entity('Contact', $values);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function delete() {
     if (!empty($this->delete_data['individual'])) {
       $values = $this->delete_data['individual'];
@@ -96,6 +127,9 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function i3val() {
     if (empty($this->conflict_data['i3val'])) {
       return;
@@ -103,6 +137,9 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->i3val_update($this->conflict_data['i3val']);
   }
 
+  /**
+   *
+   */
   public function calc_differences() {
     // get changed stuff
     $this->changed_data['individual'] = $this->compare_data_arrays($this->_individual_before, $this->_individual_after);
@@ -125,7 +162,9 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->_organisation_id = $this->create_entity('Contact', $this->_organisation_after)['id'];
   }
 
-  // Helper
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   private function get_civi_ids() {
     $values = [$this->_nav_custom_field => $this->_navision_id,];
     $result = $this->get_entity('Contact', $values);

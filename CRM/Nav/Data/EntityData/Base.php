@@ -23,14 +23,30 @@ abstract  class CRM_Nav_Data_EntityData_Base {
   protected $delete_data;
   protected $conflict_data;
 
+  /**
+   * Fetch Civi Data for Entity for this->_contact_id
+   */
   abstract protected function get_civi_data();
 
+  /**
+   * Update Values/Entities in civiCRM based on calc_differences()
+   */
   abstract public function update();
 
+  /**
+   * Applies changes in civiCRM based on calc_differences()
+   */
   abstract public function apply_changes();
 
+  /**
+   * delete values/Entities from CiviCRM based on calc_differences()
+   */
   abstract public function delete();
 
+  /**
+   * Calculates differences between before/after, setting data for update,
+   * apply_cahnges and possibly i3Val
+   */
   abstract public function calc_differences();
 
   /**
@@ -42,6 +58,13 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * Compares before and after civi values, called appropriatly from sub-classes
+   * @param $before
+   * @param $after
+   *
+   * @return array
+   */
   protected function compare_data_arrays($before, $after) {
     $changes = [];
     foreach ($after as $key => $value) {
@@ -56,6 +79,14 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     return $changes;
   }
 
+  /**
+   * Check for deleted data. Data needs to be deleted from civi
+   * if Value is in before, but not after
+   * @param $before
+   * @param $after
+   *
+   * @return array
+   */
   protected function compare_delete_data($before, $after) {
     $delete_data = [];
     foreach ($before as $key => $value) {
@@ -66,6 +97,27 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     return $delete_data;
   }
 
+  /**
+   * Compare changed data to current civi Data. Updates occur when no value is in
+   * Civi yet, or if the change value is already in civi (fill up data).
+   * If the before value is in civi, a valid update operation occurs
+   *
+   * Entity IDs will be added to update/change values
+   *
+   * i3Val:
+   * If non of the above, we have a conflict, possible values for all
+   * Entities (update/change) will be rolled back, and all changed data is added
+   * to i3Val result, and will be passed to request_update with contact_id
+   *
+   * !! Special handling for Phone and Email since whole entity needs to be updated/changed !!
+   * !! Will be overwritten by Website.php --> Special handling needed !!
+   * @param $civi_data
+   * @param $before
+   * @param $changed_data
+   * @param $entity
+   *
+   * @return mixed
+   */
   protected function compare_conflicting_data($civi_data, $before, $changed_data, $entity) {
     $i3val = [];
     $valid_changes = [];
@@ -143,6 +195,13 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $entity
+   * @param $values
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function get_entity($entity, $values) {
     $result = civicrm_api3($entity, 'get', $values);
     if ($result['is_error']) {
@@ -151,6 +210,13 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $entity
+   * @param $entity_id
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function delete_entity($entity, $entity_id) {
     $result = civicrm_api3($entity, 'delete', array(
       'sequential' => 1,
@@ -162,6 +228,12 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $values
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function i3val_update($values) {
     $result = civicrm_api3('Contact', 'request_update', $values);
     if ($result['is_error']) {
@@ -170,6 +242,10 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * set contact ID and automatically trigger update of internal civiCRM values
+   * @param $contact_id
+   */
   public function set_contact_id($contact_id) {
     $this->_contact_id = $contact_id;
     $this->get_civi_data();

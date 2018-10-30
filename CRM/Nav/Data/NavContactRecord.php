@@ -74,6 +74,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->convert_civi_phone_data();
   }
 
+  /**
+   *
+   */
   public function create_full_contact() {
     $this->Contact->create_full();
     $contact_id = $this->Contact->get_contact_id();
@@ -84,6 +87,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->create_full($contact_id);
   }
 
+  /**
+   * @return mixed
+   */
   public function get_or_create_contact() {
     $contact_id = $this->Contact->get_or_create_contact();
     if ($contact_id > '0') {
@@ -96,6 +102,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $contact_id;
   }
 
+  /**
+   * Trigger calculation for update/changes/i3val for all Entities
+   */
   public function calc_differences() {
     $this->Contact->calc_differences();
     $this->Address->calc_differences();
@@ -104,6 +113,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->calc_differences();
   }
 
+  /**
+   * Trigger update for all Entities
+   */
   public function update() {
     $this->Contact->update();
     $this->Address->update();
@@ -112,6 +124,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->update();
   }
 
+  /**
+   * Trigger apply changes for all Entities
+   */
   public function apply_changes() {
     $this->Contact->apply_changes();
     $this->Address->apply_changes();
@@ -120,6 +135,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->apply_changes();
   }
 
+  /**
+   * Trigger delete Values for all Entities
+   */
   public function delete() {
     $this->Contact->delete();
     $this->Address->delete();
@@ -128,6 +146,9 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->delete();
   }
 
+  /**
+   * Trigger i3Val request_update if needed for all Entities
+   */
   public function i3val() {
     $this->Contact->i3val();
     $this->Address->i3val();
@@ -137,7 +158,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
-   * @throws \Exception
+   * @throws \CiviCRM_API3_Exception
    */
   private function convert_civi_contact_data() {
 

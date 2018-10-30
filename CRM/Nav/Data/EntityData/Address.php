@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Data_EntityData_Address
+ */
 class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
 
   // civi address data structures
@@ -28,6 +31,17 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   private $civi_private_address;
   private $civi_organization_address;
 
+  /**
+   * CRM_Nav_Data_EntityData_Address constructor.
+   *
+   * @param $before_private
+   * @param $after_private
+   * @param $before_organization
+   * @param $after_organization
+   * @param $contact_id
+   * @param $private_location_type
+   * @param $organization_location_type
+   */
   public function __construct($before_private, $after_private, $before_organization,
                               $after_organization, $contact_id,
                               $private_location_type, $organization_location_type) {
@@ -42,6 +56,9 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function update() {
     // handle update private address
     if (!empty($this->conflict_data['private']['updates'])) {
@@ -57,6 +74,9 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function apply_changes() {
     // handle update private address
     if (!empty($this->conflict_data['private']['valid_changes'])) {
@@ -72,6 +92,9 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function delete() {
     if (!empty($this->delete_data['private']['updates'])) {
       $values = $this->delete_data['private']['updates'];
@@ -92,6 +115,9 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function i3val() {
     if (!empty($this->conflict_data['private']['i3val'])) {
       $values = $this->conflict_data['private']['i3val'];
@@ -125,6 +151,14 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     );
   }
 
+  /**
+   * Create complete new Contact for all Values from Navision
+   *
+   * @param $contact_id
+   * @param $organization_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function create_full($contact_id, $organization_id) {
     // create company address
     if (isset($this->_organisation_after)) {
@@ -150,6 +184,10 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * Get Data from CiviCRM
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function get_civi_data() {
     if (empty($this->_contact_id)) {
       return;

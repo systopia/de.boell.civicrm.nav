@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Data_EntityData_Email
+ */
 class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
 
   private $_email_org;
@@ -27,6 +30,16 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
   private $civi_email_priv;
   private $civi_email_priv_2;
 
+  /**
+   * CRM_Nav_Data_EntityData_Email constructor.
+   *
+   * @param $email_1_org
+   * @param $email_priv
+   * @param $email_2_priv
+   * @param $private_location_type
+   * @param $organization_location_type
+   * @param $contact_id
+   */
   public function __construct($email_1_org, $email_priv, $email_2_priv,
                               $private_location_type, $organization_location_type, $contact_id) {
     $this->_email_org                  = $email_1_org;
@@ -40,6 +53,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function update() {
     foreach ($this->conflict_data as $conflict) {
       if (empty($conflict['updates'])) {
@@ -51,6 +67,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function apply_changes() {
     foreach ($this->conflict_data as $conflict) {
       if (empty($conflict['valid_changes'])) {
@@ -62,6 +81,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function delete() {
     foreach ($this->delete_data as $del_data) {
       if (empty($del_data)) {
@@ -71,6 +93,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function i3val() {
     foreach ($this->conflict_data as $conflict) {
       if (empty($conflict['i3val'])) {
@@ -80,6 +105,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   *
+   */
   public function calc_differences() {
     $emails = $this->iterate_all_emails();
     foreach ($emails as $email) {
@@ -104,6 +132,11 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function create_full($contact_id) {
     foreach ($this->iterate_values('after') as $email_value) {
       $email_value['contact_id'] = $contact_id;
@@ -111,6 +144,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function get_civi_data() {
     if (empty($this->_contact_id)) {
       return;
@@ -129,6 +165,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @return array
+   */
   private function iterate_all_emails() {
     $result = [];
     $result[] = $this->_email_org;
@@ -137,6 +176,11 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $nav_email
+   *
+   * @return array|mixed
+   */
   private function get_civi_email($nav_email) {
     foreach ($this->iterate_civi_emails() as $email) {
       if (isset($nav_email['before']) && $email['email'] == $nav_email['before']['email']) {
@@ -149,6 +193,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     return [];
   }
 
+  /**
+   * @return array
+   */
   private function iterate_civi_emails() {
     $result = [];
     $result[] = $this->civi_email_org;
@@ -157,6 +204,11 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $type
+   *
+   * @return array
+   */
   private function iterate_values($type) {
     $result = [];
     if(isset($this->_email_org[$type])) {
@@ -171,6 +223,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $email
+   */
   private function map_email($email){
     if ($email['location_type_id'] == $this->_location_type_private) {
       if ($email['email'] == $this->_email_priv['before']['email']) {

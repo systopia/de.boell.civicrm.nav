@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Data_EntityData_Website
+ */
 class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
 
   private $_website_before;
@@ -23,6 +26,13 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
   // if website is empty, needs to be created with after values
   private $civi_website;
 
+  /**
+   * CRM_Nav_Data_EntityData_Website constructor.
+   *
+   * @param $web_before
+   * @param $web_after
+   * @param $contact_id
+   */
   public function __construct($web_before, $web_after, $contact_id) {
     $this->_website_before = $web_before;
     $this->_website_after = $web_after;
@@ -31,6 +41,9 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function update() {
     if (empty($this->conflict_data['updates'])) {
       return;
@@ -41,6 +54,9 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     $this->create_entity('Website', $values);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function apply_changes() {
     if (empty($this->conflict_data['valid_changes'])) {
       return;
@@ -50,6 +66,9 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     $this->create_entity('Website', $values);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function delete() {
     if (empty($this->delete_data)) {
       return;
@@ -57,10 +76,16 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     $this->delete_entity('Website', $this->delete_data['id']);
   }
 
+  /**
+   * Not needed for Website
+   */
   public function i3val() {
-    // not implemented for Website. Instead we create a new Website in case of conflict
+    return;
   }
 
+  /**
+   *
+   */
   public function calc_differences() {
     $this->changed_data = $this->compare_data_arrays($this->_website_before, $this->_website_after);
     $this->delete_data = $this->compare_delete_data($this->_website_before, $this->_website_after);
@@ -70,6 +95,11 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     );
   }
 
+  /**
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function create_full($contact_id) {
     if (isset($this->_website_after)) {
       $website_data = $this->_website_after;
@@ -78,6 +108,9 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function get_civi_data() {
     if (empty($this->_contact_id)) {
       return;
@@ -170,6 +203,11 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
 
     }
 
+  /**
+   * @param $url
+   *
+   * @return mixed
+   */
     private function parse_civi_url($url) {
       if(empty(parse_url($url, PHP_URL_HOST))) {
         return parse_url($url, PHP_URL_PATH);

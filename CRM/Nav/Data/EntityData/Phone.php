@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_Data_EntityData_Phone
+ */
 class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
 
   // all values with before and after
@@ -35,6 +38,19 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
   private $civi_fax_priv;
 
 
+  /**
+   * CRM_Nav_Data_EntityData_Phone constructor.
+   *
+   * @param $phone_org
+   * @param $mobile_org
+   * @param $fax_org
+   * @param $phone_priv
+   * @param $mobile_priv
+   * @param $fax_priv
+   * @param $private_location_type
+   * @param $organization_location_type
+   * @param $contact_id
+   */
   public function __construct($phone_org, $mobile_org, $fax_org,
                               $phone_priv, $mobile_priv, $fax_priv,
                               $private_location_type, $organization_location_type,
@@ -53,6 +69,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function update() {
     foreach ($this->conflict_data as $conflict) {
       if (empty($conflict['updates'])) {
@@ -64,6 +83,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function apply_changes() {
     foreach ($this->conflict_data as $conflict) {
       if (empty($conflict['valid_changes'])) {
@@ -75,6 +97,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function i3val() {
     foreach ($this->conflict_data as $conflict) {
       if (empty($conflict['i3val'])) {
@@ -84,6 +109,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function delete() {
     foreach ($this->delete_data as $del_data) {
       if (empty($del_data)) {
@@ -93,6 +121,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   *
+   */
   public function calc_differences() {
     $phones = $this->iterate_all_phones();
     foreach ($phones as $phone) {
@@ -117,6 +148,11 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function create_full($contact_id) {
     foreach ($this->iterate_values('after') as $phone_value) {
       $phone_value['contact_id'] = $contact_id;
@@ -124,6 +160,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function get_civi_data() {
     if (empty($this->_contact_id)) {
       return;
@@ -144,6 +183,11 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @param $nav_phone
+   *
+   * @return array|mixed
+   */
   private function get_civi_phone($nav_phone) {
     foreach ($this->iterate_civi_phones() as $phone) {
       if (isset($nav_phone['before']) && $phone['phone'] == $nav_phone['before']['phone']) {
@@ -156,6 +200,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     return [];
   }
 
+  /**
+   * @return array
+   */
   private function iterate_all_phones() {
     $result = [];
     $result[] = $this->_phone_org;
@@ -167,6 +214,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @return array
+   */
   private function iterate_civi_phones() {
     $result = [];
     $result[] = $this->civi_phone_org;
@@ -178,6 +228,11 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $type
+   *
+   * @return array
+   */
   private function iterate_values($type) {
     $result = [];
     if(isset($this->_phone_org[$type])) {
@@ -201,6 +256,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     return $result;
   }
 
+  /**
+   * @param $civi_phone_data
+   */
   private function assign_civi_phone_type($civi_phone_data) {
     switch ($civi_phone_data['phone_type_id']) {
       case CRM_Nav_Config::get('Phone'):
