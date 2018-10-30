@@ -17,6 +17,8 @@
 
 abstract  class CRM_Nav_Data_EntityData_Base {
 
+  protected $_contact_id;
+
   abstract protected function get_civi_data();
 
     /**
@@ -49,5 +51,9 @@ abstract  class CRM_Nav_Data_EntityData_Base {
       $this->log("Failed to get {$entity}-Entity with values " . json_encode($values));
     }
     return $result;
+  }
+
+  public function set_contact_id($contact_id) {
+    $this->_contact_id = $contact_id;
   }
 }

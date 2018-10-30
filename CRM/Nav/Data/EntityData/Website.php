@@ -19,7 +19,6 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
 
   private $_website_before;
   private $_website_after;
-  private $_contact_id;
 
   // if website is empty, needs to be created with after values
   private $civi_website;

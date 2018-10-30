@@ -22,7 +22,6 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
   private $_email_priv_2;
   private $_location_type_private;
   private $_location_type_organization;
-  private $_contact_id;
 
   private $civi_email_org_1;
   private $civi_email_priv;

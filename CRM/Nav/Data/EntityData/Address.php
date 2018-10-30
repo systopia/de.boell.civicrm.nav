@@ -22,7 +22,6 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   private $_private_after;
   private $_organisation_before;
   private $_organisation_after;
-  private $_contact_id;
   private $_location_type_private;
   private $_location_type_organization;
 
@@ -45,11 +44,13 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   }
 
   public function create_full($contact_id, $organization_id) {
+    // create company address
     if (isset($this->_organisation_after)) {
       $org_values = $this->_organisation_after;
       $org_values['contact_id'] = $organization_id;
       $org_addr_id = $this->create_entity('Address', $org_values)['id'];
     }
+    // create shared company address
     if (isset($this->_private_after)) {
       $contact_values = $this->_private_after;
       $contact_values['contact_id'] = $contact_id;
@@ -57,6 +58,13 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
         $contact_values['master_id'] = $org_addr_id;
       }
       $this->create_entity('Address', $contact_values);
+    }
+
+    // create private address
+    if (isset($this->_private_after)) {
+      $address_values = $this->_private_after;
+      $address_values['contact_id'] = $contact_id;
+      $this->create_entity('Address', $address_values);
     }
   }
 

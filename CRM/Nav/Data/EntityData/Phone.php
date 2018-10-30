@@ -27,8 +27,6 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
   private $_location_type_private;
   private $_location_type_organization;
 
-  private $_contact_id;
-
   private $civi_phone_org;
   private $civi_mobile_org;
   private $civi_fax_org;

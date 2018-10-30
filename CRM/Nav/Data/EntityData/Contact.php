@@ -25,7 +25,6 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
 
   private $_navision_id;
   private $_nav_custom_field;
-  private $_contact_id;
   private $_organisation_id;
 
   private $_parent;
