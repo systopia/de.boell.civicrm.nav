@@ -90,36 +90,45 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     ];
     // get Website(s) for contact, and if url is set in before values put that in as arg
     if (isset($this->_website_before['url'])) {
-      $values['url'] = ['LIKE' => "%{$this->_website_before['url']}"];
+      $values['url'] = ['LIKE' => "%{$this->parse_civi_url($this->_website_before['url'])}"];
     }
     $result = civicrm_api3('Website', 'get', $values);
     if ($result['is_error']) {
       $this->log("Couldn't get civi data for Website {$this->_contact_id}. Error: {$result['error_message']}");
-      // TODO: throw Exception?
+      return;
     }
-    if (!isset($this->_website_before['url'])) {
-      foreach ($result['values'] as $civi_website_data) {
-        if (strpos($civi_website_data['url'], $this->_website_after['url']) >= 0) {
-          $this->civi_website = $civi_website_data;
-          break;
-        }
+    if ($result['count'] == '0') {
+      // nothing found, get all websites for contact and compare to _website_after/before
+      unset($values['url']);
+      $result = civicrm_api3('Website', 'get', $values);
+      if ($result['is_error']) {
+        $this->log("Couldn't get civi data for Website {$this->_contact_id}. Error: {$result['error_message']}");
+        return;
       }
-    } else {
-      foreach ($result['values'] as $civi_website_data) {
-        if (strpos($civi_website_data['url'], $this->_website_before['url']) >= 0) {
-          $this->civi_website = $civi_website_data;
-          break;
-        }
+    }
+
+    // first check against after values
+    foreach ($result['values'] as $civi_website_data) {
+      if ($this->parse_civi_url($civi_website_data['url']) == $this->parse_civi_url($this->_website_after['url'])) {
+        $this->civi_website = $civi_website_data;
+        return;
+      }
+    }
+    // then check against before values
+    foreach ($result['values'] as $civi_website_data) {
+      if ($this->parse_civi_url($civi_website_data['url']) == $this->parse_civi_url($this->_website_before['url'])) {
+        $this->civi_website = $civi_website_data;
+        return;
       }
     }
   }
 
   /**
-   * Website needs special handling here
+   * Website needs special handling here, overwrites base function
    * @param $civi_data
    * @param $before
    * @param $changed_data
-   * @param $entity
+   * @param $entity (not needed here)
    *
    * @return mixed|void
    */
