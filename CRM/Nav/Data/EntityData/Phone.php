@@ -95,7 +95,8 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
       }
       $delete_data = $this->compare_delete_data($phone['before'], $phone['after']);
       if (!empty($delete_data)) {
-        $this->delete_data[] = $phone['before'];
+        $civi_data = $this->get_civi_phone($phone);
+        $this->delete_data[] = $civi_data;
       }
       $civi_data = $this->get_civi_phone($phone);
       $this->conflict_data[] = $this->compare_conflicting_data(

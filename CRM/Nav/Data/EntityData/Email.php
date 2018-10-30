@@ -82,7 +82,8 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
       }
       $delete_data = $this->compare_delete_data($email['before'], $email['after']);
       if (!empty($delete_data)) {
-        $this->delete_data[] = $email['before'];
+        $civi_data = $this->get_civi_email($email);
+        $this->delete_data[] = $civi_data;
       }
       $civi_data = $this->get_civi_email($email);
       $this->conflict_data[] = $this->compare_conflicting_data(
