@@ -203,6 +203,9 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  /**
+   * @param $organization_id
+   */
   public function set_organization_id($organization_id) {
     $this->_organization_id = $organization_id;
   }
@@ -237,7 +240,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
 
   /**
    * get addresses from $this->_organization_address, compares them to nav_after
-   * and returns id from said address. If no address is found, throw Exception.
+   * and returns id from said address. If no address is found, return ''.
+   * Compare is first all available data, then just street_address, city and postal_code
    * It shouldn't be possible to get an invalid address
    *    (Company should be updated first in Navision, thus address always valid)
    *
