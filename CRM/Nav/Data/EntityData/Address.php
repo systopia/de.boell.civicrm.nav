@@ -42,6 +42,41 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  public function update() {
+    // handle update private address
+    if (!empty($this->conflict_data['private']['updates'])) {
+      $values = $this->conflict_data['private']['updates'];
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Address', $values);
+    }
+    // handle update organization address
+    if (!empty($this->conflict_data['organization']['updates'])) {
+      $values = $this->conflict_data['organization']['updates'];
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Address', $values);
+    }
+  }
+
+  public function delete() {
+    if (!empty($this->delete_data['private']['updates'])) {
+      $values = $this->delete_data['private']['updates'];
+      foreach ($values as $key => $val) {
+        $values[$key] = '';
+      }
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Address', $values);
+    }
+    // handle update organization address
+    if (!empty($this->delete_data['organization']['updates'])) {
+      $values = $this->delete_data['organization']['updates'];
+      foreach ($values as $key => $val) {
+        $values[$key] = '';
+      }
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Address', $values);
+    }
+  }
+
   public function calc_differences() {
     // get changed stuff
     $this->changed_data['private'] = $this->compare_data_arrays($this->_private_before, $this->_private_after);

@@ -67,7 +67,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     foreach ($changed_data as $key => $value) {
       if (!isset($civi_data[$key])) {
         if ($entity == 'Phone' || $entity == 'Email' || $entity == 'Website') {
-          $update_values[$key] = $changed_data;
+          $update_values = $changed_data;
           break;
         } else {
           // $value can be updated
@@ -141,6 +141,17 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     $result = civicrm_api3($entity, 'get', $values);
     if ($result['is_error']) {
       $this->log("Failed to get {$entity}-Entity with values " . json_encode($values));
+    }
+    return $result;
+  }
+
+  protected function delete_entity($entity, $entity_id) {
+    $result = civicrm_api3($entity, 'delete', array(
+      'sequential' => 1,
+      'id' => $entity_id,
+    ));
+    if ($result['is_error']) {
+      $this->log("Failed to delete {$entity}-Entity with values ID {$entity_id}");
     }
     return $result;
   }

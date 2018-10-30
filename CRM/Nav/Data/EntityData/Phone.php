@@ -53,6 +53,26 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     $this->get_civi_data();
   }
 
+  public function update() {
+    foreach ($this->conflict_data as $conflict) {
+      if (empty($conflict['updates'])) {
+        continue;
+      }
+      $values = $conflict['updates'];
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Phone', $values);
+    }
+  }
+
+  public function delete() {
+    foreach ($this->delete_data as $del_data) {
+      if (empty($del_data)) {
+        continue;
+      }
+      $this->delete_entity('Phone', $del_data['id']);
+    }
+  }
+
   public function calc_differences() {
     $phones = $this->iterate_all_phones();
     foreach ($phones as $phone) {

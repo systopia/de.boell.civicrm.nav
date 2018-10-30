@@ -71,11 +71,14 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
 
     // update
-
+    $this->record->update();
     // delete
-
+    $this->record->delete();
     // i3val
+    $this->record->i3val();
 
+    $this->record->set_consumed();
+    return;
 
     // delete values:
     $deleted_entities = $this->record->get_delete_entities();
