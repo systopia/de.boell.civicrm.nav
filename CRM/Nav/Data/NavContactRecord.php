@@ -87,8 +87,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   public function get_or_create_contact() {
     $contact_id = $this->Contact->get_or_create_contact();
     if ($contact_id > '0') {
-      // set contact_id to other objects as well and trigger entity lookups
-
+      // set contact_id to other objects as well and trigger civi-entity lookups
+      $this->Address->set_contact_id($contact_id);
+      $this->Phone->set_contact_id($contact_id);
+      $this->Email->set_contact_id($contact_id);
+      $this->Website->set_contact_id($contact_id);
     }
     return $contact_id;
   }

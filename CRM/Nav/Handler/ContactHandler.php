@@ -56,8 +56,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     }
 
     $contact_id = $this->record->get_or_create_contact();
-    // contact is created, all new values are already added as well
     if ($contact_id < '0') {
+      // contact is created, all new values are already added as well
       $this->record->set_consumed();
       return;
     }

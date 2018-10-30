@@ -152,7 +152,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       if ($result['count'] == '0') {
         return;
       }
-      if ($result['count'] > '1') {
+      if ($result['count'] != '1') {
         $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
         return;
       }

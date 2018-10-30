@@ -33,9 +33,9 @@ abstract  class CRM_Nav_Data_EntityData_Base {
 
   abstract public function calc_differences();
 
-    /**
-     * @param $message
-     */
+  /**
+   * @param $message
+   */
   protected function log($message) {
     if ($this->debug) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] " . $message);
@@ -172,5 +172,6 @@ abstract  class CRM_Nav_Data_EntityData_Base {
 
   public function set_contact_id($contact_id) {
     $this->_contact_id = $contact_id;
+    $this->get_civi_data();
   }
 }
