@@ -134,10 +134,10 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
 
   private function get_civi_phone($nav_phone) {
     foreach ($this->iterate_civi_phones() as $phone) {
-      if ($phone['phone'] == $nav_phone['before']['phone']) {
+      if (isset($nav_phone['before']) && $phone['phone'] == $nav_phone['before']['phone']) {
         return $phone;
       }
-      if ($phone['phone'] == $nav_phone['after']['phone']) {
+      if (isset($nav_phone['after']) && $phone['phone'] == $nav_phone['after']['phone']) {
         return $phone;
       }
     }
