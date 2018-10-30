@@ -107,6 +107,14 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->update();
   }
 
+  public function apply_changes() {
+    $this->Contact->apply_changes();
+    $this->Address->apply_changes();
+    $this->Phone->apply_changes();
+    $this->Email->apply_changes();
+    $this->Website->apply_changes();
+  }
+
   public function delete() {
     $this->Contact->delete();
     $this->Address->delete();

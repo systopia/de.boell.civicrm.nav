@@ -51,6 +51,17 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  public function apply_changes() {
+    foreach ($this->conflict_data as $conflict) {
+      if (empty($conflict['valid_changes'])) {
+        continue;
+      }
+      $values = $conflict['valid_changes'];
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Email', $values);
+    }
+  }
+
   public function delete() {
     foreach ($this->delete_data as $del_data) {
       if (empty($del_data)) {

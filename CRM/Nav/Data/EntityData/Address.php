@@ -57,6 +57,21 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  public function apply_changes() {
+    // handle update private address
+    if (!empty($this->conflict_data['private']['valid_changes'])) {
+      $values = $this->conflict_data['private']['valid_changes'];
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Address', $values);
+    }
+    // handle update organization address
+    if (!empty($this->conflict_data['organization']['valid_changes'])) {
+      $values = $this->conflict_data['organization']['valid_changes'];
+      $values['contact_id'] = $this->_contact_id;
+      $this->create_entity('Address', $values);
+    }
+  }
+
   public function delete() {
     if (!empty($this->delete_data['private']['updates'])) {
       $values = $this->delete_data['private']['updates'];

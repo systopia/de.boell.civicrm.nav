@@ -37,6 +37,16 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     }
     $values = $this->conflict_data['updates'];
     $values['contact_id'] = $this->_contact_id;
+    $values['website_type_id'] = "Work";
+    $this->create_entity('Website', $values);
+  }
+
+  public function apply_changes() {
+    if (empty($this->conflict_data['valid_changes'])) {
+      return;
+    }
+    $values = $this->conflict_data['valid_changes'];
+    $values['contact_id'] = $this->_contact_id;
     $this->create_entity('Website', $values);
   }
 
@@ -48,10 +58,7 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
   }
 
   public function i3val() {
-    if (empty($this->conflict_data['i3val'])) {
-      return;
-    }
-    $this->i3val_update($this->conflict_data['i3val']);
+    // not implemented for Website. Instead we create a new Website in case of conflict
   }
 
   public function calc_differences() {
@@ -79,7 +86,7 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
       'sequential' => 1,
       'contact_id' => $this->_contact_id,
       'website_type_id' => "Work",
-      'return' => ["website_type_id", "url"],
+      'return' => ["website_type_id", "url", "contact_id"],
     ];
     // get Website(s) for contact, and if url is set in before values put that in as arg
     if (isset($this->_website_before['url'])) {
@@ -97,7 +104,69 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
           break;
         }
       }
+    } else {
+      foreach ($result['values'] as $civi_website_data) {
+        if (strpos($civi_website_data['url'], $this->_website_before['url']) >= 0) {
+          $this->civi_website = $civi_website_data;
+          break;
+        }
+      }
     }
   }
+
+  /**
+   * Website needs special handling here
+   * @param $civi_data
+   * @param $before
+   * @param $changed_data
+   * @param $entity
+   *
+   * @return mixed|void
+   */
+  protected function compare_conflicting_data($civi_data, $before, $changed_data, $entity) {
+    $i3val = [];
+    $valid_changes = [];
+    $update_values = [];
+
+    if (!isset($civi_data['url'])) {
+      $update_values = $changed_data;
+    } else {
+      if ($this->parse_civi_url($civi_data['url']) == $this->parse_civi_url($changed_data['url'])) {
+        $update_values = $changed_data;
+      }
+    }
+
+    // check if nav changed data is different from civi data
+    if ($this->parse_civi_url($civi_data['url']) != $this->parse_civi_url($changed_data['url'])) {
+      // check if $value matches before data
+      if (isset($before['url']) && $this->parse_civi_url($before['url']) == $this->parse_civi_url($civi_data['url'])) {
+          $valid_changes = $changed_data;
+      }
+    }
+
+    if (empty($update_values) && empty($valid_changes)) {
+      // usually we would have an i3val problem here, but we just add the website to update
+      $update_values = $changed_data;
+    }
+    if (!empty($update_values) && isset($civi_data['id'])) {
+      $update_values['id'] = $civi_data['id'];
+    }
+    if (!empty($valid_changes) && isset($civi_data['id'])) {
+      $valid_changes['id'] = $civi_data['id'];
+    }
+    $result['updates'] = $update_values;
+    $result['valid_changes'] = $valid_changes;
+    $result['i3val'] = $i3val;
+    return $result;
+
+    }
+
+    private function parse_civi_url($url) {
+      if(empty(parse_url($url, PHP_URL_HOST))) {
+        return parse_url($url, PHP_URL_PATH);
+      } else {
+        return parse_url($url, PHP_URL_HOST);
+      }
+    }
 
 }

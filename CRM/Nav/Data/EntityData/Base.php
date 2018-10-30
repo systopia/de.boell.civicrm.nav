@@ -25,6 +25,12 @@ abstract  class CRM_Nav_Data_EntityData_Base {
 
   abstract protected function get_civi_data();
 
+  abstract public function update();
+
+  abstract public function apply_changes();
+
+  abstract public function delete();
+
   abstract public function calc_differences();
 
     /**
@@ -66,7 +72,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     $update_values = [];
     foreach ($changed_data as $key => $value) {
       if (!isset($civi_data[$key])) {
-        if ($entity == 'Phone' || $entity == 'Email' || $entity == 'Website') {
+        if ($entity == 'Phone' || $entity == 'Email') {
           $update_values = $changed_data;
           break;
         } else {
@@ -76,7 +82,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
         continue;
       }
       if ($civi_data[$key] == $value) {
-        if ($entity == 'Phone' || $entity == 'Email' || $entity == 'Website') {
+        if ($entity == 'Phone' || $entity == 'Email') {
           $update_values = $changed_data;
           break;
         } else {
@@ -87,10 +93,10 @@ abstract  class CRM_Nav_Data_EntityData_Base {
       // check if nav changed data is different from civi data
       if ($civi_data[$key] != $value) {
         // check if $value matches before data
-        if (isset($before[$key]) && $before[$key] == $value) {
-          // special behavior for Email, Phone and Website.
+        if (isset($before[$key]) && $before[$key] == $civi_data[$key]) {
+          // special behavior for Email, Phone
           // We always need the whole Entity if we have updates/ Valid changes
-          if ($entity == 'Phone' || $entity == 'Email' || $entity == 'Website') {
+          if ($entity == 'Phone' || $entity == 'Email') {
             $valid_changes = $changed_data;
             break;
           } else {

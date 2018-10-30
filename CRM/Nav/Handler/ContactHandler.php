@@ -72,6 +72,8 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
     // update
     $this->record->update();
+    // apply valid change operations
+    $this->record->apply_changes();
     // delete
     $this->record->delete();
     // i3val

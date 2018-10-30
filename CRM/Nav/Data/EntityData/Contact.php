@@ -66,6 +66,15 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->create_entity('Contact', $values);
   }
 
+  public function apply_changes() {
+    if (empty($this->conflict_data['valid_changes'])) {
+      return;
+    }
+    $values = $this->conflict_data['valid_changes'];
+    $values['id'] = $this->_contact_id;
+    $this->create_entity('Contact', $values);
+  }
+
   public function delete() {
     if (!empty($this->delete_data['individual'])) {
       $values = $this->delete_data['individual'];
