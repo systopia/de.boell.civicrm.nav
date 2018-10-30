@@ -38,14 +38,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     if (!$this->check_record_type()) {
       return;
     }
-    $nav_id = $this->record->get_individual_navision_id();
-    $contact_id = $this->get_contact_id_from_nav_id($nav_id);
-    if ($this->check_delete_record()) {
-      $this->delete_nav_id_from_contact($contact_id);
-      $this->record->set_consumed();
-      $this->log("Deleted nav_id from contact");
-      return;
-    }
 
     if ($this->check_new_record()) {
       $this->record->create_full_contact();
@@ -53,14 +45,29 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
-    $contact_id = $this->get_or_create_contact($contact_id);
+    $nav_id = $this->record->get_individual_navision_id();
+    $contact_id = $this->get_contact_id_from_nav_id($nav_id);
+
+    if ($this->check_delete_record()) {
+      $this->delete_nav_id_from_contact($contact_id);
+      $this->record->set_consumed();
+      $this->log("Deleted nav_id from contact");
+      return;
+    }
+
+    $contact_id = $this->record->get_or_create_contact();
     // contact is created, all new values are already added as well
     if ($contact_id < '0') {
       $this->record->set_consumed();
       return;
     }
+
+
     // add NavId to Contact
     $this->add_nav_id_to_contact($contact_id, $nav_id);
+
+
+
 
     // delete values:
     $deleted_entities = $this->record->get_delete_entities();
@@ -500,32 +507,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
   }
 
   /**
-   * If contact couldn't be identified by NavId, it will be identified by email(s)
-   * and first_name and last name. If that's not available, a new contact is created
-   * with the AFTER values and ALL provided values
-   * @param $contact_id
-   *
-   * @return mixed
-   * @throws \CiviCRM_API3_Exception
-   */
-  private function get_or_create_contact($contact_id) {
-    // if contact_id is empty, get/create contact via XCM with first_name, last_name, email
-    if ($contact_id == "") {
-      $contact_lookup_details = $this->record->get_contact_lookup_details();
-      $email_contact_ids = $this->get_contact_ids_via_emails($contact_lookup_details['Emails']);
-      $lookup_contact_id = $this->get_contact($email_contact_ids, $contact_lookup_details['Contact']);
-
-      if ($lookup_contact_id == "") {
-        // create contact with all available data, then return '-1' to abort further processing
-        $this->create_civi_full_contact();
-        return '-1';
-      }
-      return $lookup_contact_id;
-    }
-    return $contact_id;
-  }
-
-  /**
    * @throws \Exception
    */
   private function create_civi_full_contact() {
@@ -632,54 +613,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return TRUE;
     }
     return FALSE;
-  }
-
-  /**
-   * @param $contact_ids      (array with contact_ids from email lookup)
-   * @param $contact_details  (array first_name, last_name)
-   *
-   * @return string
-   * @throws \CiviCRM_API3_Exception
-   */
-  private function get_contact($contact_ids, $contact_details) {
-    if (!empty($contact_ids)) {
-      $contact_details['id'] = array('IN' => $contact_ids);
-    }
-    $result = civicrm_api3('Contact', 'get', $contact_details);
-    if ($result['is_error'] == '1') {
-      $this->log("Error occured while looking up contacts. Message: " . $result['error_message']);
-      return "";
-    }
-    if ($result['count'] != '1') {
-      $this->log("Found {$result['count']} entries for contact.");
-      return "";
-    }
-    return $result['values']['contact_id'];
-  }
-
-  /**
-   * @param $emails
-   *
-   * @return array
-   * @throws \CiviCRM_API3_Exception
-   */
-  private function get_contact_ids_via_emails($emails) {
-    if (empty($emails)) {
-      return array();
-    }
-    $result = civicrm_api3('Email', 'get', array(
-      'sequential' => 1,
-      'email' => array('IN' => $emails),
-    ));
-    if ($result['is_error'] == '1') {
-      $this->log("Api command to get Emails Entities failed. Reason: {$result['error_message']}");
-      return array();
-    }
-    $contact_ids = array();
-    foreach ($result['values'] as $val) {
-      $contact_ids[] = $val['contact_id'];
-    }
-    return $contact_ids;
   }
 
   /**

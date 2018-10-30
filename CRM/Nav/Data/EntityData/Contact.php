@@ -26,17 +26,24 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
   private $_navision_id;
   private $_nav_custom_field;
   private $_contact_id;
-  private $_organisation_id;    // TODO
+  private $_organisation_id;
+
+  private $_parent;
+
+  // ['emails' => xx, 'Contact' => xx]
+  private $_lookup_data;
 
   // Civi Data
   private $civi_contact_data;
 
-  public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id) {
+  public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id, $lookup_data, &$parent) {
     $this->_individual_before   = $before_individual;
     $this->_individual_after    = $after_individual;
     $this->_organisation_before = $before_company;
     $this->_organisation_after  = $after_company;
     $this->_navision_id         = $nav_id;
+    $this->_lookup_data         = $lookup_data;
+    $this->_parent              = $parent;
     $this->_nav_custom_field    = CRM_Nav_Config::get('navision_custom_field');
 
     $this->get_civi_ids();
@@ -55,8 +62,8 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    * create Contact for Person, and if set for Company as well
    */
   public function create_full() {
-    $this->create_entity('Contact', $this->_individual_after);
-    $this->create_entity('Contact', $this->_organisation_after);
+    $this->_contact_id      = $this->create_entity('Contact', $this->_individual_after)['id'];
+    $this->_organisation_id = $this->create_entity('Contact', $this->_organisation_after)['id'];
   }
 
   // Helper
@@ -64,15 +71,17 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $values = [$this->_nav_custom_field => $this->_navision_id,];
     $result = $this->get_entity('Contact', $values);
 
-    if ($result['count'] == '0') {
-      $this->_contact_id = $this->create_contact();
-    }
     if ($result['count'] > '1') {
       $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
       return;
     }
-    $this->_contact_id = $result['id'];
+    if ($result['count'] == '0') {
+      $this->_contact_id = '';
+    } else {
+      $this->_contact_id = $result['id'];
+    }
 
+    // Organization
     if ($this->_organisation_before[$this->_nav_custom_field] == $this->_navision_id) {
       // we don't have organization data yet
       return;
@@ -82,7 +91,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       $values = [$this->_nav_custom_field => $this->_organisation_before[$this->_nav_custom_field],];
       $result = $this->get_entity('Contact', $values);
       if ($result['count'] == '0') {
-        $this->_organisation_id = $this->create_organization();
+        return;
       }
       if ($result['count'] > '1') {
         $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
@@ -92,18 +101,83 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
-  private function create_contact() {
-    return $this->create_entity('Contact', $this->_individual_after)['id'];
+  /**
+   * If contact couldn't be identified by NavId, it will be identified by email(s)
+   * and first_name and last name. If that's not available, a new contact is created
+   * with the AFTER values and ALL provided values
+   * @param $contact_id
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function get_or_create_contact() {
+    if (!empty($this->_contact_id)) {
+      return $this->_contact_id;
+    }
+    $email_contact_ids = $this->get_contact_ids_via_emails($this->_lookup_data['Emails']);
+    $lookup_contact_id = $this->get_contact_via_emails($email_contact_ids, $this->_lookup_data['Contact']);
+    if ($lookup_contact_id == "") {
+      $this->_parent->create_full_contact();
+      return '-1';
+    }
+    return $lookup_contact_id;
   }
 
-  private function create_organization() {
-    return $this->create_entity('Contact', $this->_organisation_after)['id'];
+  /**
+   * @param $emails
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_contact_ids_via_emails($emails) {
+    if (empty($emails)) {
+      return array();
+    }
+    $result = civicrm_api3('Email', 'get', array(
+      'sequential' => 1,
+      'email' => array('IN' => $emails),
+    ));
+    if ($result['is_error'] == '1') {
+      $this->log("Api command to get Emails Entities failed. Reason: {$result['error_message']}");
+      return array();
+    }
+    $contact_ids = array();
+    foreach ($result['values'] as $val) {
+      $contact_ids[] = $val['contact_id'];
+    }
+    return $contact_ids;
+  }
+
+  /**
+   * @param $contact_ids      (array with contact_ids from email lookup)
+   * @param $contact_details  (array first_name, last_name)
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_contact_via_emails($contact_ids, $contact_details) {
+    if (!empty($contact_ids)) {
+      $contact_details['id'] = array('IN' => $contact_ids);
+    }
+    $result = civicrm_api3('Contact', 'get', $contact_details);
+    if ($result['is_error'] == '1') {
+      $this->log("Error occured while looking up contacts. Message: " . $result['error_message']);
+      return "";
+    }
+    if ($result['count'] != '1') {
+      $this->log("Found {$result['count']} entries for contact.");
+      return "";
+    }
+    return $result['values']['contact_id'];
   }
 
   /**
    * @throws \CiviCRM_API3_Exception
    */
   protected function get_civi_data() {
+    if (empty($this->_contact_id)) {
+      return;
+    }
     $result = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
       'id' => $this->_contact_id,

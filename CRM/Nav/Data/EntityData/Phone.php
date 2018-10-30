@@ -63,6 +63,9 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
   }
 
   protected function get_civi_data() {
+    if (empty($this->_contact_id)) {
+      return;
+    }
     $result = civicrm_api3('Phone', 'get', array(
       'sequential' => 1,
       'contact_id' => $this->_contact_id,

@@ -87,6 +87,10 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->create_full($contact_id);
   }
 
+  public function get_or_create_contact() {
+    return $this->Contact->get_or_create_contact();
+  }
+
   /**
    * @throws \Exception
    */
@@ -102,12 +106,15 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $civi_data_before_individual_company = $this->create_civi_contact_data_organization($nav_data_before);
     $civi_data_after_individual_company  = $this->create_civi_contact_data_organization($nav_data_after);
 
+    $lookup_data = $this->get_contact_lookup_details();
     $this->Contact = new CRM_Nav_Data_EntityData_Contact(
       $civi_data_before_individual,
       $civi_data_after_individual,
       $civi_data_before_individual_company,
       $civi_data_after_individual_company,
-      $this->get_individual_navision_id()
+      $this->get_individual_navision_id(),
+      $lookup_data,
+      $this
     );
 
   }
@@ -634,15 +641,16 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   /**
    * @return mixed
    */
-  public function get_contact_lookup_details() {
+  private function get_contact_lookup_details() {
     $result['Emails'] = $this->get_contact_email();
-    foreach ($this->civi_data_before['Contact'] as $contact) {
-      if ($contact['contact_type'] == "Individual") {
-        $result['Contact'] = array (
-          'first_name' => $contact['first_name'],
-          'last_name'  => $contact['last_name'],
-        );
-      }
+    $nav_data = $this->get_nav_before_data();
+    $first_name = $this->get_nav_value_if_exist($nav_data, 'First_Name');
+    if (isset($first_name)) {
+      $result['Contact']['first_name'] = $first_name;
+    }
+    $last_name = $this->get_nav_value_if_exist($nav_data, 'Surname');
+    if (isset($last_name)) {
+      $result['Contact']['last_name'] = $last_name;
     }
     return $result;
   }

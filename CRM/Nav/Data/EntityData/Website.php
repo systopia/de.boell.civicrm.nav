@@ -34,12 +34,16 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
 
   public function create_full($contact_id) {
     if (isset($this->_website_after)) {
-      $this->_website_after['contact_id'] = $contact_id;
-      $this->create_entity('Website', $this->_website_after['contact_id']);
+      $website_data = $this->_website_after;
+      $website_data['contact_id'] = $contact_id;
+      $this->create_entity('Website', $website_data);
     }
   }
 
   protected function get_civi_data() {
+    if (empty($this->_contact_id)) {
+      return;
+    }
     $values = [
       'sequential' => 1,
       'contact_id' => $this->_contact_id,
