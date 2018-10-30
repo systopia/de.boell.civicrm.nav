@@ -180,13 +180,33 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     }
 
     // Organization
-    if ($this->_organisation_before[$this->_nav_custom_field] == $this->_navision_id) {
-      // we don't have organization data yet
+    if ($this->_organisation_before[$this->_nav_custom_field] == $this->_navision_id &&
+      $this->_organisation_after[$this->_nav_custom_field] == $this->_navision_id
+    ) {
+      // We don't have a connected Company
       return;
     }
-
-    if (isset($this->_organisation_before[$this->_nav_custom_field])) {
+    // Check before Values for Org ID if nav ID is a company ID (diff than person NavID)
+    if (isset($this->_organisation_before[$this->_nav_custom_field]) &&
+      $this->_organisation_before[$this->_nav_custom_field] != $this->_navision_id)
+    {
       $values = [$this->_nav_custom_field => $this->_organisation_before[$this->_nav_custom_field],];
+      $result = $this->get_entity('Contact', $values);
+      if ($result['count'] == '0') {
+        return;
+      }
+      if ($result['count'] != '1') {
+        $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
+        return;
+      }
+      $this->_organisation_id = $result['id'];
+    }
+
+    // Check after Values for Org ID if nav ID is a company ID (diff than person NavID)
+    if (isset($this->_organisation_after[$this->_nav_custom_field]) &&
+      $this->_organisation_after[$this->_nav_custom_field] != $this->_navision_id)
+    {
+      $values = [$this->_nav_custom_field => $this->_organisation_after[$this->_nav_custom_field],];
       $result = $this->get_entity('Contact', $values);
       if ($result['count'] == '0') {
         return;

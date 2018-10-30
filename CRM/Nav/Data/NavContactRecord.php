@@ -95,6 +95,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     if ($contact_id > '0') {
       // set contact_id to other objects as well and trigger civi-entity lookups
       $this->Address->set_contact_id($contact_id);
+      $this->Address->set_organization_id($this->Contact->get_org_id());
       $this->Phone->set_contact_id($contact_id);
       $this->Email->set_contact_id($contact_id);
       $this->Website->set_contact_id($contact_id);
@@ -202,6 +203,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $organization_after  = $this->create_civi_address_values_organization($nav_data_after);
 
     $contact_id = $this->Contact->get_contact_id();
+    $orgnization_id = $this->Contact->get_org_id();
 
     $this->Address = new CRM_Nav_Data_EntityData_Address(
       $private_before,
@@ -209,6 +211,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $organization_before,
       $organization_after,
       $contact_id,
+      $orgnization_id,
       $this->location_type_private,
       $this->location_type_organization
     );

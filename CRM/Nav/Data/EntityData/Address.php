@@ -27,6 +27,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   private $_organisation_after;
   private $_location_type_private;
   private $_location_type_organization;
+  private $_organization_id;
 
   private $civi_private_address;
   private $civi_organization_address;
@@ -39,17 +40,21 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @param $before_organization
    * @param $after_organization
    * @param $contact_id
+   * @param $organization_id
    * @param $private_location_type
    * @param $organization_location_type
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function __construct($before_private, $after_private, $before_organization,
-                              $after_organization, $contact_id,
+                              $after_organization, $contact_id, $organization_id,
                               $private_location_type, $organization_location_type) {
     $this->_private_before = $before_private;
     $this->_private_after = $after_private;
     $this->_organisation_before = $before_organization;
     $this->_organisation_after = $after_organization;
     $this->_contact_id = $contact_id;
+    $this->_organization_id = $organization_id;
     $this->_location_type_private = $private_location_type;
     $this->_location_type_organization = $organization_location_type;
 
@@ -69,7 +74,20 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     // handle update organization address
     if (!empty($this->conflict_data['organization']['updates'])) {
       $values = $this->conflict_data['organization']['updates'];
+      $values['location_type_id'] = $this->_location_type_organization;
+      // set to primary
+      $values['is_primary'] = '1';
       $values['contact_id'] = $this->_contact_id;
+      // if we don't have an ID, the address will be newly created
+      // we need the Org_id, lookup the address and add it as master_id
+      if (empty($values['id'])) {
+        $master_address_id = $this->get_organization_address();
+        if (empty($master_address_id)) {
+          $this->log("Couldn't determine Master Address ID for {$this->_organization_id} Creating Address, but wont be shared with Company");
+        } else {
+          $values['master_id'] = $master_address_id;
+        }
+      }
       $this->create_entity('Address', $values);
     }
   }
@@ -168,20 +186,25 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
     // create shared company address
     if (isset($this->_private_after)) {
-      $contact_values = $this->_organisation_after;
-      $contact_values['contact_id'] = $contact_id;
+      $org_address_values = $this->_organisation_after;
+      $org_address_values['contact_id'] = $contact_id;
       if (isset($org_addr_id)) {
-        $contact_values['master_id'] = $org_addr_id;
+        $org_address_values['master_id'] = $org_addr_id;
       }
-      $this->create_entity('Address', $contact_values);
+      $org_address_values['is_primary'] = '1';
+      $this->create_entity('Address', $org_address_values);
     }
 
     // create private address
     if (isset($this->_private_after)) {
-      $address_values = $this->_private_after;
-      $address_values['contact_id'] = $contact_id;
-      $this->create_entity('Address', $address_values);
+      $priv_address_values = $this->_private_after;
+      $priv_address_values['contact_id'] = $contact_id;
+      $this->create_entity('Address', $priv_address_values);
     }
+  }
+
+  public function set_organization_id($organization_id) {
+    $this->_organization_id = $organization_id;
   }
 
   /**
@@ -192,21 +215,17 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     if (empty($this->_contact_id)) {
       return;
     }
-    $result = civicrm_api3('Address', 'get', array(
-      'sequential' => 1,
-      'contact_id' => $this->_contact_id,
-      'return' => ["location_type_id",
-                   "street_address",
-                   "supplemental_address_1",
-                   "city",
-                   "postal_code",
-                   "country_id",
-      ],
-    ));
-    if ($result['is_error']) {
-      $this->log("Couldn't get civi data for Address {$this->_contact_id}. Error: {$result['error_message']}");
-      // TODO: throw Exception?
-    }
+    $values =  ['sequential' => 1,
+                'contact_id' => $this->_contact_id,
+                'return' => ["location_type_id",
+                             "street_address",
+                             "supplemental_address_1",
+                             "city",
+                             "postal_code",
+                             "country_id",
+                ],
+      ];
+    $result = $this->get_entity('Address', $values);
     foreach ($result['values'] as $civi_address) {
       if ($civi_address['location_type_id'] == $this->_location_type_private) {
         $this->civi_private_address = $civi_address;
@@ -216,6 +235,43 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
-
+  /**
+   * get addresses from $this->_organization_address, compares them to nav_after
+   * and returns id from said address. If no address is found, throw Exception.
+   * It shouldn't be possible to get an invalid address
+   *    (Company should be updated first in Navision, thus address always valid)
+   *
+   * @return String
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_organization_address() {
+    if (empty($this->_organization_id)) {
+      return '';
+    }
+    $values =  ['sequential' => 1,
+                'contact_id' => $this->_organization_id,
+                'return' => ["location_type_id",
+                             "street_address",
+                             "supplemental_address_1",
+                             "city",
+                             "postal_code",
+                             "country_id",
+                ],
+    ];
+    $result = $this->get_entity('Address', $values);
+    foreach ($result['values'] as $address) {
+      if ($address == $this->_organisation_after) {
+        return $address['id'];
+      }
+      // we check a couple of more fields to be sure (remove location_type, country_id etc
+      if ($address['street_address'] == $this->_organisation_after['street_address'] &&
+        $address['city'] == $this->_organisation_after['city'] &&
+        $address['postal_code'] == $this->_organisation_after['postal_code']
+      ) {
+        return $address['id'];
+      }
+    }
+    return '';
+  }
 
 }
