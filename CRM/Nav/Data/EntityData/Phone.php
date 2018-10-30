@@ -64,6 +64,15 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  public function i3val() {
+    foreach ($this->conflict_data as $conflict) {
+      if (empty($conflict['i3val'])) {
+        continue;
+      }
+      $this->i3val_update($conflict['i3val']);
+    }
+  }
+
   public function delete() {
     foreach ($this->delete_data as $del_data) {
       if (empty($del_data)) {

@@ -77,6 +77,21 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  public function i3val() {
+    if (!empty($this->conflict_data['private']['i3val'])) {
+      $values = $this->conflict_data['private']['i3val'];
+      $values['id'] = $this->_contact_id;
+      $this->i3val_update($values);
+    }
+
+    if (!empty($this->conflict_data['organization']['i3val'])) {
+      $values = $this->conflict_data['organization']['i3val'];
+      $values['id'] = $this->_contact_id;
+      $this->i3val_update($values);
+    }
+
+  }
+
   public function calc_differences() {
     // get changed stuff
     $this->changed_data['private'] = $this->compare_data_arrays($this->_private_before, $this->_private_after);

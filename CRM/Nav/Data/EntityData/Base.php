@@ -118,7 +118,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     }
     $result['updates'] = $update_values;
     $result['valid_changes'] = $valid_changes;
-    $result['i3Val'] = $i3val;
+    $result['i3val'] = $i3val;
     return $result;
   }
 
@@ -150,6 +150,14 @@ abstract  class CRM_Nav_Data_EntityData_Base {
       'sequential' => 1,
       'id' => $entity_id,
     ));
+    if ($result['is_error']) {
+      $this->log("Failed to delete {$entity}-Entity with values ID {$entity_id}");
+    }
+    return $result;
+  }
+
+  protected function i3val_update($values) {
+    $result = civicrm_api3('Contact', 'request_update', $values);
     if ($result['is_error']) {
       $this->log("Failed to delete {$entity}-Entity with values ID {$entity_id}");
     }

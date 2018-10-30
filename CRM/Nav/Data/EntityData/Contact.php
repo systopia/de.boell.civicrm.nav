@@ -87,6 +87,13 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  public function i3val() {
+    if (empty($this->conflict_data['i3val'])) {
+      return;
+    }
+    $this->i3val_update($this->conflict_data['i3val']);
+  }
+
   public function calc_differences() {
     // get changed stuff
     $this->changed_data['individual'] = $this->compare_data_arrays($this->_individual_before, $this->_individual_after);

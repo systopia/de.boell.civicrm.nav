@@ -115,6 +115,14 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->delete();
   }
 
+  public function i3val() {
+    $this->Contact->i3val();
+    $this->Address->i3val();
+    $this->Phone->i3val();
+    $this->Email->i3val();
+    $this->Website->i3val();
+  }
+
   /**
    * @throws \Exception
    */

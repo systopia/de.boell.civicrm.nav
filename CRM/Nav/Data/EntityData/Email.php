@@ -60,6 +60,15 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  public function i3val() {
+    foreach ($this->conflict_data as $conflict) {
+      if (empty($conflict['i3val'])) {
+        continue;
+      }
+      $this->i3val_update($conflict['i3val']);
+    }
+  }
+
   public function calc_differences() {
     $emails = $this->iterate_all_emails();
     foreach ($emails as $email) {

@@ -47,6 +47,13 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     $this->delete_entity('Website', $this->delete_data['id']);
   }
 
+  public function i3val() {
+    if (empty($this->conflict_data['i3val'])) {
+      return;
+    }
+    $this->i3val_update($this->conflict_data['i3val']);
+  }
+
   public function calc_differences() {
     $this->changed_data = $this->compare_data_arrays($this->_website_before, $this->_website_after);
     $this->delete_data = $this->compare_delete_data($this->_website_before, $this->_website_after);
