@@ -30,6 +30,8 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
   private $_nav_custom_field;
   private $_organisation_id;
 
+  private $_is_organization;
+
   private $_nav_data_record;
 
   // ['emails' => xx, 'Contact' => xx]
@@ -51,13 +53,14 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id, $lookup_data, &$parent) {
+  public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id, $lookup_data, $is_organization, &$parent) {
     $this->_individual_before   = $before_individual;
     $this->_individual_after    = $after_individual;
     $this->_organisation_before = $before_company;
     $this->_organisation_after  = $after_company;
     $this->_navision_id         = $nav_id;
     $this->_lookup_data         = $lookup_data;
+    $this->_is_organization     = $is_organization;
     $this->_nav_data_record     = $parent;
     $this->_nav_custom_field    = CRM_Nav_Config::get('navision_custom_field');
 
@@ -77,6 +80,10 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    */
   public function get_org_id() {
     return $this->_organisation_id;
+  }
+
+  public function is_organization() {
+    return $this->_is_organization;
   }
 
   /**
@@ -156,10 +163,13 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
 
   /**
    * create Contact for Person, and if set for Company as well
+   * @throws \CiviCRM_API3_Exception
    */
   public function create_full() {
     $this->_contact_id      = $this->create_entity('Contact', $this->_individual_after)['id'];
-    $this->_organisation_id = $this->create_entity('Contact', $this->_organisation_after)['id'];
+    if (!empty($this->_organisation_after) && !$this->_is_organization) {
+      $this->_organisation_id = $this->create_entity('Contact', $this->_organisation_after)['id'];
+    }
   }
 
   /**
