@@ -69,6 +69,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     if (!empty($this->conflict_data['private']['updates'])) {
       $values = $this->conflict_data['private']['updates'];
       $values['contact_id'] = $this->_contact_id;
+      $values['location_type_id'] = $this->_location_type_private;
       $this->create_entity('Address', $values);
     }
     // handle update organization address
