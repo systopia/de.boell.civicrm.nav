@@ -36,6 +36,8 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   private $org_name_1;
   private $org_name_2;
 
+  private $is_organization;
+
   private   $matcher;
 
   private $contactType;
@@ -170,8 +172,20 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $civi_data_after_individual  = $this->create_civi_contact_values($nav_data_after);
 
     // company
-    $civi_data_before_individual_company = $this->create_civi_contact_data_organization($nav_data_before);
-    $civi_data_after_individual_company  = $this->create_civi_contact_data_organization($nav_data_after);
+    if ($this->contactType == 'Individual') {
+      $is_organization = FALSE;
+    } else {
+      $is_organization = TRUE;
+    }
+    if (!$is_organization) {
+      // only parse Company Data if it is a company
+      $civi_data_before_individual_company = $this->create_civi_contact_data_organization($nav_data_before);
+      $civi_data_after_individual_company  = $this->create_civi_contact_data_organization($nav_data_after);
+    } else {
+      $civi_data_before_individual_company = [];
+      $civi_data_after_individual_company  = [];
+    }
+
 
     $lookup_data = $this->get_contact_lookup_details();
     $this->Contact = new CRM_Nav_Data_EntityData_Contact(
@@ -181,6 +195,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $civi_data_after_individual_company,
       $this->get_individual_navision_id(),
       $lookup_data,
+      $is_organization,
       $this
     );
 
@@ -199,21 +214,22 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $private_before = $this->create_civi_address_values_private($nav_data_before);
     $private_after  = $this->create_civi_address_values_private($nav_data_after);
     // organizationAddress
-    $organization_before  = $this->create_civi_address_values_organization($nav_data_before);
-    $organization_after  = $this->create_civi_address_values_organization($nav_data_after);
+//    $organization_before  = $this->create_civi_address_values_organization($nav_data_before);
+//    $organization_after  = $this->create_civi_address_values_organization($nav_data_after);
 
     $contact_id = $this->Contact->get_contact_id();
-    $orgnization_id = $this->Contact->get_org_id();
+    $organization_id = $this->Contact->get_org_id();
 
     $this->Address = new CRM_Nav_Data_EntityData_Address(
       $private_before,
       $private_after,
-      $organization_before,
-      $organization_after,
+//      $organization_before,
+//      $organization_after,
       $contact_id,
-      $orgnization_id,
+      $organization_id,
       $this->location_type_private,
-      $this->location_type_organization
+      $this->location_type_organization,
+      $this->Contact->is_organization()
     );
   }
 
@@ -380,16 +396,16 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
    *
    * @return array
    */
-  private function create_civi_address_values_organization($nav_data) {
-    return [
-      'street_address'         => $this->get_nav_value_if_exist($nav_data, 'Company_Adress'),
-      'supplemental_address_1' => $this->get_nav_value_if_exist($nav_data, 'Company_Adress_2'),
-      'postal_code'            => $this->get_nav_value_if_exist($nav_data, 'Company_Post_Code'),
-      'city'                   => $this->get_nav_value_if_exist($nav_data, 'Company_City'),
-      'country_id'             => $this->get_nav_value_if_exist($nav_data, 'Company_Country_Region_Code'),
-      'location_type_id'       => $this->location_type_organization,
-    ];
-  }
+//  private function create_civi_address_values_organization($nav_data) {
+//    return [
+//      'street_address'         => $this->get_nav_value_if_exist($nav_data, 'Company_Adress'),
+//      'supplemental_address_1' => $this->get_nav_value_if_exist($nav_data, 'Company_Adress_2'),
+//      'postal_code'            => $this->get_nav_value_if_exist($nav_data, 'Company_Post_Code'),
+//      'city'                   => $this->get_nav_value_if_exist($nav_data, 'Company_City'),
+//      'country_id'             => $this->get_nav_value_if_exist($nav_data, 'Company_Country_Region_Code'),
+//      'location_type_id'       => $this->location_type_organization,
+//    ];
+//  }
 
   /**
    * @param $location_type
@@ -458,7 +474,15 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     switch ($contact_type) {
       case 'Company':
         // nothing to do here. No Person data needs to be created
-        return;
+        $org_name1 = $this->get_nav_value_if_exist($nav_data, 'Company_Name');
+        $org_name2 = $this->get_nav_value_if_exist($nav_data, 'Company_Name_2');
+        return [
+          'contact_type' => "Organization",
+          $this->org_name_1   => $org_name1,
+          $this->org_name_2   => $org_name2,
+          'organization_name' => $org_name1 ." " . $org_name2,
+          $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'No'),        // NavisionID
+        ];
       case 'Person':
       return [
         // TODO: Iterate over fields from NavContactMatcher and make this more generic!
@@ -468,31 +492,14 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
         'last_name'    => $this->get_nav_value_if_exist($nav_data, 'Surname'),
         'birth_date'   => $this->get_nav_value_if_exist($nav_data, 'Geburtsdatum'),
         $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'No'),        // NavisionID
-//        'email'        => $this->get_nav_value_if_exist($nav_data, 'E_mail'),
         'formal_title' => $this->get_nav_value_if_exist($nav_data, 'Job_Title'),
         'job_title'    => $this->get_nav_value_if_exist($nav_data, 'Funktion'),
-        'contact_type' => $this->get_contact_type($this->get_nav_value_if_exist($nav_data, 'Type')),
         'prefix_id'    => $this->get_nav_value_if_exist($nav_data, 'Salutation_Code'),
       ];
       default:
         throw new Exception("Invalid Contact Type {$contact_type}. Couldn't convert Navision Data to CiviCRM data.");
     }
 
-  }
-
-
-  /**
-   * @param $fields
-   *
-   * @return bool
-   */
-  private function value_changed($fields) {
-    foreach ($fields as $f) {
-      if (array_key_exists($f, $this->changed_data) && $this->changed_data[$f] != "") {
-        return TRUE;
-      }
-    }
-    return FALSE;
   }
 
   /**
