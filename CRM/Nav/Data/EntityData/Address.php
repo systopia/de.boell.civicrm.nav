@@ -92,26 +92,6 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
         $this->create_entity('Address', $company_address);
       }
     }
-//    // handle update organization address
-//    if (!empty($this->conflict_data['organization']['updates'])) {
-//      $values = $this->conflict_data['organization']['updates'];
-//      $values['location_type_id'] = $this->_location_type_organization;
-//      // set to primary
-//      $values['is_primary'] = '1';
-//      $values['contact_id'] = $this->_contact_id;
-//      // if we don't have an ID, the address will be newly created
-//      // we need the Org_id, lookup the address and add it as master_id
-//      // only for organization
-//      if (empty($values['id']) && !$this->_is_organization) {
-//        $master_address_id = $this->get_organization_address();
-//        if (empty($master_address_id)) {
-//          $this->log("Couldn't determine Master Address ID for {$this->_organization_id} Creating Address, but wont be shared with Company");
-//        } else {
-//          $values['master_id'] = $master_address_id;
-//        }
-//      }
-//      $this->create_entity('Address', $values);
-//    }
   }
 
   /**
@@ -124,12 +104,6 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       $values['contact_id'] = $this->_contact_id;
       $this->create_entity('Address', $values);
     }
-//    // handle update organization address
-//    if (!empty($this->conflict_data['organization']['valid_changes'])) {
-//      $values = $this->conflict_data['organization']['valid_changes'];
-//      $values['contact_id'] = $this->_contact_id;
-//      $this->create_entity('Address', $values);
-//    }
   }
 
   /**
@@ -198,16 +172,6 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       $this->create_entity('Address', $company_address);
       return;
     }
-//    // create shared company address (only for Individuals)
-//    if (isset($this->_address_after)) {
-//      $org_address_values = $this->_organisation_after;
-//      $org_address_values['contact_id'] = $contact_id;
-//      if (isset($org_addr_id)) {
-//        $org_address_values['master_id'] = $org_addr_id;
-//      }
-//      $org_address_values['is_primary'] = '1';
-//      $this->create_entity('Address', $org_address_values);
-//    }
   }
 
   /**
