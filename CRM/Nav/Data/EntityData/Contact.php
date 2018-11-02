@@ -196,11 +196,11 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       // We don't have a connected Company
       return;
     }
-    // Check before Values for Org ID if nav ID is a company ID (diff than person NavID)
-    if (isset($this->_organisation_before[$this->_nav_custom_field]) &&
-      $this->_organisation_before[$this->_nav_custom_field] != $this->_navision_id)
+    // Check after Values for Org ID if nav ID is a company ID (diff than person NavID)
+    if (isset($this->_organisation_after[$this->_nav_custom_field]) &&
+      $this->_organisation_after[$this->_nav_custom_field] != $this->_navision_id)
     {
-      $values = [$this->_nav_custom_field => $this->_organisation_before[$this->_nav_custom_field],];
+      $values = [$this->_nav_custom_field => $this->_organisation_after[$this->_nav_custom_field],];
       $result = $this->get_entity('Contact', $values);
       if ($result['count'] == '0') {
         return;
@@ -209,14 +209,16 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
         $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
       } else {
         $this->_organisation_id = $result['id'];
+        return;
       }
     }
 
-    // Check after Values for Org ID if nav ID is a company ID (diff than person NavID)
-    if (isset($this->_organisation_after[$this->_nav_custom_field]) &&
-      $this->_organisation_after[$this->_nav_custom_field] != $this->_navision_id)
+    // TODO: Is this needed ?
+    // Check before Values for Org ID if nav ID is a company ID (diff than person NavID)
+    if (isset($this->_organisation_before[$this->_nav_custom_field]) &&
+      $this->_organisation_before[$this->_nav_custom_field] != $this->_navision_id)
     {
-      $values = [$this->_nav_custom_field => $this->_organisation_after[$this->_nav_custom_field],];
+      $values = [$this->_nav_custom_field => $this->_organisation_before[$this->_nav_custom_field],];
       $result = $this->get_entity('Contact', $values);
       if ($result['count'] == '0') {
         return;

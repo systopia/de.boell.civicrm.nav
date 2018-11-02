@@ -71,6 +71,27 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       $values['location_type_id'] = $this->_location_type_private;
       $this->create_entity('Address', $values);
     }
+
+    if (!empty($this->_organization_id)) {
+      // share address now
+      //TODO: remove old address
+      // add the current one
+      $local_business_address = $this->get_organization_address($this->_contact_id);
+      $company_address = $this->get_organization_address($this->_organization_id);
+
+      // create company address
+      if (!empty($company_address) && (!$this->compare_addresses($local_business_address, $company_address))) {
+        // delete old business address if available, add new linked address
+        if (!empty($local_business_address['id'])) {
+          $this->delete_entity('Address', $local_business_address['id']);
+        }
+        $company_address['contact_id'] = $this->_contact_id;
+        $company_address['master_id'] = $company_address['id'];
+        $company_address['is_primary'] = '1';
+        unset($company_address['id']);
+        $this->create_entity('Address', $company_address);
+      }
+    }
 //    // handle update organization address
 //    if (!empty($this->conflict_data['organization']['updates'])) {
 //      $values = $this->conflict_data['organization']['updates'];
@@ -241,6 +262,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $values =  ['sequential' => 1,
                 'contact_id' => $orgnization_id,
                 'is_primary' => '1',
+                "location_type_id" => $this->_location_type_organization,
                 'return' => ["location_type_id",
                              "street_address",
                              "supplemental_address_1",
@@ -254,6 +276,25 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       return $result['values']['0'];
     }
     return '';
+  }
+
+  /**
+   * Compares 2 address arrays, but ignores the id field
+   * @param $address1
+   * @param $address2
+   *
+   * @return bool
+   */
+  private function compare_addresses($address1, $address2) {
+    foreach ($address1 as $key => $value) {
+      if ($key == 'id') {
+        continue;
+      }
+      if (!isset($address2[$key]) || $address2[$key] != $value) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
 }
