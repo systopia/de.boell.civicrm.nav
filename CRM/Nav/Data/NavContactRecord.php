@@ -164,6 +164,11 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->Website->i3val();
   }
 
+
+  public function get_nav_id() {
+    return $this->Contact->get_nav_id();
+  }
+
   /**
    * @throws \CiviCRM_API3_Exception
    */

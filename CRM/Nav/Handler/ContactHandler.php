@@ -53,6 +53,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
+    $nav_id = $this->record->get_nav_id();
     // add NavId to Contact
     $this->add_nav_id_to_contact($contact_id, $nav_id);
 

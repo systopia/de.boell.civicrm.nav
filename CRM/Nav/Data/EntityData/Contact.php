@@ -155,6 +155,10 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->_contact_id      = $this->create_entity('Contact', $this->_individual_after)['id'];
   }
 
+  public function get_nav_id() {
+    return $this->_navision_id;
+  }
+
   /**
    * @throws \CiviCRM_API3_Exception
    */
