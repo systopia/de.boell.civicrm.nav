@@ -20,8 +20,6 @@
  */
 class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
 
-  private $i3Val_values = [];
-
   /**
    * CRM_Nav_Handler_ContactHandler constructor.
    *
