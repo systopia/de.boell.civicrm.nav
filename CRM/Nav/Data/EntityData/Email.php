@@ -115,7 +115,8 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
         continue;
       }
       $tmp_changed_data = $this->compare_data_arrays($email['before'], $email['after']);
-      if (!empty($tmp_changed_data) || empty($this->get_civi_email($email))) {
+
+      if (!empty($tmp_changed_data) || (empty($this->get_civi_email($email)) && !empty($email['after']))) {
         $this->changed_data[] = $email['after'];
         $tmp_changed_data = $email['after']; // for later we need the whole entity
       }

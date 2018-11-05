@@ -131,7 +131,7 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
         continue;
       }
       $tmp_changed_data = $this->compare_data_arrays($phone['before'], $phone['after']);
-      if (!empty($tmp_changed_data) || empty($this->get_civi_phone($phone))) {
+      if (!empty($tmp_changed_data) || (empty($this->get_civi_phone($phone)) && !empty($phone['after']))) {
         $this->changed_data[] = $phone['after'];
         $tmp_changed_data = $phone['after']; // for later we need the whole entity
       }
