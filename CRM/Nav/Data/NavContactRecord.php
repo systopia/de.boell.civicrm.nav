@@ -77,7 +77,8 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
-   *
+   * Creates full contact with all available data
+   * Should only be called if Contact wasn't found by NavId, ID-Tracker and Data
    */
   public function create_full_contact() {
     $this->Contact->create_full();
@@ -93,16 +94,19 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
    * @return mixed
    */
   public function get_or_create_contact() {
-    $contact_id = $this->Contact->get_or_create_contact();
-    if ($contact_id > '0') {
+    $contact_id = $this->Contact->get_contact_id();
+    if (!empty($contact_id)) {
       // set contact_id to other objects as well and trigger civi-entity lookups
       $this->Address->set_contact_id($contact_id);
       $this->Address->set_organization_id($this->Contact->get_org_id());
       $this->Phone->set_contact_id($contact_id);
       $this->Email->set_contact_id($contact_id);
       $this->Website->set_contact_id($contact_id);
+      return $contact_id;
     }
-    return $contact_id;
+    // nothing found, we create Contact now
+    $this->create_full_contact();
+    return '-1';
   }
 
   /**
@@ -195,8 +199,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $civi_data_after_individual_company,
       $this->get_individual_navision_id(),
       $lookup_data,
-      $is_organization,
-      $this
+      $is_organization
     );
 
   }
@@ -392,22 +395,6 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   /**
-   * @param $nav_data
-   *
-   * @return array
-   */
-//  private function create_civi_address_values_organization($nav_data) {
-//    return [
-//      'street_address'         => $this->get_nav_value_if_exist($nav_data, 'Company_Adress'),
-//      'supplemental_address_1' => $this->get_nav_value_if_exist($nav_data, 'Company_Adress_2'),
-//      'postal_code'            => $this->get_nav_value_if_exist($nav_data, 'Company_Post_Code'),
-//      'city'                   => $this->get_nav_value_if_exist($nav_data, 'Company_City'),
-//      'country_id'             => $this->get_nav_value_if_exist($nav_data, 'Company_Country_Region_Code'),
-//      'location_type_id'       => $this->location_type_organization,
-//    ];
-//  }
-
-  /**
    * @param $location_type
    * @param $phone_type
    * @param $nav_index
@@ -524,14 +511,26 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
    */
   private function get_contact_lookup_details() {
     $result['Emails'] = $this->get_contact_email();
-    $nav_data = $this->get_nav_before_data();
-    $first_name = $this->get_nav_value_if_exist($nav_data, 'First_Name');
+
+    $nav_data_before = $this->get_nav_before_data();
+    $nav_data_after = $this->get_nav_before_data();
+    // before
+    $first_name = $this->get_nav_value_if_exist($nav_data_before, 'First_Name');
     if (isset($first_name)) {
-      $result['Contact']['first_name'] = $first_name;
+      $result['Contact']['before']['first_name'] = $first_name;
     }
-    $last_name = $this->get_nav_value_if_exist($nav_data, 'Surname');
+    $last_name = $this->get_nav_value_if_exist($nav_data_before, 'Surname');
     if (isset($last_name)) {
-      $result['Contact']['last_name'] = $last_name;
+      $result['Contact']['before']['last_name'] = $last_name;
+    }
+    // after
+    $first_name = $this->get_nav_value_if_exist($nav_data_after, 'First_Name');
+    if (isset($first_name)) {
+      $result['Contact']['after']['first_name'] = $first_name;
+    }
+    $last_name = $this->get_nav_value_if_exist($nav_data_after, 'Surname');
+    if (isset($last_name)) {
+      $result['Contact']['after']['last_name'] = $last_name;
     }
     return $result;
   }
@@ -540,18 +539,29 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
    * @return array
    */
   private function get_contact_email() {
-    $nav_data = $this->get_nav_before_data();
+    $nav_data_before = $this->get_nav_before_data();
+    $nav_data_after = $this->get_nav_after_data();
     $result= [];
-    if (isset($nav_data['E_mail'])) {
-      $result[] = $nav_data['E_mail'];
+    // before values
+    if (isset($nav_data_before['E_Mail'])) {
+      $result['before'][] = $nav_data_before['E_Mail'];
     }
-    if (isset($nav_data['E_mail_2'])) {
-      $result[] = $nav_data['E_mail_2'];
+    if (isset($nav_data_before['E_Mail_2'])) {
+      $result['before'][] = $nav_data_before['E_Mail_2'];
     }
-    if (isset($nav_data['Private_E_Mail'])) {
-      $result[] = $nav_data['Private_E_Mail'];
+    if (isset($nav_data_before['Private_E_Mail'])) {
+      $result['before'][] = $nav_data_before['Private_E_Mail'];
+    }
+    // after values
+    if (isset($nav_data_after['E_Mail'])) {
+      $result['after'][] = $nav_data_after['E_Mail'];
+    }
+    if (isset($nav_data_after['E_Mail_2'])) {
+      $result['after'][] = $nav_data_after['E_Mail_2'];
+    }
+    if (isset($nav_data_after['Private_E_Mail'])) {
+      $result['after'][] = $nav_data_after['Private_E_Mail'];
     }
     return $result;
   }
-
 }

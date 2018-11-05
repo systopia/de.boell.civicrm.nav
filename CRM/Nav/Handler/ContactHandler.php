@@ -39,12 +39,6 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
-    if ($this->check_new_record()) {
-      $this->record->create_full_contact();
-      $this->record->set_consumed();
-      return;
-    }
-
     $nav_id = $this->record->get_individual_navision_id();
     $contact_id = $this->get_contact_id_from_nav_id($nav_id);
 
@@ -105,6 +99,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
    * @throws \CiviCRM_API3_Exception
    */
   private function delete_nav_id_from_contact($contact_id) {
+    // if we don't have a contact_id --> no need for delete of navId
+    if (empty($contact_id)) {
+      return;
+    }
     $result = civicrm_api3('Contact', 'create', array(
       'sequential' => 1,
       'contact_type' => "Individual",
