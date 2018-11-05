@@ -73,9 +73,6 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
 
     if (!empty($this->_organization_id)) {
-      // share address now
-      //TODO: remove old address
-      // add the current one
       $local_business_address = $this->get_organization_address($this->_contact_id);
       $company_address = $this->get_organization_address($this->_organization_id);
 
@@ -250,6 +247,10 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @return bool
    */
   private function compare_addresses($address1, $address2) {
+    if (empty($address1)) {
+      // we don't have values in civi
+      return FALSE;
+    }
     foreach ($address1 as $key => $value) {
       if ($key == 'id') {
         continue;
