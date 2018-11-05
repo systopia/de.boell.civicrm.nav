@@ -213,27 +213,13 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
-
-
-  /**
-   * If contact couldn't be identified by NavId/ID-Tracker, it will be identified by email(s)
-   * and first_name and last name. If that's not available, a new contact is created
-   * with the AFTER values and ALL provided values
-   * @param $contact_id
-   *
-   * @return mixed
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function get_or_create_contact() {
-    if (!empty($this->_contact_id)) {
-      return $this->_contact_id;
-    }
-  }
-
   private function get_contact_by_data() {
     $email_contact_ids = $this->get_contact_ids_via_emails($this->_lookup_data['Emails']['before']);
     if (empty($email_contact_ids)) {
       $email_contact_ids = $this->get_contact_ids_via_emails($this->_lookup_data['Emails']['after']);
+    } // TODO: check if only one contact is in here - we found contact then!
+    if (count($email_contact_ids) == '1') {
+      return reset($email_contact_ids);
     }
     return $this->get_contact_via_emails($email_contact_ids, $this->_lookup_data['Contact']);
   }
@@ -272,10 +258,16 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    */
   private function get_contact_via_emails($contact_ids, $contact_details) {
     if (!empty($contact_ids)) {
-      $contact_details['id'] = array('IN' => $contact_ids);
+      $lookup_details['id'] = array('IN' => $contact_ids);
     }
-    $lookup_details = $contact_details['before'];
-    if (empty($lookup_details)) {
+
+    if (!empty($contact_details['before']['first_name']) || empty(!$contact_details['before']['last_name'])) {
+      $lookup_details = $contact_details['before'];
+    }
+    if (!empty($contact_details['after']['first_name']) || empty(!$contact_details['after']['last_name'])) {
+      foreach ($contact_details['after'] as $key => $value) {
+        $lookup_details[$key] = $value;
+      }
       $lookup_details = $contact_details['after'];
     }
     $result = civicrm_api3('Contact', 'get', $lookup_details);
@@ -287,7 +279,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       $this->log("Found {$result['count']} entries for contact.");
       return "";
     }
-    return $result['values']['contact_id'];
+    return $result['id'];
   }
 
   /**

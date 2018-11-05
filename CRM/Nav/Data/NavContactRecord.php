@@ -513,23 +513,23 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $result['Emails'] = $this->get_contact_email();
 
     $nav_data_before = $this->get_nav_before_data();
-    $nav_data_after = $this->get_nav_before_data();
+    $nav_data_after = $this->get_nav_after_data();
     // before
     $first_name = $this->get_nav_value_if_exist($nav_data_before, 'First_Name');
-    if (isset($first_name)) {
+    if (!empty($first_name)) {
       $result['Contact']['before']['first_name'] = $first_name;
     }
     $last_name = $this->get_nav_value_if_exist($nav_data_before, 'Surname');
-    if (isset($last_name)) {
+    if (!empty($last_name)) {
       $result['Contact']['before']['last_name'] = $last_name;
     }
     // after
     $first_name = $this->get_nav_value_if_exist($nav_data_after, 'First_Name');
-    if (isset($first_name)) {
+    if (!empty($first_name)) {
       $result['Contact']['after']['first_name'] = $first_name;
     }
     $last_name = $this->get_nav_value_if_exist($nav_data_after, 'Surname');
-    if (isset($last_name)) {
+    if (!empty($last_name)) {
       $result['Contact']['after']['last_name'] = $last_name;
     }
     return $result;
