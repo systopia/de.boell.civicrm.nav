@@ -228,6 +228,19 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
    * @param $email
    */
   private function map_email($email){
+    if ($email['location_type_id'] == $this->_location_type_organization) {
+      if ($email['email'] == strtolower($this->_email_org['before']['email'])) {
+        $this->civi_email_org = $email;
+        return;
+      }
+      if ($email['email'] == strtolower($this->_email_org['after']['email'])) {
+        $this->civi_email_org = $email;
+        return;
+      }
+      // Couldn't be mapped. Maybe it's an Email besides the ones from Navision
+      return;
+    }
+
     if ($email['location_type_id'] == $this->_location_type_private) {
       if ($email['email'] == strtolower($this->_email_priv['before']['email'])) {
         $this->civi_email_priv = $email;
@@ -243,18 +256,6 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
       }
       if ($email['email'] == strtolower($this->_email_priv_2['after']['email'])) {
         $this->civi_email_priv_2 = $email;
-        return;
-      }
-      // Couldn't be mapped. Maybe it's an Email besides the ones from Navision
-      return;
-    }
-    if ($email['location_type_id'] == $this->_location_type_organization) {
-      if ($email['email'] == strtolower($this->_email_org['before']['email'])) {
-        $this->civi_email_org = $email;
-        return;
-      }
-      if ($email['email'] == strtolower($this->_email_org['after']['email'])) {
-        $this->civi_email_org = $email;
         return;
       }
       // Couldn't be mapped. Maybe it's an Email besides the ones from Navision
