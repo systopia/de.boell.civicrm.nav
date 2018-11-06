@@ -63,7 +63,7 @@ class CRM_Nav_SoapCommand_ReadMultipleTest extends \PHPUnit_Framework_TestCase {
     }
 
     print "ReadMultiple API call successful!\n";
-//    print_r($testReadCommand->getSoapResult());
+    print json_encode($testReadCommand->getSoapResult());
   }
 
 }

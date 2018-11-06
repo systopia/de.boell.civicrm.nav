@@ -131,7 +131,7 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
         continue;
       }
       $tmp_changed_data = $this->compare_data_arrays($phone['before'], $phone['after']);
-      if (!empty($tmp_changed_data)) {
+      if (!empty($tmp_changed_data) || (empty($this->get_civi_phone($phone)) && !empty($phone['after']))) {
         $this->changed_data[] = $phone['after'];
         $tmp_changed_data = $phone['after']; // for later we need the whole entity
       }
@@ -241,7 +241,7 @@ class CRM_Nav_Data_EntityData_Phone  extends CRM_Nav_Data_EntityData_Base {
     if(isset($this->_mobile_org[$type])) {
       $result[] = $this->_mobile_org[$type];
     }
-    if(isset($this->$fax_org[$type])) {
+    if(isset($this->_fax_org[$type])) {
       $result[] = $this->_fax_org[$type];
     }
     if(isset($this->_phone_priv[$type])) {

@@ -123,7 +123,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
     $valid_changes = [];
     $update_values = [];
     foreach ($changed_data as $key => $value) {
-      if (!isset($civi_data[$key])) {
+      if (empty($civi_data[$key])) {
         if ($entity == 'Phone' || $entity == 'Email') {
           $update_values = $changed_data;
           break;
@@ -163,6 +163,8 @@ abstract  class CRM_Nav_Data_EntityData_Base {
             unset ($valid_changes);
             unset ($update_values);
             break;
+          } else {
+            $i3val[$key] = $value;
           }
         }
       }
@@ -237,7 +239,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
   protected function i3val_update($values) {
     $result = civicrm_api3('Contact', 'request_update', $values);
     if ($result['is_error']) {
-      $this->log("Failed to delete {$entity}-Entity with values ID {$entity_id}");
+      $this->log("i3Val Request update failed for values " . json_encode($values));
     }
     return $result;
   }

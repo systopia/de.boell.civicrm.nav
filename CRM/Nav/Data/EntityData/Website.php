@@ -70,10 +70,10 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function delete() {
-    if (empty($this->delete_data)) {
+    if (empty($this->delete_data) || empty($this->civi_website['id'])) {
       return;
     }
-    $this->delete_entity('Website', $this->delete_data['id']);
+    $this->delete_entity('Website', $this->civi_website['id']);
   }
 
   /**

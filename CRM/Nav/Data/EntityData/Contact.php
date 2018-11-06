@@ -32,9 +32,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
 
   private $_is_organization;
 
-  private $_nav_data_record;
-
-  // ['emails' => xx, 'Contact' => xx]
+  // ['emails' => 'before|after'] => xx, 'Contact' => 'before|after'] => xx]
   private $_lookup_data;
 
   // Civi Data
@@ -53,7 +51,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id, $lookup_data, $is_organization, &$parent) {
+  public function __construct($before_individual, $after_individual, $before_company, $after_company, $nav_id, $lookup_data, $is_organization) {
     $this->_individual_before   = $before_individual;
     $this->_individual_after    = $after_individual;
     $this->_organisation_before = $before_company;
@@ -61,7 +59,6 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->_navision_id         = $nav_id;
     $this->_lookup_data         = $lookup_data;
     $this->_is_organization     = $is_organization;
-    $this->_nav_data_record     = $parent;
     $this->_nav_custom_field    = CRM_Nav_Config::get('navision_custom_field');
 
     $this->get_civi_ids();
@@ -129,10 +126,11 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function i3val() {
-    if (empty($this->conflict_data['i3val'])) {
-      return;
+    if (!empty($this->conflict_data['i3val'])) {
+      $values = $this->conflict_data['i3val'];
+      $values['id'] = $this->_contact_id;
+      $this->i3val_update($values);
     }
-    $this->i3val_update($this->conflict_data['i3val']);
   }
 
   /**
@@ -156,27 +154,27 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    */
   public function create_full() {
     $this->_contact_id      = $this->create_entity('Contact', $this->_individual_after)['id'];
-//    if (!empty($this->_organisation_after) && !$this->_is_organization) {
-//      $this->_organisation_id = $this->create_entity('Contact', $this->_organisation_after)['id'];
-//    }
+  }
+
+  public function get_nav_id() {
+    return $this->_navision_id;
   }
 
   /**
    * @throws \CiviCRM_API3_Exception
    */
   private function get_civi_ids() {
-    $values = [$this->_nav_custom_field => $this->_navision_id,];
-    $result = $this->get_entity('Contact', $values);
-
-    if ($result['count'] > '1') {
-      $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
-      return;
+    // Lookup via Navision_id
+    $contact_id = $this->get_contact_by_navision_id();
+    // lookup via ID Tracker
+    if (empty($contact_id)) {
+      $contact_id = $this->find_contact_by_id_tracker();
     }
-    if ($result['count'] == '0') {
-      $this->_contact_id = '';
-    } else {
-      $this->_contact_id = $result['id'];
+    // Lookup via emails / first_name/last_name
+    if (empty($contact_id)) {
+      $contact_id = $this->get_contact_by_data();
     }
+    $this->_contact_id = $contact_id;
 
     // Organization
     if ($this->_organisation_before[$this->_nav_custom_field] == $this->_navision_id &&
@@ -186,7 +184,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       return;
     }
     // Check after Values for Org ID if nav ID is a company ID (diff than person NavID)
-    if (isset($this->_organisation_after[$this->_nav_custom_field]) &&
+    if (isset($this->_organisation_after[$this->_nav_custom_field]) && !empty($this->_organisation_after[$this->_nav_custom_field]) &&
       $this->_organisation_after[$this->_nav_custom_field] != $this->_navision_id)
     {
       $values = [$this->_nav_custom_field => $this->_organisation_after[$this->_nav_custom_field],];
@@ -204,7 +202,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
 
     // TODO: Is this needed ?
     // Check before Values for Org ID if nav ID is a company ID (diff than person NavID)
-    if (isset($this->_organisation_before[$this->_nav_custom_field]) &&
+    if (isset($this->_organisation_before[$this->_nav_custom_field]) && !empty($this->_organisation_before[$this->_nav_custom_field]) &&
       $this->_organisation_before[$this->_nav_custom_field] != $this->_navision_id)
     {
       $values = [$this->_nav_custom_field => $this->_organisation_before[$this->_nav_custom_field],];
@@ -220,26 +218,15 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
-  /**
-   * If contact couldn't be identified by NavId, it will be identified by email(s)
-   * and first_name and last name. If that's not available, a new contact is created
-   * with the AFTER values and ALL provided values
-   * @param $contact_id
-   *
-   * @return mixed
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function get_or_create_contact() {
-    if (!empty($this->_contact_id)) {
-      return $this->_contact_id;
+  private function get_contact_by_data() {
+    $email_contact_ids = $this->get_contact_ids_via_emails($this->_lookup_data['Emails']['before']);
+    if (empty($email_contact_ids)) {
+      $email_contact_ids = $this->get_contact_ids_via_emails($this->_lookup_data['Emails']['after']);
+    } // TODO: check if only one contact is in here - we found contact then!
+    if (count($email_contact_ids) == '1') {
+      return reset($email_contact_ids);
     }
-    $email_contact_ids = $this->get_contact_ids_via_emails($this->_lookup_data['Emails']);
-    $lookup_contact_id = $this->get_contact_via_emails($email_contact_ids, $this->_lookup_data['Contact']);
-    if ($lookup_contact_id == "") {
-      $this->_nav_data_record->create_full_contact();
-      return '-1';
-    }
-    return $lookup_contact_id;
+    return $this->get_contact_via_emails($email_contact_ids, $this->_lookup_data['Contact']);
   }
 
   /**
@@ -276,9 +263,19 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    */
   private function get_contact_via_emails($contact_ids, $contact_details) {
     if (!empty($contact_ids)) {
-      $contact_details['id'] = array('IN' => $contact_ids);
+      $lookup_details['id'] = array('IN' => $contact_ids);
     }
-    $result = civicrm_api3('Contact', 'get', $contact_details);
+
+    if (!empty($contact_details['before']['first_name']) || empty(!$contact_details['before']['last_name'])) {
+      $lookup_details = $contact_details['before'];
+    }
+    if (!empty($contact_details['after']['first_name']) || empty(!$contact_details['after']['last_name'])) {
+      foreach ($contact_details['after'] as $key => $value) {
+        $lookup_details[$key] = $value;
+      }
+      $lookup_details = $contact_details['after'];
+    }
+    $result = civicrm_api3('Contact', 'get', $lookup_details);
     if ($result['is_error'] == '1') {
       $this->log("Error occured while looking up contacts. Message: " . $result['error_message']);
       return "";
@@ -287,7 +284,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       $this->log("Found {$result['count']} entries for contact.");
       return "";
     }
-    return $result['values']['contact_id'];
+    return $result['id'];
   }
 
   /**
@@ -321,5 +318,37 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     $this->civi_contact_data = $result['values']['0'];
   }
 
+  /**
+   * @return string|void
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_contact_by_navision_id() {
+    $values = [$this->_nav_custom_field => $this->_navision_id,];
+    $result = $this->get_entity('Contact', $values);
 
+    if ($result['count'] > '1') {
+      $this->log("Didn't find contactId for {$this->_navision_id}. Found {$result['count']} contacts.");
+      return;
+    }
+    if ($result['count'] == '0') {
+      return '';
+    } else {
+      return $result['id'];
+    }
+  }
+
+  /**
+   * @param $navision_id
+   *
+   * @return string
+   */
+  private function find_contact_by_id_tracker() {
+    $id_table = CRM_Nav_Config::get('id_table');
+    $sql = "SELECT * FROM `{$id_table}` WHERE `identifier_type` = 'navision' AND `identifier` = '{$this->_navision_id}' GROUP BY id DESC LIMIT 0, 1;";
+    $query = CRM_Core_DAO::executeQuery($sql);
+    while($query->fetch()) {
+     return $query->entity_id;
+    }
+    return '';
+  }
 }
