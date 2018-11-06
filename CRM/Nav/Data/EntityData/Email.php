@@ -184,10 +184,10 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
    */
   private function get_civi_email($nav_email) {
     foreach ($this->iterate_civi_emails() as $email) {
-      if (isset($nav_email['before']) && $email['email'] == $nav_email['before']['email']) {
+      if (isset($nav_email['before']) && $email['email'] == strtolower($nav_email['before']['email'])) {
         return $email;
       }
-      if (isset($nav_email['after']) && $email['email'] == $nav_email['after']['email']) {
+      if (isset($nav_email['after']) && $email['email'] == strtolower($nav_email['after']['email'])) {
         return $email;
       }
     }
@@ -229,19 +229,19 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
    */
   private function map_email($email){
     if ($email['location_type_id'] == $this->_location_type_private) {
-      if ($email['email'] == $this->_email_priv['before']['email']) {
+      if ($email['email'] == strtolower($this->_email_priv['before']['email'])) {
         $this->civi_email_priv = $email;
         return;
       }
-      if ($email['email'] == $this->_email_priv['after']['email']) {
+      if ($email['email'] == strtolower($this->_email_priv['after']['email'])) {
         $this->civi_email_priv = $email;
         return;
       }
-      if ($email['email'] == $this->_email_priv_2['before']['email']) {
+      if ($email['email'] == strtolower($this->_email_priv_2['before']['email'])) {
         $this->civi_email_priv_2 = $email;
         return;
       }
-      if ($email['email'] == $this->_email_priv_2['after']['email']) {
+      if ($email['email'] == strtolower($this->_email_priv_2['after']['email'])) {
         $this->civi_email_priv_2 = $email;
         return;
       }
@@ -249,11 +249,11 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
       return;
     }
     if ($email['location_type_id'] == $this->_location_type_organization) {
-      if ($email['email'] == $this->_email_org['before']['email']) {
+      if ($email['email'] == strtolower($this->_email_org['before']['email'])) {
         $this->civi_email_org = $email;
         return;
       }
-      if ($email['email'] == $this->_email_org['after']['email']) {
+      if ($email['email'] == strtolower($this->_email_org['after']['email'])) {
         $this->civi_email_org = $email;
         return;
       }
