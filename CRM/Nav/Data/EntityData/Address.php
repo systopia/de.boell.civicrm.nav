@@ -21,13 +21,14 @@
 class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
 
   // civi address data structures
-  private $_private_before;
-  private $_private_after;
-  private $_organisation_before;
-  private $_organisation_after;
+  private $_address_before;
+  private $_address_after;
+
   private $_location_type_private;
   private $_location_type_organization;
   private $_organization_id;
+
+  private $_is_organization;
 
   private $civi_private_address;
   private $civi_organization_address;
@@ -37,26 +38,24 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    *
    * @param $before_private
    * @param $after_private
-   * @param $before_organization
-   * @param $after_organization
    * @param $contact_id
    * @param $organization_id
    * @param $private_location_type
    * @param $organization_location_type
    *
+   * @param $is_organization
+   *
    * @throws \CiviCRM_API3_Exception
    */
-  public function __construct($before_private, $after_private, $before_organization,
-                              $after_organization, $contact_id, $organization_id,
-                              $private_location_type, $organization_location_type) {
-    $this->_private_before = $before_private;
-    $this->_private_after = $after_private;
-    $this->_organisation_before = $before_organization;
-    $this->_organisation_after = $after_organization;
-    $this->_contact_id = $contact_id;
-    $this->_organization_id = $organization_id;
-    $this->_location_type_private = $private_location_type;
+  public function __construct($before_private, $after_private, $contact_id, $organization_id,
+                              $private_location_type, $organization_location_type, $is_organization) {
+    $this->_address_before             = $before_private;
+    $this->_address_after              = $after_private;
+    $this->_contact_id                 = $contact_id;
+    $this->_organization_id            = $organization_id;
+    $this->_location_type_private      = $private_location_type;
     $this->_location_type_organization = $organization_location_type;
+    $this->_is_organization            = $is_organization;
 
     $this->get_civi_data();
   }
@@ -66,30 +65,29 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    */
   public function update() {
     // handle update private address
-    if (!empty($this->conflict_data['private']['updates'])) {
-      $values = $this->conflict_data['private']['updates'];
+    if (!empty($this->conflict_data['updates']) && !$this->_is_organization) {
+      $values = $this->conflict_data['updates'];
       $values['contact_id'] = $this->_contact_id;
       $values['location_type_id'] = $this->_location_type_private;
       $this->create_entity('Address', $values);
     }
-    // handle update organization address
-    if (!empty($this->conflict_data['organization']['updates'])) {
-      $values = $this->conflict_data['organization']['updates'];
-      $values['location_type_id'] = $this->_location_type_organization;
-      // set to primary
-      $values['is_primary'] = '1';
-      $values['contact_id'] = $this->_contact_id;
-      // if we don't have an ID, the address will be newly created
-      // we need the Org_id, lookup the address and add it as master_id
-      if (empty($values['id'])) {
-        $master_address_id = $this->get_organization_address();
-        if (empty($master_address_id)) {
-          $this->log("Couldn't determine Master Address ID for {$this->_organization_id} Creating Address, but wont be shared with Company");
-        } else {
-          $values['master_id'] = $master_address_id;
+
+    if (!empty($this->_organization_id)) {
+      $local_business_address = $this->get_organization_address($this->_contact_id);
+      $company_address = $this->get_organization_address($this->_organization_id);
+
+      // create company address
+      if (!empty($company_address) && (!$this->compare_addresses($local_business_address, $company_address))) {
+        // delete old business address if available, add new linked address
+        if (!empty($local_business_address['id'])) {
+          $this->delete_entity('Address', $local_business_address['id']);
         }
+        $company_address['contact_id'] = $this->_contact_id;
+        $company_address['master_id'] = $company_address['id'];
+        $company_address['is_primary'] = '1';
+        unset($company_address['id']);
+        $this->create_entity('Address', $company_address);
       }
-      $this->create_entity('Address', $values);
     }
   }
 
@@ -98,14 +96,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    */
   public function apply_changes() {
     // handle update private address
-    if (!empty($this->conflict_data['private']['valid_changes'])) {
-      $values = $this->conflict_data['private']['valid_changes'];
-      $values['contact_id'] = $this->_contact_id;
-      $this->create_entity('Address', $values);
-    }
-    // handle update organization address
-    if (!empty($this->conflict_data['organization']['valid_changes'])) {
-      $values = $this->conflict_data['organization']['valid_changes'];
+    if (!empty($this->conflict_data['valid_changes']) && !$this->_is_organization) {
+      $values = $this->conflict_data['valid_changes'];
       $values['contact_id'] = $this->_contact_id;
       $this->create_entity('Address', $values);
     }
@@ -115,17 +107,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function delete() {
-    if (!empty($this->delete_data['private']['updates'])) {
-      $values = $this->delete_data['private']['updates'];
-      foreach ($values as $key => $val) {
-        $values[$key] = '';
-      }
-      $values['contact_id'] = $this->_contact_id;
-      $this->create_entity('Address', $values);
-    }
-    // handle update organization address
-    if (!empty($this->delete_data['organization']['updates'])) {
-      $values = $this->delete_data['organization']['updates'];
+    if (!empty($this->delete_data['updates']) && !$this->_is_organization) {
+      $values = $this->delete_data['updates'];
       foreach ($values as $key => $val) {
         $values[$key] = '';
       }
@@ -138,35 +121,38 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function i3val() {
-    if (!empty($this->conflict_data['private']['i3val'])) {
-      $values = $this->conflict_data['private']['i3val'];
+    if (!empty($this->conflict_data['i3val']) && !$this->_is_organization) {
+      $values = $this->conflict_data['i3val'];
       $values['id'] = $this->_contact_id;
       $this->i3val_update($values);
     }
-
-    if (!empty($this->conflict_data['organization']['i3val'])) {
-      $values = $this->conflict_data['organization']['i3val'];
-      $values['id'] = $this->_contact_id;
-      $this->i3val_update($values);
-    }
-
   }
 
   public function calc_differences() {
-    // get changed stuff
-    $this->changed_data['private'] = $this->compare_data_arrays($this->_private_before, $this->_private_after);
-    $this->changed_data['organization'] = $this->compare_data_arrays($this->_organisation_before, $this->_organisation_after);
+    if (empty($this->civi_private_address)) {
+      // we don't have data in civi, but this is a change set.
+      // We now fill all values for changed data to update the whole Entity with after data
+      $this->changed_data = $this->_address_after;
+    } else {
+      // get changed stuff
+      $changed_data_set = $this->compare_data_arrays($this->_address_before, $this->_address_after);
+      // if there are no changes, check if after and current civi values differ.
+      // (Always differ in id field, but if more than one field differs, we must update whole Entity)
+      $number_of_differences_civi_after = count($this->compare_data_arrays($this->_address_after, $this->civi_private_address));
+      if (empty($changed_data_set) &&  $number_of_differences_civi_after > '1') {
+        $this->changed_data = $this->_address_after;
+      } else {
+        $this->changed_data = $changed_data_set;
+      }
+    }
+    $this->correct_civi_country_id();
+    // TODO: Fix Country_id: map to option_value
     // deleted stuff
-    $this->delete_data['private'] = $this->compare_delete_data($this->_private_before, $this->_private_after);
-    $this->delete_data['organization'] = $this->compare_delete_data($this->_organisation_before, $this->_organisation_after);
+    $this->delete_data = $this->compare_delete_data($this->_address_before, $this->_address_after);
     // conflicting stuff
-    $this->conflict_data['private'] = $this->compare_conflicting_data(
-      $this->civi_private_address, $this->_private_before,
-      $this->changed_data['private'], 'Address'
-    );
-    $this->conflict_data['organization'] = $this->compare_conflicting_data(
-      $this->civi_organization_address, $this->_private_before,
-      $this->changed_data['organization'], 'Address'
+    $this->conflict_data = $this->compare_conflicting_data(
+      $this->civi_private_address, $this->_address_before,
+      $this->changed_data, 'Address'
     );
   }
 
@@ -179,28 +165,25 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function create_full($contact_id, $organization_id) {
-    // create company address
-    if (isset($this->_organisation_after)) {
-      $org_values = $this->_organisation_after;
-      $org_values['contact_id'] = $organization_id;
-      $org_addr_id = $this->create_entity('Address', $org_values)['id'];
-    }
-    // create shared company address
-    if (isset($this->_private_after)) {
-      $org_address_values = $this->_organisation_after;
-      $org_address_values['contact_id'] = $contact_id;
-      if (isset($org_addr_id)) {
-        $org_address_values['master_id'] = $org_addr_id;
-      }
-      $org_address_values['is_primary'] = '1';
-      $this->create_entity('Address', $org_address_values);
+    // create private address
+    if (!empty($this->_address_after)) {
+      $address_values = $this->_address_after;
+      $address_values['contact_id'] = $contact_id;
+      $this->create_entity('Address', $address_values);
     }
 
-    // create private address
-    if (isset($this->_private_after)) {
-      $priv_address_values = $this->_private_after;
-      $priv_address_values['contact_id'] = $contact_id;
-      $this->create_entity('Address', $priv_address_values);
+    if (empty($organization_id)) {
+      return;
+    }
+    // get civi Company Address
+    $company_address = $this->get_organization_address($organization_id);
+    // create company address
+    if (!empty($company_address)) {
+      $company_address['contact_id'] = $contact_id;
+      $company_address['master_id'] = $company_address['id'];
+      unset($company_address['id']);
+      $this->create_entity('Address', $company_address);
+      return;
     }
   }
 
@@ -239,6 +222,21 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  private function correct_civi_country_id() {
+    if (!isset($this->changed_data['country_id'])) {
+      return;
+    }
+    $country_iso_code = $this->changed_data['country_id'];
+    $result = civicrm_api3('Country', 'get', array(
+      'sequential' => 1,
+      'iso_code' => $country_iso_code,
+    ));
+    if ($result['count'] != '1' || $result['is_error'] == '1') {
+      $this->log("Couldn't resolve Country ISO Code ({$country_iso_code}). Returning ISO Code - This will probably end up in i3Val then. ERROR MEssage: {$result['error_message']}");
+    }
+    $this->changed_data['country_id'] = $result['id'];
+  }
+
   /**
    * get addresses from $this->_organization_address, compares them to nav_after
    * and returns id from said address. If no address is found, return ''.
@@ -249,12 +247,14 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @return String
    * @throws \CiviCRM_API3_Exception
    */
-  private function get_organization_address() {
-    if (empty($this->_organization_id)) {
+  private function get_organization_address($orgnization_id) {
+    if (empty($orgnization_id)) {
       return '';
     }
     $values =  ['sequential' => 1,
-                'contact_id' => $this->_organization_id,
+                'contact_id' => $orgnization_id,
+                'is_primary' => '1',
+                "location_type_id" => $this->_location_type_organization,
                 'return' => ["location_type_id",
                              "street_address",
                              "supplemental_address_1",
@@ -264,19 +264,33 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
                 ],
     ];
     $result = $this->get_entity('Address', $values);
-    foreach ($result['values'] as $address) {
-      if ($address == $this->_organisation_after) {
-        return $address['id'];
-      }
-      // we check a couple of more fields to be sure (remove location_type, country_id etc
-      if ($address['street_address'] == $this->_organisation_after['street_address'] &&
-        $address['city'] == $this->_organisation_after['city'] &&
-        $address['postal_code'] == $this->_organisation_after['postal_code']
-      ) {
-        return $address['id'];
-      }
+    if ($result['count'] == 1) {
+      return $result['values']['0'];
     }
     return '';
+  }
+
+  /**
+   * Compares 2 address arrays, but ignores the id field
+   * @param $address1
+   * @param $address2
+   *
+   * @return bool
+   */
+  private function compare_addresses($address1, $address2) {
+    if (empty($address1)) {
+      // we don't have values in civi
+      return FALSE;
+    }
+    foreach ($address1 as $key => $value) {
+      if ($key == 'id') {
+        continue;
+      }
+      if (!isset($address2[$key]) || $address2[$key] != $value) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
 }

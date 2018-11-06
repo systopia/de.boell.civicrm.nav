@@ -115,7 +115,8 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
         continue;
       }
       $tmp_changed_data = $this->compare_data_arrays($email['before'], $email['after']);
-      if (!empty($tmp_changed_data)) {
+
+      if (!empty($tmp_changed_data) || (empty($this->get_civi_email($email)) && !empty($email['after']))) {
         $this->changed_data[] = $email['after'];
         $tmp_changed_data = $email['after']; // for later we need the whole entity
       }
@@ -183,10 +184,10 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
    */
   private function get_civi_email($nav_email) {
     foreach ($this->iterate_civi_emails() as $email) {
-      if (isset($nav_email['before']) && $email['email'] == $nav_email['before']['email']) {
+      if (isset($nav_email['before']) && $email['email'] == strtolower($nav_email['before']['email'])) {
         return $email;
       }
-      if (isset($nav_email['after']) && $email['email'] == $nav_email['after']['email']) {
+      if (isset($nav_email['after']) && $email['email'] == strtolower($nav_email['after']['email'])) {
         return $email;
       }
     }
@@ -227,33 +228,34 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
    * @param $email
    */
   private function map_email($email){
-    if ($email['location_type_id'] == $this->_location_type_private) {
-      if ($email['email'] == $this->_email_priv['before']['email']) {
-        $this->civi_email_priv = $email;
+    if ($email['location_type_id'] == $this->_location_type_organization) {
+      if ($email['email'] == strtolower($this->_email_org['before']['email'])) {
+        $this->civi_email_org = $email;
         return;
       }
-      if ($email['email'] == $this->_email_priv['after']['email']) {
-        $this->civi_email_priv = $email;
-        return;
-      }
-      if ($email['email'] == $this->_email_priv_2['before']['email']) {
-        $this->civi_email_priv_2 = $email;
-        return;
-      }
-      if ($email['email'] == $this->_email_priv_2['after']['email']) {
-        $this->civi_email_priv_2 = $email;
+      if ($email['email'] == strtolower($this->_email_org['after']['email'])) {
+        $this->civi_email_org = $email;
         return;
       }
       // Couldn't be mapped. Maybe it's an Email besides the ones from Navision
       return;
     }
-    if ($email['location_type_id'] == $this->_location_type_organization) {
-      if ($email['email'] == $this->_email_org['before']['email']) {
-        $this->civi_email_org = $email;
+
+    if ($email['location_type_id'] == $this->_location_type_private) {
+      if ($email['email'] == strtolower($this->_email_priv['before']['email'])) {
+        $this->civi_email_priv = $email;
         return;
       }
-      if ($email['email'] == $this->_email_org['after']['email']) {
-        $this->civi_email_org = $email;
+      if ($email['email'] == strtolower($this->_email_priv['after']['email'])) {
+        $this->civi_email_priv = $email;
+        return;
+      }
+      if ($email['email'] == strtolower($this->_email_priv_2['before']['email'])) {
+        $this->civi_email_priv_2 = $email;
+        return;
+      }
+      if ($email['email'] == strtolower($this->_email_priv_2['after']['email'])) {
+        $this->civi_email_priv_2 = $email;
         return;
       }
       // Couldn't be mapped. Maybe it's an Email besides the ones from Navision
