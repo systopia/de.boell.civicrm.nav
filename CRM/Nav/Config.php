@@ -20,7 +20,7 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = TRUE;
+  private static $local        = FALSE;
 
   private static $candidature_process_code_option_value_cache = [];
 
