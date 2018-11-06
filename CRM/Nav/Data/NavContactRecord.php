@@ -169,6 +169,13 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     return $this->Contact->get_nav_id();
   }
 
+  public function is_delete() {
+    if (($this->get_nav_after_data()['Delete_Flag']) || $this->get_contact_type() == 'Delete') {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
   /**
    * @throws \CiviCRM_API3_Exception
    */
