@@ -116,10 +116,6 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $this->disconnect_from_organization();
     if ($this->check_delete_address() && isset($this->civi_private_address['id'])) {
       $this->delete_entity('Address', $this->civi_private_address['id']);
-      // prevent possible update
-      if ($this->conflict_data['updates']['id'] == $this->civi_private_address['id']) {
-        unset($this->conflict_data['updates']);
-      }
       return;
     }
     if (!empty($this->delete_data['updates']) && !$this->_is_organization) {
@@ -240,9 +236,12 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   }
 
   private function check_delete_address() {
+    if (empty($this->delete_data)) {
+      return;
+    }
     // Check if $this->delete_data == $this->civi (ignore country_id and id)
     foreach ($this->civi_private_address as $key => $value) {
-      if ($key == 'id' || $key == 'country_id') {
+      if ($key == 'id' || $key == 'country_id' || $key == 'location_type_id') {
         continue;
       }
       if (!isset($this->delete_data[$key])) {

@@ -87,7 +87,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
    */
   protected function check_if_value_is_deleted(&$changed_data, $deleted_data) {
     foreach ($changed_data as $key => $value) {
-      if (isset($deleted_data[$key])) {
+      if (empty($changed_data) && isset($deleted_data[$key])) {
         unset($changed_data[$key]);
       }
     }
