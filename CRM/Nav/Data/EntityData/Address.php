@@ -101,7 +101,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    */
   public function apply_changes() {
     // handle update private address
-    if (!empty($this->conflict_data['valid_changes']) && !$this->_is_organization) {
+    if (!empty($this->conflict_data['valid_changes'])) {
       $values = $this->conflict_data['valid_changes'];
       $values['contact_id'] = $this->_contact_id;
       $this->create_entity('Address', $values);
@@ -118,7 +118,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       $this->delete_entity('Address', $this->civi_private_address['id']);
       return;
     }
-    if (!empty($this->delete_data['updates']) && !$this->_is_organization) {
+    if (!empty($this->delete_data['updates'])) {
       $values = $this->delete_data['updates'];
       foreach ($values as $key => $val) {
         $values[$key] = '';
@@ -132,7 +132,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function i3val() {
-    if (!empty($this->conflict_data['i3val']) && !$this->_is_organization) {
+    if (!empty($this->conflict_data['i3val'])) {
       $values = $this->conflict_data['i3val'];
       $values['id'] = $this->_contact_id;
       $this->i3val_update($values);
