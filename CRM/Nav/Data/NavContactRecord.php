@@ -399,14 +399,20 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
    * @return array
    */
   private function create_civi_address_values_private($nav_data) {
-    return [
+    $result = [
       'street_address'         => $this->get_nav_value_if_exist($nav_data, 'Address'),
       'supplemental_address_1' => $this->get_nav_value_if_exist($nav_data, 'Address_2'),
       'postal_code'            => $this->get_nav_value_if_exist($nav_data, 'Post_Code'),
       'city'                   => $this->get_nav_value_if_exist($nav_data, 'City'),
       'country_id'             => $this->get_nav_value_if_exist($nav_data, 'Country_Region_Code'),
-      'location_type_id'       => $this->location_type_private,
     ];
+    foreach ($result as $value) {
+      if (!empty($value)) {
+        $result['location_type_id'] = $this->location_type_private;
+        break;
+      }
+    }
+    return $result;
   }
 
   /**

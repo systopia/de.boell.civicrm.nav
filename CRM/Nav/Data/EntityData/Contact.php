@@ -142,6 +142,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     // deleted stuff
     $this->delete_data['individual'] = $this->compare_delete_data($this->_individual_before, $this->_individual_after);
 
+    $this->check_if_value_is_deleted($this->changed_data['individual'], $this->delete_data['individual']);
     $this->conflict_data = $this->compare_conflicting_data(
       $this->civi_contact_data, $this->_individual_before,
       $this->changed_data['individual'], 'Contact'

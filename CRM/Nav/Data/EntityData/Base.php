@@ -80,6 +80,20 @@ abstract  class CRM_Nav_Data_EntityData_Base {
   }
 
   /**
+   * Iterates over changed data and checks if data is in deleted,
+   * if so remove from update
+   * @param $changed_data
+   * @param $deleted_data
+   */
+  protected function check_if_value_is_deleted(&$changed_data, $deleted_data) {
+    foreach ($changed_data as $key => $value) {
+      if (isset($deleted_data[$key])) {
+        unset($changed_data[$key]);
+      }
+    }
+  }
+
+  /**
    * Check for deleted data. Data needs to be deleted from civi
    * if Value is in before, but not after
    * @param $before
