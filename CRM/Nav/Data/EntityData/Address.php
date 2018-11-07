@@ -30,6 +30,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
 
   private $_is_organization;
 
+  private $_disconnect;
+
   private $civi_private_address;
   private $civi_organization_address;
 
@@ -48,7 +50,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function __construct($before_private, $after_private, $contact_id, $organization_id,
-                              $private_location_type, $organization_location_type, $is_organization) {
+                              $private_location_type, $organization_location_type, $is_organization, $disconnect =FALSE) {
     $this->_address_before             = $before_private;
     $this->_address_after              = $after_private;
     $this->_contact_id                 = $contact_id;
@@ -56,6 +58,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $this->_location_type_private      = $private_location_type;
     $this->_location_type_organization = $organization_location_type;
     $this->_is_organization            = $is_organization;
+
+    $this->_disconnect                 = $disconnect;
 
     $this->get_civi_data();
   }
@@ -107,6 +111,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function delete() {
+    // check if address needs to be disconnected
+    $this->disconnect_from_organization();
     if (!empty($this->delete_data['updates']) && !$this->_is_organization) {
       $values = $this->delete_data['updates'];
       foreach ($values as $key => $val) {
@@ -220,6 +226,24 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
         $this->civi_organization_address = $civi_address;
       }
     }
+  }
+
+  private function disconnect_from_organization() {
+    if (!$this->_disconnect) {
+      return;
+    }
+    // get all addresses from contact with master_id NOT NULL (Should return just one address)
+    $result = civicrm_api3('Address', 'get', array(
+      'sequential' => 1,
+      'contact_id' => $this->_contact_id,
+      'master_id' => array('IS NOT NULL' => 1),
+    ));
+    if ($result['count'] != '1') {
+      $this->log("Couldn't get address from contact {$this->_contact_id}.");
+      return;
+    }
+    // delete address
+    $this->delete_entity('Address', $result['id']);
   }
 
   private function correct_civi_country_id() {

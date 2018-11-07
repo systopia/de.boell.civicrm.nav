@@ -235,6 +235,8 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     $contact_id = $this->Contact->get_contact_id();
     $organization_id = $this->Contact->get_org_id();
 
+    $disconnect_shared_address = $this->check_disconnect_address();
+
     $this->Address = new CRM_Nav_Data_EntityData_Address(
       $private_before,
       $private_after,
@@ -244,7 +246,8 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
       $organization_id,
       $this->location_type_private,
       $this->location_type_organization,
-      $this->Contact->is_organization()
+      $this->Contact->is_organization(),
+      $disconnect_shared_address
     );
   }
 
@@ -436,7 +439,16 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
     ];
   }
 
+  private function check_disconnect_address() {
+    $nav_data_before                 = $this->get_nav_before_data();
+    $nav_data_after                  = $this->get_nav_after_data();
 
+    // check if 'No.' and 'Company No.' were different before, and equal after --> disconnect address
+    if ($nav_data_before['No'] != $nav_data_before['Company_No'] && $nav_data_after['No'] == $nav_data_after['Company_No']) {
+      return TRUE;
+    }
+    return FALSE;
+  }
 
   /**
    * @param $type
