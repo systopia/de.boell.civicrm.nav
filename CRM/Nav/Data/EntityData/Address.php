@@ -194,6 +194,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     if (!empty($company_address)) {
       $company_address['contact_id'] = $contact_id;
       $company_address['master_id'] = $company_address['id'];
+      $company_address['is_primary'] = '1';
       unset($company_address['id']);
       $this->create_entity('Address', $company_address);
       return;
