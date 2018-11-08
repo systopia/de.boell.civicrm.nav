@@ -50,7 +50,6 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     }
     $values = $this->conflict_data['updates'];
     $values['contact_id'] = $this->_contact_id;
-    $values['website_type_id'] = "Work";
     $this->create_entity('Website', $values);
   }
 
@@ -118,8 +117,7 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     $values = [
       'sequential' => 1,
       'contact_id' => $this->_contact_id,
-      'website_type_id' => "Work",
-      'return' => ["website_type_id", "url", "contact_id"],
+      'return' => ["url", "contact_id"],
     ];
     // get Website(s) for contact, and if url is set in before values put that in as arg
     if (isset($this->_website_before['url'])) {

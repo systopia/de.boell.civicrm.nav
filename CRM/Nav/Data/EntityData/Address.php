@@ -30,6 +30,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
 
   private $_is_organization;
 
+  private $_disconnect;
+
   private $civi_private_address;
   private $civi_organization_address;
 
@@ -48,7 +50,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function __construct($before_private, $after_private, $contact_id, $organization_id,
-                              $private_location_type, $organization_location_type, $is_organization) {
+                              $private_location_type, $organization_location_type, $is_organization, $disconnect =FALSE) {
     $this->_address_before             = $before_private;
     $this->_address_after              = $after_private;
     $this->_contact_id                 = $contact_id;
@@ -56,6 +58,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     $this->_location_type_private      = $private_location_type;
     $this->_location_type_organization = $organization_location_type;
     $this->_is_organization            = $is_organization;
+
+    $this->_disconnect                 = $disconnect;
 
     $this->get_civi_data();
   }
@@ -66,6 +70,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   public function update() {
     // handle update private address
     if (!empty($this->conflict_data['updates']) && !$this->_is_organization) {
+
       $values = $this->conflict_data['updates'];
       $values['contact_id'] = $this->_contact_id;
       $values['location_type_id'] = $this->_location_type_private;
@@ -96,7 +101,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    */
   public function apply_changes() {
     // handle update private address
-    if (!empty($this->conflict_data['valid_changes']) && !$this->_is_organization) {
+    if (!empty($this->conflict_data['valid_changes'])) {
       $values = $this->conflict_data['valid_changes'];
       $values['contact_id'] = $this->_contact_id;
       $this->create_entity('Address', $values);
@@ -107,7 +112,13 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function delete() {
-    if (!empty($this->delete_data['updates']) && !$this->_is_organization) {
+    // check if address needs to be disconnected
+    $this->disconnect_from_organization();
+    if ($this->check_delete_address() && isset($this->civi_private_address['id'])) {
+      $this->delete_entity('Address', $this->civi_private_address['id']);
+      return;
+    }
+    if (!empty($this->delete_data['updates'])) {
       $values = $this->delete_data['updates'];
       foreach ($values as $key => $val) {
         $values[$key] = '';
@@ -121,7 +132,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public function i3val() {
-    if (!empty($this->conflict_data['i3val']) && !$this->_is_organization) {
+    if (!empty($this->conflict_data['i3val'])) {
       $values = $this->conflict_data['i3val'];
       $values['id'] = $this->_contact_id;
       $this->i3val_update($values);
@@ -149,6 +160,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     // TODO: Fix Country_id: map to option_value
     // deleted stuff
     $this->delete_data = $this->compare_delete_data($this->_address_before, $this->_address_after);
+    // remove deleted stuff from updates
+    $this->check_if_value_is_deleted($this->changed_data, $this->delete_data);
     // conflicting stuff
     $this->conflict_data = $this->compare_conflicting_data(
       $this->civi_private_address, $this->_address_before,
@@ -181,6 +194,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     if (!empty($company_address)) {
       $company_address['contact_id'] = $contact_id;
       $company_address['master_id'] = $company_address['id'];
+      $company_address['is_primary'] = '1';
       unset($company_address['id']);
       $this->create_entity('Address', $company_address);
       return;
@@ -222,6 +236,43 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     }
   }
 
+  private function check_delete_address() {
+    if (empty($this->delete_data)) {
+      return;
+    }
+    // Check if $this->delete_data == $this->civi (ignore country_id and id)
+    foreach ($this->civi_private_address as $key => $value) {
+      if ($key == 'id' || $key == 'country_id' || $key == 'location_type_id') {
+        continue;
+      }
+      if (!isset($this->delete_data[$key])) {
+        // we have more values in civi than in delete data,
+        // thus don't delete full address
+        return FALSE;
+      }
+    }
+    // all values except id and country_id are deleted --> delete whole address
+    return TRUE;
+  }
+
+  private function disconnect_from_organization() {
+    if (!$this->_disconnect) {
+      return;
+    }
+    // get all addresses from contact with master_id NOT NULL (Should return just one address)
+    $result = civicrm_api3('Address', 'get', array(
+      'sequential' => 1,
+      'contact_id' => $this->_contact_id,
+      'master_id' => array('IS NOT NULL' => 1),
+    ));
+    if ($result['count'] != '1') {
+      $this->log("Couldn't get address from contact {$this->_contact_id}.");
+      return;
+    }
+    // delete address
+    $this->delete_entity('Address', $result['id']);
+  }
+
   private function correct_civi_country_id() {
     if (!isset($this->changed_data['country_id'])) {
       return;
@@ -232,6 +283,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       'iso_code' => $country_iso_code,
     ));
     if ($result['count'] != '1' || $result['is_error'] == '1') {
+
       $this->log("Couldn't resolve Country ISO Code ({$country_iso_code}). Returning ISO Code - This will probably end up in i3Val then. ERROR MEssage: {$result['error_message']}");
     }
     $this->changed_data['country_id'] = $result['id'];
