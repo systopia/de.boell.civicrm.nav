@@ -118,12 +118,12 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       $this->delete_entity('Address', $this->civi_private_address['id']);
       return;
     }
-    if (!empty($this->delete_data['updates'])) {
-      $values = $this->delete_data['updates'];
+    if (!empty($this->delete_data)) {
+      $values = $this->delete_data;
       foreach ($values as $key => $val) {
         $values[$key] = '';
       }
-      $values['contact_id'] = $this->_contact_id;
+      $values['id'] = $this->civi_private_address['id'];
       $this->create_entity('Address', $values);
     }
   }
@@ -135,6 +135,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     if (!empty($this->conflict_data['i3val'])) {
       $values = $this->conflict_data['i3val'];
       $values['id'] = $this->_contact_id;
+      $values['location_type_id'] = $this->_location_type_private;
       $this->i3val_update($values);
     }
   }
@@ -274,7 +275,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   }
 
   private function correct_civi_country_id() {
-    if (!isset($this->changed_data['country_id'])) {
+    if (empty($this->changed_data['country_id'])) {
       return;
     }
     $country_iso_code = $this->changed_data['country_id'];
