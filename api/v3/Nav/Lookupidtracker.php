@@ -28,7 +28,8 @@ function civicrm_api3_nav_Lookupidtracker($params) {
   $query = CRM_Core_DAO::executeQuery($sql);
   $returnValues = [];
   while($query->fetch()) {
-    $returnValues['contact_id'] = $query->entity_id;
+    $returnValues[$query->entity_id] = ['contact_id' => $query->entity_id];
+
     return civicrm_api3_create_success($returnValues, $params, 'Nav', 'LookUpIdTracker');
   }
   return civicrm_api3_create_success($returnValues, $params, 'Nav', 'LookUpIdTracker');
