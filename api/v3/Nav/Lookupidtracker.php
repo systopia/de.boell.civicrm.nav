@@ -24,7 +24,8 @@ function _civicrm_api3_nav_Lookupidtracker_spec(&$spec) {
  */
 function civicrm_api3_nav_Lookupidtracker($params) {
   $id_table = CRM_Nav_Config::get('id_table');
-  $sql = "SELECT * FROM `{$id_table}` WHERE `identifier_type` = 'navision' AND `identifier` = '{$params['navision_id']}' GROUP BY id DESC LIMIT 0, 1;";
+//  SELECT h.id, h.entity_id, h.identifier_type, h.identifier, c.is_deleted FROM `civicrm_value_contact_id_history` h LEFT JOIN civicrm_contact c on c.id = h.entity_id WHERE `identifier_type` = 'navision' AND `identifier` = 'K000777' AND c.is_deleted != '1' GROUP BY id DESC LIMIT 0, 1
+  $sql = "SELECT h.id, h.entity_id, h.identifier_type, h.identifier, c.is_deleted FROM `{$id_table}` h LEFT JOIN civicrm_contact c on c.id = h.entity_id WHERE `identifier_type` = 'navision' AND `identifier` = '{$params['navision_id']}' AND c.is_deleted != '1' GROUP BY id DESC LIMIT 0, 1;";
   $query = CRM_Core_DAO::executeQuery($sql);
   $returnValues = [];
   while($query->fetch()) {
