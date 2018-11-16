@@ -25,7 +25,8 @@ class CRM_Nav_Data_NavContactMatcherCivi {
 
   private $field_mapping;
 
-  private $contact_fields = ['No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum'];
+//  private $contact_fields = ['No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum'];
+  private $contact_fields = ['No', 'Type', 'First_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum'];
   private $org_fields = ['Company_No', 'Company_Name', 'Company_Name_2'];
   private $email_fields = ['E_Mail', 'E_Mail_2', 'Private_E_Mail'];
   private $address_fields = ['Address', 'Address_2', 'City', 'Country_Region_Code', 'Post_Code'];
@@ -57,7 +58,7 @@ class CRM_Nav_Data_NavContactMatcherCivi {
       'Company_No'                    => $this->navision_custom_field,
       'Company_Name'                  => $org_name_1,
       'First_Name'                    => 'first_name',
-      'Middle_Name'                   => 'middle_name',
+//      'Middle_Name'                   => 'middle_name',
       'Surname'                       => 'last_name',
       'Job_Title'                     => 'formal_title',
       'Mobile_Phone_No'               => 'phone', // location_type_id = org, phone_type_id = Mobile
@@ -93,7 +94,8 @@ class CRM_Nav_Data_NavContactMatcherCivi {
   public function get_contact_fields($contact_type){
     switch ($contact_type) {
       case 'Individual':
-        return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum');
+//        return array('No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum');
+        return array('No', 'Type', 'First_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum');
       case 'Organization':
         return array('Company_No', 'Company_Name', 'Company_Name_2');
       default:
@@ -195,13 +197,6 @@ class CRM_Nav_Data_NavContactMatcherCivi {
     return $this->field_mapping[$nav_index];
   }
 
-//$contact_fields = ['No', 'Type', 'First_Name', 'Middle_Name', 'Surname', 'Job_Title', 'Funktion', 'Salutation_Code', 'Geburtsdatum'];
-//$org_fields = ['Company_No', 'Company_Name', 'Company_Name_2'];
-//$email_fields = ['E_Mail', 'E_Mail_2', 'Private_E_Mail'];
-//$address_fields = ['Company_Adress', 'Company_Adress_2','Company_Post_Code','Company_City','Company_Country_Region_Code'];
-//$company_address_fields = ['Address', 'Address_2', 'City', 'Country_Region_Code', 'Post_Code'];
-//$phone_fields = ['Phone_No', 'Private_Telefonnr', 'Mobile_Phone_No', 'Privat_Mobile_Phone_No', 'Private_Faxnr', 'Fax_No'];
-//$website_fields = ['Home_Page'];
   /**
    * @param $nav_index
    *

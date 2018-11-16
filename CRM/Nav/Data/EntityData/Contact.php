@@ -301,7 +301,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       'return' => array("id",
                         $this->_nav_custom_field,
                         'first_name',
-                        'middle_name',
+//                        'middle_name',
                         'last_name',
                         'formal_title',
                         'job_title',

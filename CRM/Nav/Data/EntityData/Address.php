@@ -81,8 +81,13 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       $local_business_address = $this->get_organization_address($this->_contact_id);
       $company_address = $this->get_organization_address($this->_organization_id);
 
+      // TODO: if empty company_address --> create relationship here!
+      if (empty($company_address)) {
+        $this->create_relationship($this->_contact_id, $this->_organization_id);
+        return;
+      }
       // create company address
-      if (!empty($company_address) && (!$this->compare_addresses($local_business_address, $company_address))) {
+      if (!$this->compare_addresses($local_business_address, $company_address)) {
         // delete old business address if available, add new linked address
         if (!empty($local_business_address['id'])) {
           $this->delete_entity('Address', $local_business_address['id']);
@@ -118,12 +123,12 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       $this->delete_entity('Address', $this->civi_private_address['id']);
       return;
     }
-    if (!empty($this->delete_data['updates'])) {
-      $values = $this->delete_data['updates'];
+    if (!empty($this->delete_data)) {
+      $values = $this->delete_data;
       foreach ($values as $key => $val) {
         $values[$key] = '';
       }
-      $values['contact_id'] = $this->_contact_id;
+      $values['id'] = $this->civi_private_address['id'];
       $this->create_entity('Address', $values);
     }
   }
@@ -135,6 +140,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
     if (!empty($this->conflict_data['i3val'])) {
       $values = $this->conflict_data['i3val'];
       $values['id'] = $this->_contact_id;
+      $values['location_type_id'] = $this->_location_type_private;
       $this->i3val_update($values);
     }
   }
@@ -198,6 +204,9 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       unset($company_address['id']);
       $this->create_entity('Address', $company_address);
       return;
+    } else {
+      //TODO: create relationship here!
+      $this->create_relationship($contact_id, $organization_id);
     }
   }
 
@@ -274,7 +283,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
   }
 
   private function correct_civi_country_id() {
-    if (!isset($this->changed_data['country_id'])) {
+    if (empty($this->changed_data['country_id'])) {
       return;
     }
     $country_iso_code = $this->changed_data['country_id'];
@@ -343,6 +352,28 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Create Relationship between contact and organization
+   */
+  private function create_relationship($contact_id, $organization_id) {
+    try {
+      $result = civicrm_api3('Relationship', 'create', [
+        'sequential'           => 1,
+        'contact_id_a'         => $contact_id,
+        'contact_id_b'         => $organization_id,
+        'relationship_type_id' => CRM_Nav_Config::get('employee_relationship_type_id'),
+      ]);
+
+      if ($result['is_error'] == '1') {
+        $this->log("Failed to create Relationship between {$contact_id} and {$organization_id}");
+      }
+    } catch (Exception $e) {
+      $this->log("Failed to create Relationship between {$contact_id} and {$organization_id}. Error Message: {$e->getMessage()}");
+      return 0;
+    }
+    return $result['id'];
   }
 
 }
