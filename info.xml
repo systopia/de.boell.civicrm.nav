@@ -14,13 +14,13 @@
     <url desc="Support">https://github.com/systopia/de.boell.civicrm.nav</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2018-11-08</releaseDate>
-  <version>0.5</version>
+  <releaseDate>2018-11-16</releaseDate>
+  <version>0.6</version>
   <develStage>beta</develStage>
   <compatibility>
     <ver>4.7</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module in alpha status. Handle at your own risk</comments>
+  <comments>Tested Version for HBS.</comments>
   <civix>
     <namespace>CRM/Nav</namespace>
   </civix>
