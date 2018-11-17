@@ -69,6 +69,7 @@ class CRM_Nav_Config {
     'Voicemail'                     => '5',
     'website_type_id'               => 'Work',
     'id_table'                      => 'civicrm_value_contact_id_history',
+    'employee_relationship_type_id' => '16',
   ];
 
   /**
@@ -128,6 +129,7 @@ class CRM_Nav_Config {
     'Pager'                         => '4',
     'Voicemail'                     => '5',
     'id_table'                      => 'civicrm_value_contact_id_history',
+    'employee_relationship_type_id' => '18',
   ];
 
   /**
