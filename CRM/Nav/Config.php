@@ -20,7 +20,7 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = FALSE;
+  private static $local        = TRUE;
 
   private static $candidature_process_code_option_value_cache = [];
 
@@ -194,4 +194,36 @@ class CRM_Nav_Config {
   public static function local() {
     return self::$local;
   }
+
+  public static function get_last_timestamp() {
+    $nav_settings = self::get_settings();
+    if (!empty($nav_settings['last_change_gather_run'])) {
+      return $nav_settings['last_change_gather_run'];
+    }
+    return '';
+  }
+
+  public static function set_last_timestamp($timestamp) {
+    $nav_settings = self::get_settings();
+    $nav_settings['last_change_gather_run'] = $timestamp;
+    self::set_settings($nav_settings);
+  }
+
+  // Log Analyszer
+  // use Civi-Settings for timestamp etc ...
+
+  private static function get_settings() {
+    $settings = CRM_Core_BAO_Setting::getItem('de.boell.civicrm.nav', 'NavSync_settings');
+    return $settings;
+  }
+
+  /**
+   * set Mailingtools settings
+   *
+   * @param $settings array
+   */
+  private static function set_settings($settings) {
+    CRM_Core_BAO_Setting::setItem($settings, 'de.boell.civicrm.nav', 'NavSync_settings');
+  }
+
 }
