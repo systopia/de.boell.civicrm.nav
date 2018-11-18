@@ -28,6 +28,10 @@ class CRM_Nav_ChangeTracker_ContactAnalyzer extends CRM_Nav_ChangeTracker_Analyz
     return get_class();
   }
 
+  protected function get_table_descriptions() {
+    return CRM_Nav_ChangeTracker_TableDescriptions::get_Contact_fields();
+  }
+
   protected function eval_data() {
     // TODO: Implement eval_data() method.
     // Compare before dataset and after dataset, parse and save here in format:

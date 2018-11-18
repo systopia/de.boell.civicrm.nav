@@ -50,11 +50,12 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->get_changed_navision_contacts(strtolower($this->type), $this->_select_fields);
     $this->parse_log_data_before(strtolower($this->type));
     $this->parse_log_data_after(strtolower($this->type));
-    print "hello?";
   }
 
   private function is_nav_contact($contact_id) {
-
+    if (isset(CRM_Nav_ChangeTracker_LogAnalyzRunner::$nav_id_cache[$contact_id])) {
+      return CRM_Nav_ChangeTracker_LogAnalyzRunner::$nav_id_cache[$contact_id];
+    }
     $result = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
       'return' => array(CRM_Nav_Config::get('navision_custom_field')),
@@ -96,13 +97,12 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $sql = "select * FROM log_civicrm_{$entity} WHERE log_date <= '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
 
-    $function_name ="get_{$this->type}_fields";
     while($query->fetch()) {
       if (!isset($this->_record_ids[$query->id])) {
         continue;
       }
       $values = [];
-      foreach (CRM_Nav_ChangeTracker_TableDescriptions::{$function_name}() as $field_name) {
+      foreach ($this->get_table_descriptions() as $field_name) {
         $values[$field_name] = $query->{$field_name};
       }
       $this->last_before_values[$query->id] = $values;
@@ -113,13 +113,12 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $sql = "select * FROM log_civicrm_{$entity} WHERE log_date > '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
 
-    $function_name ="get_{$this->type}_fields";
     while($query->fetch()) {
       if (!isset($this->_record_ids[$query->id])) {
         continue;
       }
       $values = [];
-      foreach (CRM_Nav_ChangeTracker_TableDescriptions::{$function_name}() as $field_name) {
+      foreach ($this->get_table_descriptions() as $field_name) {
         $values[$field_name] = $query->{$field_name};
       }
       $this->last_after_values[$query->id] = $values;
@@ -135,4 +134,6 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   abstract protected function get_my_class_name();
 
   abstract protected function eval_data();
+
+  abstract protected function get_table_descriptions();
 }
