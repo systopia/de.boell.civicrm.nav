@@ -29,6 +29,10 @@ class CRM_Nav_Config {
     '_blank_',
   ];
 
+  public static $always_log_fields = [
+    'created_date', 'modified_date', 'log_date', 'log_user_id', 'log_action',
+  ];
+
   private static $local_config = [
     'hbs_contact_id'                  => '4',
     'navision_custom_field'           => 'custom_41',
