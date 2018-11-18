@@ -25,7 +25,6 @@ function _civicrm_api3_nav_GatherChanges_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_nav_GatherChanges($params) {
-
   try{
     $runner = new CRM_Nav_ChangeTracker_LogAnalyzRunner($params['entity'], $params['debug']);
     $runner->process();

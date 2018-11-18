@@ -15,7 +15,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-class CRM_Nav_ChangeTracker_LogAnalyzRunner {
+class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
 
   private $_entities = [
     'Contact',
