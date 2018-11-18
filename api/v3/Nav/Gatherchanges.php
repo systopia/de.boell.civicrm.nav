@@ -26,7 +26,7 @@ function _civicrm_api3_nav_GatherChanges_spec(&$spec) {
  */
 function civicrm_api3_nav_GatherChanges($params) {
   try{
-    $runner = new CRM_Nav_ChangeTracker_LogAnalyzRunner($params['entity'], $params['debug']);
+    $runner = new CRM_Nav_ChangeTracker_LogAnalyzeRunner($params['entity'], $params['debug']);
     $runner->process();
     return civicrm_api3_create_success($runner->get_stats(), $params, 'Nav', 'GatherChanges');
   } catch (Exception $e) {
