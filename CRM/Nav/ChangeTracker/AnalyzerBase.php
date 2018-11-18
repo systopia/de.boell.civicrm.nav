@@ -33,11 +33,14 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   // last value after timestamp
   protected $last_after_values;
 
+  protected $changed_values;
+
   public function __construct($timestamp, $debug = FALSE) {
     $this->_timestamp = $timestamp;
     $this->debug = $debug;
     $this->error_counter = 0;
     $this->_record_ids = [];
+    $this->changed_values = [];
 
     if (!isset($this->_select_fields) || !isset($this->_lookupfields) || !isset($this->type)) {
       $class_name = get_called_class();
@@ -50,11 +53,12 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->get_changed_navision_contacts(strtolower($this->type), $this->_select_fields);
     $this->parse_log_data_before(strtolower($this->type));
     $this->parse_log_data_after(strtolower($this->type));
+    $this->eval_data();
   }
 
-  private function is_nav_contact($contact_id) {
-    if (isset(CRM_Nav_ChangeTracker_LogAnalyzRunner::$nav_id_cache[$contact_id])) {
-      return CRM_Nav_ChangeTracker_LogAnalyzRunner::$nav_id_cache[$contact_id];
+  protected function is_nav_contact($contact_id) {
+    if (isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id])) {
+      return TRUE;
     }
     $result = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
@@ -84,12 +88,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $sql = "select {$select_fields} FROM log_civicrm_{$entity} WHERE log_date > '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
     while($query->fetch()) {
-      if (!isset($this->_record_ids[$query->id])) {
-        if ($this->is_nav_contact($query->id)) {
-          $this->_record_ids[$query->id] = $query->id;
-          CRM_Nav_ChangeTracker_LogAnalyzRunner::$nav_id_cache[$query->id] = $query->id;
-        }
-      }
+      $this->eval_query($query);
     }
   }
 
@@ -131,9 +130,28 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
+  protected function eval_data() {
+    foreach ($this->last_after_values as $key => $value) {
+      if (!isset($this->last_before_values[$key])) {
+        // new contact creation with Nav Id, we have to provide the whole thing
+        foreach ($value as $k => $v) {
+          $this->changed_values[$key][$k]['new'] = $v;
+        }
+      }
+      foreach ($value as $k => $v) {
+        if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
+          $this->changed_values[$key][$k]['new'] = $v;
+          $this->changed_values[$key][$k]['old'] = $this->last_before_values[$key][$k];
+        }
+      }
+    }
+  }
+
   abstract protected function get_my_class_name();
 
-  abstract protected function eval_data();
+  abstract protected function eval_query(&$query);
 
   abstract protected function get_table_descriptions();
+
+  abstract protected function get_table_contact_field();
 }

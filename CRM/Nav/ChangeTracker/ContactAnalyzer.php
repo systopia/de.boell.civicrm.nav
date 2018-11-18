@@ -32,15 +32,17 @@ class CRM_Nav_ChangeTracker_ContactAnalyzer extends CRM_Nav_ChangeTracker_Analyz
     return CRM_Nav_ChangeTracker_TableDescriptions::get_Contact_fields();
   }
 
-  protected function eval_data() {
-    // TODO: Implement eval_data() method.
-    // Compare before dataset and after dataset, parse and save here in format:
-    // contactId => [
-    //    field_name => [
-    //      old => old_val
-    //      new => new_val
-    //   ]
-    // ]
+  protected function get_table_contact_field() {
+    return 'id';
+  }
+
+  protected function eval_query(&$query) {
+    if (!isset($this->_record_ids[$query->id])) {
+      if ($this->is_nav_contact($query->id)) {
+        $this->_record_ids[$query->id] = $query->id;
+        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->id] = $query->id;
+      }
+    }
   }
 
 }
