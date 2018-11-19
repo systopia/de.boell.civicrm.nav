@@ -42,7 +42,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->_record_ids = [];
     $this->changed_values = [];
 
-    if (!isset($this->_select_fields) || !isset($this->type) || !isset($this->_log_table)) {
+    if (!isset($this->_select_fields) || !isset($this->_log_table)) {
       $class_name = get_called_class();
       throw new Exception("Invalid Analyzer initialization. Aborting Log Runner for {$class_name}");
     }
@@ -50,9 +50,9 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
 
 
   public function run() {
-    $this->get_changed_navision_contacts(strtolower($this->type), $this->_select_fields);
-    $this->parse_log_data_before(strtolower($this->type));
-    $this->parse_log_data_after(strtolower($this->type));
+    $this->get_changed_navision_contacts($this->_select_fields);
+    $this->parse_log_data_before();
+    $this->parse_log_data_after();
     $this->eval_data();
   }
 
@@ -83,7 +83,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
    *
    * @return array
    */
-  protected function get_changed_navision_contacts($entity, $fields) {
+  protected function get_changed_navision_contacts($fields) {
     $select_fields = implode(",", $fields);
     $sql = "select {$select_fields} FROM {$this->_log_table} WHERE log_date > '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
@@ -92,7 +92,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
-  protected function parse_log_data_before($entity) {
+  protected function parse_log_data_before() {
     $sql = "select * FROM {$this->_log_table} WHERE log_date <= '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
 
@@ -104,7 +104,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
-  protected function parse_log_data_after($entity) {
+  protected function parse_log_data_after() {
     $sql = "select * FROM {$this->_log_table} WHERE log_date > '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
 

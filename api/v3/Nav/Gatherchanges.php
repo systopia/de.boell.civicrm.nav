@@ -11,7 +11,7 @@ use CRM_Nav_ExtensionUtil as E;
  */
 function _civicrm_api3_nav_GatherChanges_spec(&$spec) {
   $spec['entity']['api.default'] = '';
-  $spec['entity']['api.description'] = "Restrict api call to changes for civi Entities. Supported Entities: 'Contact', 'Address', 'Relationship', 'Email', 'Phone', 'Website','Custom_Contact'";
+  $spec['entity']['api.description'] = "Restrict api call to changes for civi Entities. Supported Entities: 'Contact', 'Address', 'Relationship', 'Email', 'Phone', 'Website','CustomContact'";
   $spec['debug']['api.default'] = FALSE;
 }
 
@@ -30,6 +30,6 @@ function civicrm_api3_nav_GatherChanges($params) {
     $runner->process();
     return civicrm_api3_create_success($runner->get_stats(), $params, 'Nav', 'GatherChanges');
   } catch (Exception $e) {
-    throw new API_Exception(/*errorMessage*/ 'Everyone knows that the magicword is "sesame"', /*errorCode*/ 1234);
+    throw new API_Exception($e->getMessage());
   }
 }
