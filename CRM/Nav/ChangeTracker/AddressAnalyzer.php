@@ -27,13 +27,20 @@ class CRM_Nav_ChangeTracker_AddressAnalyzer extends CRM_Nav_ChangeTracker_Analyz
   protected function get_my_class_name() {
     return get_class();
   }
+//
+//  protected function eval_data() {
+//    echo "hallo";
+//    parent::eval_data();
+//  }
 
 
   protected function eval_query(&$query) {
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->contact_id)) {
         $this->_record_ids[$query->id] = $query->contact_id;
-        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->contact_id] = FALSE;
+        if (!isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->contact_id])) {
+          CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->contact_id] = '-1';
+        }
       }
     }
   }

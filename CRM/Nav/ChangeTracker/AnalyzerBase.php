@@ -141,15 +141,23 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   protected function eval_data() {
     //    iterate over all after values; $key = EntityId, Value = value array
     foreach ($this->last_after_values as $key => $value) {
+      $contact_id = $this->_record_ids[$key];
+
       // if no before value exists: New entry --> log all after values and skip rest
       if (!isset($this->last_before_values[$key])) {
         // new contact creation with Nav Id, we have to provide the whole thing
-        foreach ($value as $k => $v) {
-          $this->changed_values[$this->_record_ids[$key]][$k]['new'] = $v;
+        if ($this->is_studienwerk($contact_id)) {
+          foreach ($value as $k => $v) {
+            $this->changed_studienwerk_values[$this->_record_ids[$key]][$k]['new'] = $v;
+          }
+          continue;
+        } else {
+          foreach ($value as $k => $v) {
+            $this->changed_values[$this->_record_ids[$key]][$k]['new'] = $v;
+          }
+          continue;
         }
-        continue;
       }
-      $contact_id = $this->_record_ids[$key];
       // if Contact has a relationship to studienwerk, save in separate array $this->changed_studienwerk_values
       if ($this->is_studienwerk($contact_id)) {
         foreach ($value as $k => $v) {
@@ -170,8 +178,12 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   }
 
   private function is_studienwerk($contact_id) {
-    if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]) {
+    $tmp = CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id];
+    if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] > '0') {
       return TRUE;
+    }
+    if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] == '0') {
+      return FALSE;
     }
     $result = civicrm_api3('Relationship', 'get', array(
       'sequential' => 1,
@@ -180,9 +192,10 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     ));
     if ($result['count'] > 0) {
       // chache result
-      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = TRUE;
+      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = $contact_id;
       return TRUE;
     }
+    CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = '0';
     return FALSE;
   }
 

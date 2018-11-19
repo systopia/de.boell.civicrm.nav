@@ -40,7 +40,9 @@ class CRM_Nav_ChangeTracker_RelationshipAnalyzer extends CRM_Nav_ChangeTracker_A
       }
       if ($this->is_nav_contact($contact_id)) {
         $this->_record_ids[$query->id] = $contact_id;
-        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = FALSE;
+        if (!isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id])) {
+          CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = '-1';
+        }
       }
     }
   }
