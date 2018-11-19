@@ -94,7 +94,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $stw_data, $this->_timestamp);
     $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $data, $this->_timestamp);
 
-    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
+//    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
   }
 
   /**
