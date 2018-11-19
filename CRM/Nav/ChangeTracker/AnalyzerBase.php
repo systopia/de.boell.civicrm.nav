@@ -150,8 +150,14 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
         if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
           // resulting array should be keyed by contact id ( mapping via $this->_record_ids[$key])
           // TODO: check if studienwerk Contact
-          $this->changed_values[$this->_record_ids[$key]][$k]['new'] = $v;
-          $this->changed_values[$this->_record_ids[$key]][$k]['old'] = $this->last_before_values[$key][$k];
+          $contact_id = $this->_record_ids[$key];
+          if ($this->is_studienwerk($contact_id)) {
+            $this->changed_studienwerk_values[$contact_id][$k]['new'] = $v;
+            $this->changed_studienwerk_values[$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
+          } else {
+            $this->changed_values[$contact_id][$k]['new'] = $v;
+            $this->changed_values[$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
+          }
         }
       }
     }
@@ -161,6 +167,17 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]) {
       return TRUE;
     }
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'contact_id_a' => $contact_id,
+      'relationship_type_id' => array('IN' => array(CRM_Nav_Config::get('Stipendiat_in'), CRM_Nav_Config::get('Promotionsstipendiat_in'))),
+    ));
+    if ($result['count'] > 0) {
+      // chache result
+      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = TRUE;
+      return TRUE;
+    }
+    return FALSE;
   }
 
   abstract protected function get_my_class_name();
