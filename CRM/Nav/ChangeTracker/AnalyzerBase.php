@@ -58,6 +58,10 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->eval_data();
   }
 
+  public function get_changed_studienwerk_data() {
+    return $this->changed_studienwerk_values;
+  }
+
   public function get_changed_data() {
     return $this->changed_values;
   }
@@ -141,20 +145,22 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       if (!isset($this->last_before_values[$key])) {
         // new contact creation with Nav Id, we have to provide the whole thing
         foreach ($value as $k => $v) {
-          $this->changed_values[$key][$k]['new'] = $v;
+          $this->changed_values[$this->_record_ids[$key]][$k]['new'] = $v;
         }
         continue;
       }
-      // Value array: $k => $v
-      foreach ($value as $k => $v) {
-        if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
-          // resulting array should be keyed by contact id ( mapping via $this->_record_ids[$key])
-          // TODO: check if studienwerk Contact
-          $contact_id = $this->_record_ids[$key];
-          if ($this->is_studienwerk($contact_id)) {
+      $contact_id = $this->_record_ids[$key];
+      // if Contact has a relationship to studienwerk, save in separate array $this->changed_studienwerk_values
+      if ($this->is_studienwerk($contact_id)) {
+        foreach ($value as $k => $v) {
+          if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
             $this->changed_studienwerk_values[$contact_id][$k]['new'] = $v;
             $this->changed_studienwerk_values[$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
-          } else {
+          }
+        }
+      } else {
+        foreach ($value as $k => $v) {
+          if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
             $this->changed_values[$contact_id][$k]['new'] = $v;
             $this->changed_values[$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
           }
