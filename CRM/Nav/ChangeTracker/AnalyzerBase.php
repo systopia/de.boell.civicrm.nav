@@ -42,7 +42,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->_record_ids = [];
     $this->changed_values = [];
 
-    if (!isset($this->_select_fields) || !isset($this->_log_table)) {
+    if (!isset($this->_select_fields) || !isset($this->_log_table) || !isset($this->type)) {
       $class_name = get_called_class();
       throw new Exception("Invalid Analyzer initialization. Aborting Log Runner for {$class_name}");
     }
@@ -54,6 +54,10 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->parse_log_data_before();
     $this->parse_log_data_after();
     $this->eval_data();
+  }
+
+  public function get_changed_data() {
+    return $this->changed_values;
   }
 
   protected function is_nav_contact($contact_id) {
@@ -122,8 +126,16 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
+  /**
+   * Evaluates changes between before log entries and after log Entries.
+   * Results are stored in $this->changed_values
+   * Format:
+   * $this->changed_values[CONTACT_ID => [FIELD_NAME => [['new' => NEW_VALUE], ['old' => OLD_VALUE]]]
+   */
   protected function eval_data() {
+    //    iterate over all after values; $key = EntityId, Value = value array
     foreach ($this->last_after_values as $key => $value) {
+      // if no before value exists: New entry --> log all after values and skip rest
       if (!isset($this->last_before_values[$key])) {
         // new contact creation with Nav Id, we have to provide the whole thing
         foreach ($value as $k => $v) {
@@ -131,10 +143,12 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
         }
         continue;
       }
+      // Value array: $k => $v
       foreach ($value as $k => $v) {
         if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
-          $this->changed_values[$key][$k]['new'] = $v;
-          $this->changed_values[$key][$k]['old'] = $this->last_before_values[$key][$k];
+          // resulting array should be keyed by contact id ( mapping via $this->_record_ids[$key])
+          $this->changed_values[$this->_record_ids[$key]][$k]['new'] = $v;
+          $this->changed_values[$this->_record_ids[$key]][$k]['old'] = $this->last_before_values[$key][$k];
         }
       }
     }
@@ -143,4 +157,8 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   abstract protected function get_my_class_name();
 
   abstract protected function eval_query(&$query);
+
+  public function get_entity_type() {
+    return $this->type;
+  }
 }

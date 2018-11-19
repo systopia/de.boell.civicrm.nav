@@ -32,7 +32,7 @@ class CRM_Nav_ChangeTracker_EmailAnalyzer extends CRM_Nav_ChangeTracker_Analyzer
   protected function eval_query(&$query) {
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->contact_id)) {
-        $this->_record_ids[$query->id] = $query->id;
+        $this->_record_ids[$query->id] = $query->contact_id;
         CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->contact_id] = $query->contact_id;
       }
     }

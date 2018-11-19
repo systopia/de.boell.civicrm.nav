@@ -18,13 +18,13 @@
 class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
 
   private $_entities = [
-    'Contact',
     'Address',
-    'Relationship',
-    'Phone',
-    'Email',
-    'Website',
+    'Contact',
     'CustomContact',
+    'Email',
+    'Phone',
+    'Relationship',
+    'Website',
   ];
 
   private $_timestamp;
@@ -70,6 +70,18 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     foreach ($this->_entities as $entity) {
       $this->{$entity}->run();
     }
+    $this->create_result_data();
+  }
+
+  private function create_result_data() {
+    $result_changed_data = [];
+    foreach ($this->_entities as $entity) {
+      $entity_changed_data = $this->{$entity}->get_changed_data();
+      foreach ($entity_changed_data as $contact_id => $values) {
+        $result_changed_data[$contact_id][$entity] = $values;
+      }
+    }
+    return $result_changed_data;
   }
 
 
