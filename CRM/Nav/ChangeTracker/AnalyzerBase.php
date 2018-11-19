@@ -33,6 +33,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   // last value after timestamp
   protected $last_after_values;
 
+  protected $changed_studienwerk_values;
   protected $changed_values;
 
   public function __construct($timestamp, $debug = FALSE) {
@@ -41,6 +42,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->error_counter = 0;
     $this->_record_ids = [];
     $this->changed_values = [];
+    $this->changed_studienwerk_values = [];
 
     if (!isset($this->_select_fields) || !isset($this->_log_table) || !isset($this->type)) {
       $class_name = get_called_class();
@@ -147,10 +149,17 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       foreach ($value as $k => $v) {
         if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
           // resulting array should be keyed by contact id ( mapping via $this->_record_ids[$key])
+          // TODO: check if studienwerk Contact
           $this->changed_values[$this->_record_ids[$key]][$k]['new'] = $v;
           $this->changed_values[$this->_record_ids[$key]][$k]['old'] = $this->last_before_values[$key][$k];
         }
       }
+    }
+  }
+
+  private function is_studienwerk($contact_id) {
+    if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]) {
+      return TRUE;
     }
   }
 

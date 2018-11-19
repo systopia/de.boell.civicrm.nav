@@ -70,10 +70,10 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     foreach ($this->_entities as $entity) {
       $this->{$entity}->run();
     }
-    $this->create_result_data();
+    $this->create_studienwerk_data();
   }
 
-  private function create_result_data() {
+  private function create_studienwerk_data() {
     $result_changed_data = [];
     foreach ($this->_entities as $entity) {
       $entity_changed_data = $this->{$entity}->get_changed_data();

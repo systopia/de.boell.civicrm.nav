@@ -33,7 +33,7 @@ class CRM_Nav_ChangeTracker_WebsiteAnalyzer extends CRM_Nav_ChangeTracker_Analyz
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->contact_id)) {
         $this->_record_ids[$query->id] = $query->contact_id;
-        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->contact_id] = $query->contact_id;
+        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->contact_id] = FALSE;
       }
     }
   }
