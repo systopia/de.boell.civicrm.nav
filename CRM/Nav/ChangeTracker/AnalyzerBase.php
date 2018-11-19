@@ -141,8 +141,4 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   abstract protected function get_my_class_name();
 
   abstract protected function eval_query(&$query);
-
-  abstract protected function get_table_descriptions();
-
-  abstract protected function get_table_contact_field();
 }

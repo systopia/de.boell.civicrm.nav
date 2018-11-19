@@ -17,22 +17,14 @@
 
 class CRM_Nav_ChangeTracker_ContactAnalyzer extends CRM_Nav_ChangeTracker_AnalyzerBase {
 
-  public function __construct($timestamp) {
+  public function __construct($timestamp, $debug) {
     $this->_select_fields = ['id'];
     $this->type = 'Contact';
-    parent::__construct($timestamp);
+    parent::__construct($timestamp, $debug);
   }
 
   protected function get_my_class_name() {
     return get_class();
-  }
-
-  protected function get_table_descriptions() {
-    return CRM_Nav_ChangeTracker_TableDescriptions::get_Contact_fields();
-  }
-
-  protected function get_table_contact_field() {
-    return 'id';
   }
 
   protected function eval_query(&$query) {

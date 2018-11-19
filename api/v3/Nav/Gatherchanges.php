@@ -11,7 +11,7 @@ use CRM_Nav_ExtensionUtil as E;
  */
 function _civicrm_api3_nav_GatherChanges_spec(&$spec) {
   $spec['entity']['api.default'] = '';
-  $spec['entity']['api.description'] = "Restrict api call to changes for civi Entities. Supported Entities: 'Contact', 'Address', 'Relationship', 'Email', 'Phone', 'Website'";
+  $spec['entity']['api.description'] = "Restrict api call to changes for civi Entities. Supported Entities: 'Contact', 'Address', 'Relationship', 'Email', 'Phone', 'Website','Custom_Contact'";
   $spec['debug']['api.default'] = FALSE;
 }
 
