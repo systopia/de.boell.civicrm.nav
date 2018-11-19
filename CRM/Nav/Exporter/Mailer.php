@@ -17,7 +17,7 @@
 
 
 /**
- * TODO: Create Settings page for these settings?
+ * TODO: Create Settings page?
  * Class CRM_Nav_Exporter_Mailer
  */
 class CRM_Nav_Exporter_Mailer {
@@ -25,17 +25,30 @@ class CRM_Nav_Exporter_Mailer {
   private $email_from              = 'civi2navision@boell.de';
   private $email_name_from         = 'Civi2Navision Bot';
   private $subject                 = 'Daily Civi2Nav Report';
-  private $sender_contact_id       = '4'; // (TODO: create user for this .. ?)
+  private $sender_contact_id       = '2'; // (TODO: create user for this .. ?)
 
   private $to_name_sw              = 'Studienwerk HBS';
   private $to_name_kred            = 'Navision HBS';
 
-  private $to_email_sw             = 'civicrm-stw@boell.de';
-  private $to_email_kred           = 'kreditorenNAV2009@boell.de';
+//  private $to_email_sw             = 'civicrm-stw@boell.de';
+//  private $to_email_kred           = 'kreditorenNAV2009@boell.de';
 
+    private $to_email_sw             = 'batroff@systopia.de';
+    private $to_email_kred           = 'batroff@systopia.de';
+
+  /**
+   * CRM_Nav_Exporter_Mailer constructor.
+   */
   public function __construct() {
   }
 
+  /**
+   * @param $template_name
+   * @param $content
+   * @param $timestamp
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function create_email($template_name, $content, $timestamp) {
     $values = [];
     switch ($template_name) {
@@ -67,6 +80,12 @@ class CRM_Nav_Exporter_Mailer {
     }
   }
 
+  /**
+   * @param $template_name
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
   private function get_template_id($template_name) {
     $result = civicrm_api3('MessageTemplate', 'get', array(
       'sequential' => 1,
@@ -84,6 +103,12 @@ class CRM_Nav_Exporter_Mailer {
     throw new Exception("Template not found - unclear state. Seek help");
   }
 
+  /**
+   * @param $template_name
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
   private function create_template($template_name) {
     $template_content = file_get_contents(__DIR__ . "/../../../templates/mailer_template.tpl");
     $result = civicrm_api3('MessageTemplate', 'create', [
