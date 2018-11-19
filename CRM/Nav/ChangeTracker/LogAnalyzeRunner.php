@@ -60,8 +60,9 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     $this->Contact = new CRM_Nav_ChangeTracker_ContactAnalyzer($this->_timestamp, $debug);
     $this->Address = new CRM_Nav_ChangeTracker_AddressAnalyzer($this->_timestamp, $debug);
     $this->Relationship = new CRM_Nav_ChangeTracker_RelationshipAnalyzer($this->_timestamp, $debug);
-//    $this->Phone = new CRM_Nav_ChangeTracker_PhoneAnalyzer($this->_timestamp, $debug);
-//    $this->Website = new CRM_Nav_ChangeTracker_WebsiteAnalyzer($this->_timestamp, $debug);
+    $this->Phone = new CRM_Nav_ChangeTracker_PhoneAnalyzer($this->_timestamp, $debug);
+    $this->Email = new CRM_Nav_ChangeTracker_EmailAnalyzer($this->_timestamp, $debug);
+    $this->Website = new CRM_Nav_ChangeTracker_WebsiteAnalyzer($this->_timestamp, $debug);
 //    $this->CustomContact = new CRM_Nav_ChangeTracker_CustomContactAnalyzer($this->_timestamp, $debug);
   }
 
