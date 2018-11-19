@@ -24,7 +24,7 @@ class CRM_Nav_ChangeTracker_AddressAnalyzer extends CRM_Nav_ChangeTracker_Analyz
     parent::__construct($timestamp, $debug);
   }
 
-  
+
   protected function get_my_class_name() {
     return get_class();
   }

@@ -29,6 +29,10 @@ class CRM_Nav_Config {
     '_blank_',
   ];
 
+  public static $studienwerk_temlpate_name = 'nav_studienwerk_template';
+
+  public static $kreditoren_temlpate_name  = 'nav_kreditoren_template';
+
   public static $always_log_fields = [
     'created_date', 'modified_date', 'log_date', 'log_user_id', 'log_action',
   ];
