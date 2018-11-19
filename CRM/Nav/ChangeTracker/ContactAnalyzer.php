@@ -20,6 +20,7 @@ class CRM_Nav_ChangeTracker_ContactAnalyzer extends CRM_Nav_ChangeTracker_Analyz
   public function __construct($timestamp, $debug) {
     $this->_select_fields = ['id'];
     $this->type = 'Contact';
+    $this->_log_table = 'log_civicrm_contact';
     parent::__construct($timestamp, $debug);
   }
 

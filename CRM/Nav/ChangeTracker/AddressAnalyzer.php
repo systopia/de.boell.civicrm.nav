@@ -20,6 +20,7 @@ class CRM_Nav_ChangeTracker_AddressAnalyzer extends CRM_Nav_ChangeTracker_Analyz
   public function __construct($timestamp, $debug) {
     $this->_select_fields = ['id', 'contact_id'];
     $this->type = 'Address';
+    $this->_log_table = 'log_civicrm_address';
     parent::__construct($timestamp, $debug);
   }
 
@@ -32,7 +33,7 @@ class CRM_Nav_ChangeTracker_AddressAnalyzer extends CRM_Nav_ChangeTracker_Analyz
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->contact_id)) {
         $this->_record_ids[$query->id] = $query->id;
-        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->id] = $query->id;
+        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->contact_id] = $query->contact_id;
       }
     }
   }
