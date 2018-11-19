@@ -20,7 +20,7 @@ class CRM_Nav_ChangeTracker_RelationshipAnalyzer extends CRM_Nav_ChangeTracker_A
   private $relationship_cache;
 
   public function __construct($timestamp, $debug) {
-    $this->_select_fields = ['id', 'contact_id'];
+    $this->_select_fields = ['id', 'entity_id'];
     $this->type = 'Relationship';
     $this->_log_table = 'log_civicrm_value_studienwerk_relationship';
 

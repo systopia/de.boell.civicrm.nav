@@ -129,6 +129,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
         foreach ($value as $k => $v) {
           $this->changed_values[$key][$k]['new'] = $v;
         }
+        continue;
       }
       foreach ($value as $k => $v) {
         if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
