@@ -19,7 +19,6 @@ class CRM_Nav_ChangeTracker_ContactAnalyzer extends CRM_Nav_ChangeTracker_Analyz
 
   public function __construct($timestamp) {
     $this->_select_fields = ['id'];
-    $this->_lookupfields  = ['id'];
     $this->type = 'Contact';
     parent::__construct($timestamp);
   }

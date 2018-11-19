@@ -24,7 +24,6 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   protected $error_counter;
 
   protected $_select_fields;
-  protected $_lookupfields;
   protected $type;
 
   // format: id -> value array
@@ -42,7 +41,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->_record_ids = [];
     $this->changed_values = [];
 
-    if (!isset($this->_select_fields) || !isset($this->_lookupfields) || !isset($this->type)) {
+    if (!isset($this->_select_fields) || !isset($this->type)) {
       $class_name = get_called_class();
       throw new Exception("Invalid Analyzer initialization. Aborting Log Runner for {$class_name}");
     }
@@ -100,11 +99,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       if (!isset($this->_record_ids[$query->id])) {
         continue;
       }
-      $values = [];
-      foreach ($this->get_table_descriptions() as $field_name) {
-        $values[$field_name] = $query->{$field_name};
-      }
-      $this->last_before_values[$query->id] = $values;
+      $this->last_before_values[$query->id] = $query->toArray();
     }
   }
 
@@ -116,11 +111,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       if (!isset($this->_record_ids[$query->id])) {
         continue;
       }
-      $values = [];
-      foreach ($this->get_table_descriptions() as $field_name) {
-        $values[$field_name] = $query->{$field_name};
-      }
-      $this->last_after_values[$query->id] = $values;
+      $this->last_after_values[$query->id] = $query->toArray();
     }
   }
 
