@@ -72,7 +72,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
     $result = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
-      'return' => array(CRM_Nav_Config::get('navision_custom_field')),
+      'return' => array(CRM_Nav_Config::get('navision_custom_field'), CRM_Nav_Config::get('creditor_custom_field_id'), CRM_Nav_Config::get('debitor_custom_field_id')),
       'id' => $contact_id,
     ));
     if ($result['count'] != '1' || $result['is_error'] == '1') {
@@ -80,7 +80,10 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       $this->error_counter += 1;
       return FALSE;
     }
-    if (!empty($result['values']['0'][CRM_Nav_Config::get('navision_custom_field')])) {
+    if (!empty($result['values']['0'][CRM_Nav_Config::get('navision_custom_field')]) ||
+      !empty($result['values']['0'][CRM_Nav_Config::get('creditor_custom_field_id')]) ||
+      !empty($result['values']['0'][CRM_Nav_Config::get('debitor_custom_field_id')])
+    ) {
       return TRUE;
     }
     return FALSE;
