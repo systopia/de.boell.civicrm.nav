@@ -181,7 +181,6 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   }
 
   private function is_studienwerk($contact_id) {
-    $tmp = CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id];
     if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] > '0') {
       return TRUE;
     }

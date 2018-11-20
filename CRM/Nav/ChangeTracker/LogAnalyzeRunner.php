@@ -26,7 +26,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     'CustomContact',
     'Email',
     'Phone',
-    'Relationship',
+//    'Relationship',
     'Website',
   ];
 
@@ -35,7 +35,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
 
   private $Contact;
   private $Address;
-  private $Relationship;
+//  private $Relationship;
   private $Phone;
   private $Email;
   private $Website;
@@ -73,7 +73,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     // initialize Data Objects
     $this->Contact = new CRM_Nav_ChangeTracker_ContactAnalyzer($this->_timestamp, $debug);
     $this->Address = new CRM_Nav_ChangeTracker_AddressAnalyzer($this->_timestamp, $debug);
-    $this->Relationship = new CRM_Nav_ChangeTracker_RelationshipAnalyzer($this->_timestamp, $debug);
+//    $this->Relationship = new CRM_Nav_ChangeTracker_RelationshipAnalyzer($this->_timestamp, $debug);
     $this->Phone = new CRM_Nav_ChangeTracker_PhoneAnalyzer($this->_timestamp, $debug);
     $this->Email = new CRM_Nav_ChangeTracker_EmailAnalyzer($this->_timestamp, $debug);
     $this->Website = new CRM_Nav_ChangeTracker_WebsiteAnalyzer($this->_timestamp, $debug);
