@@ -32,9 +32,6 @@ class CRM_Nav_ChangeTracker_CustomContactAnalyzer extends CRM_Nav_ChangeTracker_
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->entity_id)) {
         $this->_record_ids[$query->id] = $query->entity_id;
-        if (!isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->entity_id])) {
-          CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$query->entity_id] = '-1';
-        }
       }
     }
   }

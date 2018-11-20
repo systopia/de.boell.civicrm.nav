@@ -84,6 +84,12 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       !empty($result['values']['0'][CRM_Nav_Config::get('creditor_custom_field_id')]) ||
       !empty($result['values']['0'][CRM_Nav_Config::get('debitor_custom_field_id')])
     ) {
+      // add to caching array
+      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = [
+        'nav_id' => $result['values']['0'][CRM_Nav_Config::get('navision_custom_field')],
+        'kred_no' => $result['values']['0'][CRM_Nav_Config::get('creditor_custom_field_id')],
+        'deb_no' => $result['values']['0'][CRM_Nav_Config::get('debitor_custom_field_id')],
+      ];
       return TRUE;
     }
     return FALSE;
@@ -152,7 +158,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       if (!isset($this->last_before_values[$key])) {
         // new contact creation with Nav Id, we have to provide the whole thing
         if ($this->is_studienwerk($contact_id)) {
-          $supervisor = reset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]);
+          $supervisor = CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'];
           foreach ($value as $k => $v) {
             if (!in_array($k, CRM_Nav_Config::$exculde_log_fields) && !empty($v)) {
               $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['new'] = $v;
@@ -171,7 +177,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       // if Contact has a relationship to studienwerk, save in separate array $this->changed_studienwerk_values
       if ($this->is_studienwerk($contact_id)) {
         foreach ($value as $k => $v) {
-          $supervisor = reset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]);
+          $supervisor = CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'];
           if ($v != $this->last_before_values[$key][$k] && !in_array($k, CRM_Nav_Config::$exculde_log_fields)) {
             $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['new'] = $v;
             $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
@@ -189,11 +195,13 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   }
 
   private function is_studienwerk($contact_id) {
-    if (is_array(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id])) {
-      return TRUE;
-    }
-    if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] == '0') {
+    if (isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor']) &&
+        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'] == '')
+    {
       return FALSE;
+    }
+    if (isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'])) {
+      return TRUE;
     }
     $result = civicrm_api3('Relationship', 'get', array(
       'sequential' => 1,
@@ -206,10 +214,10 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       if(strpos($supervisor, 'INTRANET\\') !== FALSE) {
         $supervisor = explode('\\', $supervisor)[1];
       }
-      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = [$supervisor];
+      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'] = $supervisor;
       return TRUE;
     }
-    CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = '0';
+    CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'] = '';
     return FALSE;
   }
 

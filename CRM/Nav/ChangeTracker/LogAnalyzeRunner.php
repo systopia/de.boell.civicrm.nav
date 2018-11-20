@@ -43,7 +43,11 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
 
   private $debug;
 
+  // $contact_id => 'nav_id' => id, 'kred_no' => id, 'deb_no' => id, 'supervisor' => 'value'
   public static $nav_id_cache;
+
+  // $contact_id => nav_id, Kred_no, Deb_no
+  public static $contact_extra_info_cache;
 
   /**
    * CRM_Nav_ChangeTracker_LogAnalyzeRunner constructor.
@@ -53,7 +57,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
    *
    * @throws \API_Exception
    */
-  public function __construct($entity = [], $debug) {
+  public function __construct($entity = [], $debug = FALSE) {
     // parameter validation
     $this->verify_entities($entity);
     if (!empty($entity)) {
