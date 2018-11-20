@@ -23,8 +23,8 @@
 class CRM_Nav_Exporter_Mailer {
 
   private $email_from              = 'civi2navision@boell.de';
-  private $email_name_from         = 'Civi2Navision Bot';
-  private $subject                 = 'Daily Civi2Nav Report';
+  private $email_name_from         = 'Civi2Navision';
+  private $subject                 = 'Änderungsmitteilung aus CiviCRM';
   private $sender_contact_id       = '2'; // (TODO: create user for this .. ?)
 
   private $to_name_sw              = 'Studienwerk HBS';
