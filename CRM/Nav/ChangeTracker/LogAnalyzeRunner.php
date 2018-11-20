@@ -93,7 +93,10 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     $mailer = new CRM_Nav_Exporter_Mailer();
 
     foreach ($stw_data as $supervisor => $contact_data) {
-        $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $contact_data, $this->_timestamp, $supervisor);
+      foreach ($contact_data as $contact_id => $contact_values) {
+        $val = [$contact_id => $contact_values];
+        $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $val, $this->_timestamp, $supervisor);
+      }
     }
 
     foreach ($kred_deb_data as $contact_id => $contact_values) {
