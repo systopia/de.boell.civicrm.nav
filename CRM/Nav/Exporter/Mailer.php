@@ -56,6 +56,7 @@ class CRM_Nav_Exporter_Mailer {
     switch ($template_name) {
       case CRM_Nav_Config::$studienwerk_temlpate_name:
         $template_id = $this->get_template_id($template_name);
+        $this->set_studienwerk_subject($supervisor, $template_id);
         $values['to_name'] = $this->to_name_sw ;
         $values['to_email'] = $this->to_email_sw;
         break;
@@ -123,5 +124,13 @@ class CRM_Nav_Exporter_Mailer {
       throw new Exception("Coulnd't create message template.");
     }
     return $result['id'];
+  }
+
+  private function set_studienwerk_subject($supervisor_suffix, $template_id) {
+    $result = civicrm_api3('MessageTemplate', 'create', [
+      'sequential'  => 1,
+      'id'    => $template_id,
+      'msg_subject' => $supervisor_suffix . " - ". $this->subject,
+    ]);
   }
 }
