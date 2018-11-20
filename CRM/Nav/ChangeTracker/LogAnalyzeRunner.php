@@ -88,12 +88,20 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
       $this->{$entity}->run();
     }
     $stw_data = $this->create_studienwerk_data();
-    $data = $this->create_changed_data();
+    $kred_deb_data = $this->create_changed_data();
 
     $mailer = new CRM_Nav_Exporter_Mailer();
-    $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $stw_data, $this->_timestamp);
-    $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $data, $this->_timestamp);
 
+    foreach ($stw_data as $supervisor => $contact_data) {
+        $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $contact_data, $this->_timestamp, $supervisor);
+    }
+
+    foreach ($kred_deb_data as $contact_id => $contact_values) {
+      $val = [$contact_id => $contact_values];
+      $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $val, $this->_timestamp);
+    }
+
+    // TODO: SET THIS For Live
 //    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
   }
 
@@ -104,8 +112,10 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     $result_changed_data = [];
     foreach ($this->_entities as $entity) {
       $entity_changed_data = $this->{$entity}->get_changed_studienwerk_data();
-      foreach ($entity_changed_data as $contact_id => $values) {
-        $result_changed_data[$contact_id][$entity] = $values;
+      foreach ($entity_changed_data as $supervisor => $values) {
+        foreach ($values as $contact_id => $entity_values) {
+          $result_changed_data[$supervisor][$contact_id][$entity] = $entity_values;
+        }
       }
     }
     return $result_changed_data;

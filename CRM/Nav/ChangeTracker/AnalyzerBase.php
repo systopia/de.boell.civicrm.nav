@@ -140,6 +140,8 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
    * Results are stored in $this->changed_values
    * Format:
    * $this->changed_values[CONTACT_ID => [FIELD_NAME => [['new' => NEW_VALUE], ['old' => OLD_VALUE]]]
+   * Studienwerk Format:
+   * $this->changed_values[Betreuer => [CONTACT_ID => [FIELD_NAME => [['new' => NEW_VALUE], ['old' => OLD_VALUE]]]]
    */
   protected function eval_data() {
     //    iterate over all after values; $key = EntityId, Value = value array
@@ -150,13 +152,18 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       if (!isset($this->last_before_values[$key])) {
         // new contact creation with Nav Id, we have to provide the whole thing
         if ($this->is_studienwerk($contact_id)) {
+          $supervisor = reset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]);
           foreach ($value as $k => $v) {
-            $this->changed_studienwerk_values[$this->_record_ids[$key]][$k]['new'] = $v;
+            if (!in_array($k, CRM_Nav_Config::$exculde_log_fields) && !empty($v)) {
+              $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['new'] = $v;
+            }
           }
           continue;
         } else {
           foreach ($value as $k => $v) {
-            $this->changed_values[$this->_record_ids[$key]][$k]['new'] = $v;
+            if (!in_array($k, CRM_Nav_Config::$exculde_log_fields) && !empty($v)) {
+              $this->changed_values[$contact_id][$k]['new'] = $v;
+            }
           }
           continue;
         }
@@ -164,14 +171,15 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       // if Contact has a relationship to studienwerk, save in separate array $this->changed_studienwerk_values
       if ($this->is_studienwerk($contact_id)) {
         foreach ($value as $k => $v) {
-          if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
-            $this->changed_studienwerk_values[$contact_id][$k]['new'] = $v;
-            $this->changed_studienwerk_values[$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
+          $supervisor = reset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]);
+          if ($v != $this->last_before_values[$key][$k] && !in_array($k, CRM_Nav_Config::$exculde_log_fields)) {
+            $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['new'] = $v;
+            $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
           }
         }
       } else {
         foreach ($value as $k => $v) {
-          if ($v != $this->last_before_values[$key][$k] || in_array($k, CRM_Nav_Config::$always_log_fields)) {
+          if ($v != $this->last_before_values[$key][$k] && !in_array($k, CRM_Nav_Config::$exculde_log_fields)) {
             $this->changed_values[$contact_id][$k]['new'] = $v;
             $this->changed_values[$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
           }
@@ -181,7 +189,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   }
 
   private function is_studienwerk($contact_id) {
-    if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] > '0') {
+    if (is_array(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id])) {
       return TRUE;
     }
     if (CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] == '0') {
@@ -194,11 +202,37 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     ));
     if ($result['count'] > 0) {
       // chache result
-      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = $contact_id;
+      $supervisor = $this->get_supervisor($result['values']);
+      if(strpos($supervisor, 'INTRANET\\') !== FALSE) {
+        $supervisor = explode('\\', $supervisor)[1];
+      }
+      CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = [$supervisor];
       return TRUE;
     }
     CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = '0';
     return FALSE;
+  }
+
+
+  /**
+   * @param $civi_result_set_values
+   *
+   * @return string
+   */
+  private function get_supervisor($civi_result_set_values) {
+    $highest_id = 0;
+    $supervisor = '';
+    foreach ($civi_result_set_values as $result_value) {
+      if ($result_value['id'] > $highest_id) {
+        $highest_id = $result_value['id'];
+        if (!empty($result_value[CRM_Nav_Config::get('Project_Controller')])) {
+          $supervisor = $result_value[CRM_Nav_Config::get('Project_Controller')];
+        } else {
+          $supervisor = 'not_set';
+        }
+      }
+    }
+    return $supervisor;
   }
 
   abstract protected function get_my_class_name();

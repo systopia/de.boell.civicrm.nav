@@ -43,13 +43,15 @@ class CRM_Nav_Exporter_Mailer {
   }
 
   /**
-   * @param $template_name
-   * @param $content
-   * @param $timestamp
+   * @param        $template_name
+   * @param        $content
+   * @param        $timestamp
+   *
+   * @param string $supervisor
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function create_email($template_name, $content, $timestamp) {
+  public function create_email($template_name, $content, $timestamp, $supervisor = '') {
     $values = [];
     switch ($template_name) {
       case CRM_Nav_Config::$studienwerk_temlpate_name:

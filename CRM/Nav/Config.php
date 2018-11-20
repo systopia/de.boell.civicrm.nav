@@ -33,8 +33,8 @@ class CRM_Nav_Config {
 
   public static $kreditoren_temlpate_name  = 'nav_kreditoren_template';
 
-  public static $always_log_fields = [
-    'created_date', 'modified_date', 'log_date', 'log_user_id', 'log_action',
+  public static $exculde_log_fields = [
+    'log_date', 'log_user_id', 'log_action', 'log_conn_id', 'website_type_id', 'modified_date',
   ];
 
   private static $local_config = [
