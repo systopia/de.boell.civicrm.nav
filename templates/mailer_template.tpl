@@ -17,19 +17,19 @@
 
 {foreach from=$contact_data item=entity_data key=entity_name}
     <h3>{$entity_name}</h3>
-    <table style="width: 80%; table-layout: fixed; border: 1px; border-collapse: collapse;">
+    <table style="width: 80%; table-layout: fixed;  border-collapse: collapse;">
         <thead>
         <tr>
-            <th style="text-align: left;min-width: 500px;">Attribut</th>
-            <th style="text-align: left;min-width: 300px;">old</th>
-            <th style="text-align: left;min-width: 300px;">new</th>
+            <th style="text-align: left;min-width: 500px; border: 1px solid black; padding: 0.5em;">Attribut</th>
+            <th style="text-align: left;min-width: 300px; border: 1px solid black; padding: 0.5em;">old</th>
+            <th style="text-align: left;min-width: 300px; border: 1px solid black; padding: 0.5em;">new</th>
         </tr>
         <tbody>
         {foreach from=$entity_data item=data key=attribute}
         <tr>
-            <th style="text-align: left;min-width: 500px;">{$attribute}</th>
-            <td style="text-align: left;min-width: 300px;">{$data.old}</td>
-            <td style="text-align: left;min-width: 300px;">{$data.new}</td>
+            <th style="text-align: left;min-width: 500px; border: 1px solid black; padding: 0.5em;">{$attribute}</th>
+            <td style="text-align: left;min-width: 300px; border: 1px solid black; padding: 0.5em;">{$data.old}</td>
+            <td style="text-align: left;min-width: 300px; border: 1px solid black; padding: 0.5em;">{$data.new}</td>
         </tr>
         </tbody>
         {/foreach}
