@@ -98,14 +98,14 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
 
     foreach ($stw_data as $supervisor => $contact_data) {
       foreach ($contact_data as $contact_id => $contact_values) {
-        $val = [$contact_id => $contact_values];
-        $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $val, $this->_timestamp, $supervisor);
+        $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $contact_id, $contact_values, $this->_timestamp, $supervisor);
       }
     }
 
+    // TODO: FOR DEBUGGING ONLY
+return;
     foreach ($kred_deb_data as $contact_id => $contact_values) {
-      $val = [$contact_id => $contact_values];
-      $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $val, $this->_timestamp);
+      $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp);
     }
 
     // TODO: SET THIS For Live

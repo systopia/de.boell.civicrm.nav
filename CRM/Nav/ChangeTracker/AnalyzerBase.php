@@ -86,9 +86,9 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     ) {
       // add to caching array
       CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id] = [
-        'nav_id' => $result['values']['0'][CRM_Nav_Config::get('navision_custom_field')],
-        'kred_no' => $result['values']['0'][CRM_Nav_Config::get('creditor_custom_field_id')],
-        'deb_no' => $result['values']['0'][CRM_Nav_Config::get('debitor_custom_field_id')],
+        'navision_id' => $result['values']['0'][CRM_Nav_Config::get('navision_custom_field')],
+        'creditor_id' => $result['values']['0'][CRM_Nav_Config::get('creditor_custom_field_id')],
+        'debitor_id' => $result['values']['0'][CRM_Nav_Config::get('debitor_custom_field_id')],
       ];
       return TRUE;
     }

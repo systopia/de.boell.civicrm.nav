@@ -44,6 +44,7 @@ class CRM_Nav_Exporter_Mailer {
 
   /**
    * @param        $template_name
+   * @param        $contact_id
    * @param        $content
    * @param        $timestamp
    *
@@ -51,7 +52,7 @@ class CRM_Nav_Exporter_Mailer {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function create_email($template_name, $content, $timestamp, $supervisor = '') {
+  public function create_email($template_name, $contact_id, $content, $timestamp, $supervisor = '') {
     $values = [];
     switch ($template_name) {
       case CRM_Nav_Config::$studienwerk_temlpate_name:
@@ -73,8 +74,12 @@ class CRM_Nav_Exporter_Mailer {
     $values['contact_id'] = $this->sender_contact_id;
 
     $smarty_variables = [
-      'timestamp' => $timestamp,
-      'all_contact_data' => $content,
+      'timestamp'    => $timestamp,
+      'contact_id'   => $contact_id,
+      'navision_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['navision_id'],
+      'creditor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['creditor_id'],
+      'debitor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['debitor_id'],
+      'contact_data' => $content,
     ];
     $values['template_params'] = $smarty_variables;
     $result = civicrm_api3('MessageTemplate', 'send', $values);
@@ -127,10 +132,15 @@ class CRM_Nav_Exporter_Mailer {
   }
 
   private function set_studienwerk_subject($supervisor_suffix, $template_id) {
+    if ($supervisor_suffix != not_set) {
+      $subject = $supervisor_suffix . " - " . $this->subject;
+    } else {
+      $subject = $this->subject;
+    }
     $result = civicrm_api3('MessageTemplate', 'create', [
       'sequential'  => 1,
       'id'    => $template_id,
-      'msg_subject' => $supervisor_suffix . " - ". $this->subject,
+      'msg_subject' => $subject,
     ]);
   }
 }
