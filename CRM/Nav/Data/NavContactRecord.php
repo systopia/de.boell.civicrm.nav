@@ -52,7 +52,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
    */
   public function __construct($nav_data_after, $nav_data_before = NULL) {
     $this->org_name_1 = CRM_Nav_Config::get('org_name_1');
-    $this->org_name_2 = CRM_Nav_Config::get('org_name_1');
+    $this->org_name_2 = CRM_Nav_Config::get('org_name_2');
     $this->location_type_private = CRM_Nav_Config::get('location_type_private');
     $this->location_type_organization = CRM_Nav_Config::get('location_type_organization');
     $this->website_type_id = CRM_Nav_Config::get('website_type_id');
@@ -497,7 +497,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
           'contact_type' => "Organization",
           $this->org_name_1   => $org_name1,
           $this->org_name_2   => $org_name2,
-          'organization_name' => $org_name1 ." " . $org_name2,
+          'organization_name' => $org_name1 . " " . $org_name2,
           $this->navision_custom_field   => $this->get_nav_value_if_exist($nav_data, 'No'),        // NavisionID
         ];
       case 'Person':
