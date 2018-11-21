@@ -101,9 +101,6 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
         $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $contact_id, $contact_values, $this->_timestamp, $supervisor);
       }
     }
-
-    // TODO: FOR DEBUGGING ONLY
-return;
     foreach ($kred_deb_data as $contact_id => $contact_values) {
       $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp);
     }
