@@ -73,6 +73,7 @@ class CRM_Nav_Exporter_Mailer {
     $values['from'] = "\"{$this->email_name_from}\" <{$this->email_from}>";
     $values['contact_id'] = $this->sender_contact_id;
 
+    $this->add_translations($content);
     $smarty_variables = [
       'timestamp'    => $timestamp,
       'contact_id'   => $contact_id,
@@ -85,6 +86,40 @@ class CRM_Nav_Exporter_Mailer {
     $result = civicrm_api3('MessageTemplate', 'send', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("Error sending Emails to {$template_name}");
+    }
+  }
+
+  /**
+   * @param $content
+   */
+  private function add_translations(&$content) {
+    foreach ($content as $entity => &$values) {
+      if ($entity == 'CustomContact') {
+        // write default values to 'translation' field
+        foreach ($values as $table_name => &$table_values) {
+          $table_values['translation'] = $table_name;
+        }
+        continue;
+      }
+      try{
+        if ($entity == 'Contact') {
+          $class_name = "CRM_{$entity}_DAO_{$entity}";
+        } else {
+          $class_name = "CRM_Core_DAO_{$entity}";
+        }
+        $entity_fields = $class_name::fields();
+      } catch (Exception $e) {
+        CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Failed to get DAO Fields for Entity {$entity}");
+        continue;
+      }
+
+      foreach ($values as $table_name => &$table_values) {
+        if (isset($entity_fields[$table_name]['title'])) {
+          $table_values['translation'] = $entity_fields[$table_name]['title'];
+        } else {
+          $table_values['translation'] = $table_name;
+        }
+      }
     }
   }
 
