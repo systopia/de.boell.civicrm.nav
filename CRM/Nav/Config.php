@@ -36,7 +36,7 @@ class CRM_Nav_Config {
   public static $exculde_log_fields = [
     'log_date', 'log_user_id', 'log_action', 'log_conn_id', 'website_type_id', 'modified_date',
     'email_greeting_display', 'postal_greeting_display', 'addressee_display', 'email_greeting_custom',
-    'postal_greeting_id', 'postal_greeting_custom', 'addressee_custom', 'addressee_id',
+    'postal_greeting_id', 'postal_greeting_custom', 'addressee_custom', 'addressee_id', 'entity_id',
   ];
 
   private static $local_config = [
