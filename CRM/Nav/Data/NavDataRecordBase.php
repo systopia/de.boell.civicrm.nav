@@ -136,8 +136,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    */
   public function set_consumed(){
     $this->consumed = TRUE;
-    // TODO: set Transferred flag = 1
-    $this->nav_data_before['Transferred'] = 1;
+    $this->nav_data_after['Transferred'] = 1;
     if (isset($this->nav_data_before)) {
       $this->nav_data_before['Transferred'] = 1;
     }
@@ -229,6 +228,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
 
   public function set_error_message($message) {
     $this->error_message = $message;
+    $this->set_consumed();
   }
 
   /**
