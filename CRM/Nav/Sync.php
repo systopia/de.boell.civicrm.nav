@@ -86,6 +86,9 @@ class CRM_Nav_Sync {
     return; // for debugging reasons
     $updateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
     $soapConnector = $this->soap_connectors[$type];
+    if (!isset($soapConnector)) {
+      return;
+    }
     try{
       $soapConnector->executeCommand($updateMultipleCommand);
     } catch (Exception $e) {
