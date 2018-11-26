@@ -77,10 +77,6 @@ class CRM_Nav_Sync {
   private function set_consumed_records_transferred($type){
     $contact_records  = $this->get_records($type);
     foreach ($contact_records as $rec) {
-      // TODO: IS THIS COORECT?
-      if ($rec->is_consumed()) {
-        continue; // we don't set errors to Transferred for now?
-      }
       $soap_array["{$type}_List"][$type][] = $rec->get_nav_after_data();
       $tmp_nav_data = $rec->get_nav_before_data();
       if (isset($tmp_nav_data)) {
