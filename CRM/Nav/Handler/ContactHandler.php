@@ -37,6 +37,10 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       return;
     }
 
+    if (!empty($this->record->get_error_message())) {
+      return;
+    }
+
     if ($this->record->is_delete()) {
       $nav_id = $this->record->get_individual_navision_id();
       $contact_id = $this->get_contact_id_from_nav_id($nav_id);

@@ -32,7 +32,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
    *
    * @throws \Exception
    */
-  public function __construct($nav_data_after, $nav_data_before = NULL) {
+  public function __construct($nav_data_after, $nav_data_before = NULL, $debug = FALSE) {
     $this->hbs_contact_id = CRM_Nav_Config::get('hbs_contact_id');
     $this->relationship_type_mapping = [
     'Vertrauensdozent_in'       => CRM_Nav_Config::get('Vertrauensdozent_in'),
@@ -40,13 +40,13 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
     'Promotionsstipendiat_in'   => CRM_Nav_Config::get('Promotionsstipendiat_in'),
     'Auswahlkommissionsmitglied'=> CRM_Nav_Config::get('Auswahlkommissionsmitglied'),
     ];
-    parent::__construct($nav_data_after, $nav_data_before);
+    parent::__construct($nav_data_after, $nav_data_before, $debug);
   }
 
   /**
    * @throws \Exception
    */
-  protected function convert_to_civi_data() {
+  public function convert_to_civi_data() {
     // after data
     $nav_data                              = $this->get_nav_after_data();
     $this->civi_data_after['Contact']      = array(

@@ -18,7 +18,7 @@
 /**
  * Class CRM_Nav_ErrorHandler
  */
-class CRM_Nav_ErrorHandler extends CRM_Nav_Handler_HandlerBase {
+class CRM_Nav_Handler_ErrorHandler extends CRM_Nav_Handler_HandlerBase {
 
   public function __construct($record, $debug = false) {
     parent::__construct($record, $debug);
@@ -31,18 +31,18 @@ class CRM_Nav_ErrorHandler extends CRM_Nav_Handler_HandlerBase {
     if (!$this->check_record_type()) {
       return;      // nothing to do here
     }
+    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] ERROR " . $this->record->get_error_message());
     if ($this->debug) {
-      CRM_Core_Error::debug_log_message($this->record->get_change_type());
       $this->record->dump_record();
     }
-    // TODO: Gather Errors from Record or report Error (Email?) See #7616
   }
 
   /**
    * @return bool
    */
   protected function check_record_type() {
-    if ($this->record->get_error_message()) {
+    $error_message = $this->record->get_error_message();
+    if (empty($error_message)) {
       return FALSE;
     }
     return TRUE;

@@ -50,21 +50,21 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
    *
    * @throws \Exception
    */
-  public function __construct($nav_data_after, $nav_data_before = NULL) {
+  public function __construct($nav_data_after, $nav_data_before = NULL, $debug) {
     $this->org_name_1 = CRM_Nav_Config::get('org_name_1');
     $this->org_name_2 = CRM_Nav_Config::get('org_name_2');
     $this->location_type_private = CRM_Nav_Config::get('location_type_private');
     $this->location_type_organization = CRM_Nav_Config::get('location_type_organization');
     $this->website_type_id = CRM_Nav_Config::get('website_type_id');
 
-    parent::__construct($nav_data_after, $nav_data_before);
+    parent::__construct($nav_data_after, $nav_data_before, $debug);
     $this->matcher = new CRM_Nav_Data_NavContactMatcherCivi($this->navision_custom_field, $this->org_name_1, $this->org_name_2);
   }
 
   /**
    * @throws \Exception
    */
-  protected function convert_to_civi_data() {
+  public function convert_to_civi_data() {
     // set location data
     $this->set_location_type_ids();
     // contact_data
