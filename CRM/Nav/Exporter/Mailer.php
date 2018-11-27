@@ -36,6 +36,21 @@ class CRM_Nav_Exporter_Mailer {
     private $to_email_sw             = 'batroff@systopia.de';
     private $to_email_kred           = 'batroff@systopia.de';
 
+    private $custom_contact_translation = [
+      'navision_id' => 'Navision Id',
+      'creditor_id' => 'Kreditor Id',
+      'debitor_id'  => 'Debitor Id',
+    ];
+
+    private $entity_mapper = [
+      'Contact' => 'Kontakt',
+      'Address' => 'Adresse',
+      'CustomContact' => 'Extra Felder Kontakt',
+      'Email' => 'E-Mail',
+      'Phone' => 'Telefon',
+      'Website' => 'Webseite',
+    ];
+
   /**
    * CRM_Nav_Exporter_Mailer constructor.
    */
@@ -97,7 +112,11 @@ class CRM_Nav_Exporter_Mailer {
       if ($entity == 'CustomContact') {
         // write default values to 'translation' field
         foreach ($values as $table_name => &$table_values) {
-          $table_values['translation'] = $table_name;
+          if (array_key_exists($table_name, $this->custom_contact_translation)) {
+            $table_values['translation'] = $this->custom_contact_translation[$table_name];
+          } else {
+            $table_values['translation'] = $table_name;
+          }
         }
         continue;
       }
@@ -120,6 +139,15 @@ class CRM_Nav_Exporter_Mailer {
           $table_values['translation'] = $table_name;
         }
       }
+    }
+    // Entity translation
+    foreach ($content as $entity => &$values) {
+      if (!array_key_exists($entity, $this->entity_mapper)) {
+        continue;
+      }
+      // Add Entity translation and move array
+      $content[$this->entity_mapper[$entity]] = $values;
+      unset($content[$entity]);
     }
   }
 
