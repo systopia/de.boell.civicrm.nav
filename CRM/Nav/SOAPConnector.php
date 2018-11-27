@@ -104,7 +104,8 @@ class CRM_Nav_SOAPConnector {
    * TODO: make this configurable? (config file, settings form...)
    */
   private function setSoapLocations($type){
-    $this->location = "http://10.1.0.148:7037/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/{$type}";
+    $soap_url = CRM_Nav_Config::get_soap_url();
+    $this->location = $soap_url . $type;
   }
 
   /**

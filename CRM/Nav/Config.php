@@ -22,6 +22,13 @@ class CRM_Nav_Config {
 
   private static $local        = TRUE;
 
+  private static $is_dev       = TRUE;
+
+  private static $soap_url     = [
+    'pro' => 'http://10.1.0.143:7077/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
+    'dev' => 'http://10.1.0.148:7037/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
+  ];
+
   private static $candidature_process_code_option_value_cache = [];
 
   public static  $filter       = [
@@ -206,6 +213,18 @@ class CRM_Nav_Config {
    */
   public static function local() {
     return self::$local;
+  }
+
+  public static function is_dev() {
+    return self::$is_dev;
+  }
+
+  public static function get_soap_url() {
+    if (self::$is_dev) {
+      return self::$soap_url['dev'];
+    } else {
+      return self::$soap_url['pro'];
+    }
   }
 
   public static function get_last_timestamp() {
