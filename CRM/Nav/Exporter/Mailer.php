@@ -153,6 +153,15 @@ class CRM_Nav_Exporter_Mailer {
     }
   }
 
+  /**
+   * Get contact name (first_name last_name, or if those are
+   * empty display_name)
+   *
+   * @param $contact_id
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
   private function get_contact_name($contact_id) {
     $result = civicrm_api3('Contact', 'get', array(
       'sequential' => 1,
@@ -213,6 +222,12 @@ class CRM_Nav_Exporter_Mailer {
     return $result['id'];
   }
 
+  /**
+   * @param $supervisor_suffix
+   * @param $template_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function set_studienwerk_subject($supervisor_suffix, $template_id) {
     if ($supervisor_suffix != not_set) {
       $subject = $supervisor_suffix . " - " . $this->subject;
