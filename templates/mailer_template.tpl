@@ -1,4 +1,4 @@
-<h2>Änderungen in CiviCRM an Navision Kontakten seit {$timestamp}</h2>
+<h2>Änderungen in CiviCRM an NAV-Kontakten, {$timestamp}</h2>
 
 <h2>
     Kontakt: {$contact_name} ({$contact_id})
