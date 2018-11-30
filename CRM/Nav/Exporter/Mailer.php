@@ -89,9 +89,11 @@ class CRM_Nav_Exporter_Mailer {
     $values['contact_id'] = $this->sender_contact_id;
 
     $this->add_translations($content);
+    $contact_name = $this->get_contact_name($contact_id);
     $smarty_variables = [
       'timestamp'    => $timestamp,
       'contact_id'   => $contact_id,
+      'contact_name' => $contact_name,
       'navision_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['navision_id'],
       'creditor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['creditor_id'],
       'debitor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['debitor_id'],
@@ -148,6 +150,23 @@ class CRM_Nav_Exporter_Mailer {
       // Add Entity translation and move array
       $content[$this->entity_mapper[$entity]] = $values;
       unset($content[$entity]);
+    }
+  }
+
+  private function get_contact_name($contact_id) {
+    $result = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'return' => array("first_name", "last_name", "display_name"),
+      'id' => $contact_id,
+    ));
+    if ($result['count'] == '1') {
+      if (empty($result['values']['0']['first_name']) && empty($result['values']['0']['last_name'])) {
+        // use display name instead
+        $name = $result['values']['0']['display_name'];
+      } else {
+        $name = $result['values']['0']['first_name'] . " " . $result['values']['0']['last_name'];
+      }
+      return $name;
     }
   }
 
