@@ -49,6 +49,7 @@ class CRM_Nav_Config {
   ];
 
   private static $local_config = [
+    'db_log_id'                       => '222',
     'hbs_contact_id'                  => '4',
     'navision_custom_field'           => 'custom_41',
     'process_id'                      => 'custom_172',
@@ -111,6 +112,7 @@ class CRM_Nav_Config {
   }
 
   private static $hbs_config   = [
+    'db_log_id'                       => '2',
     'hbs_contact_id'                  => '4',
     'navision_custom_field'           => 'custom_147',
     'process_id'                      => 'custom_126',
