@@ -152,6 +152,11 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   protected function eval_data() {
     //    iterate over all after values; $key = EntityId, Value = value array
     foreach ($this->last_after_values as $key => $value) {
+      if ($value['log_user_id'] == CRM_Nav_Config::get('db_log_id')) {
+        // if log user is navision user we skip this log entry,
+        // otherwise we have circular notifications
+        continue;
+      }
       $contact_id = $this->_record_ids[$key];
 
       // if no before value exists: New entry --> log all after values and skip rest
