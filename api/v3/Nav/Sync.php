@@ -34,6 +34,10 @@ function civicrm_api3_nav_Sync($params) {
       }
     }
   }
+  $userID = CRM_Nav_Config::get('db_log_id');
+  CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+    array(1 => array($userID, 'Integer'))
+  );
   $runner = new CRM_Nav_Sync($params['poll_size'], $params['debug'], $params['entity']);
   try {
     $number_of_parsed_entries = $runner->run();
