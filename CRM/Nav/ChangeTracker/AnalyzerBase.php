@@ -161,14 +161,14 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
           $supervisor = CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'];
           foreach ($value as $k => $v) {
             if (!in_array($k, CRM_Nav_Config::$exculde_log_fields) && !empty($v)) {
-              $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['new'] = $v;
+              $this->changed_studienwerk_values[$supervisor][$contact_id][$key][$k]['new'] = $v;
             }
           }
           continue;
         } else {
           foreach ($value as $k => $v) {
             if (!in_array($k, CRM_Nav_Config::$exculde_log_fields) && !empty($v)) {
-              $this->changed_values[$contact_id][$k]['new'] = $v;
+              $this->changed_values[$contact_id][$key][$k]['new'] = $v;
             }
           }
           continue;
@@ -179,15 +179,15 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
         foreach ($value as $k => $v) {
           $supervisor = CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'];
           if ($v != $this->last_before_values[$key][$k] && !in_array($k, CRM_Nav_Config::$exculde_log_fields)) {
-            $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['new'] = $v;
-            $this->changed_studienwerk_values[$supervisor][$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
+            $this->changed_studienwerk_values[$supervisor][$contact_id][$key][$k]['new'] = $v;
+            $this->changed_studienwerk_values[$supervisor][$contact_id][$key][$k]['old'] = $this->last_before_values[$key][$k];
           }
         }
       } else {
         foreach ($value as $k => $v) {
           if ($v != $this->last_before_values[$key][$k] && !in_array($k, CRM_Nav_Config::$exculde_log_fields)) {
-            $this->changed_values[$contact_id][$k]['new'] = $v;
-            $this->changed_values[$contact_id][$k]['old'] = $this->last_before_values[$key][$k];
+            $this->changed_values[$contact_id][$key][$k]['new'] = $v;
+            $this->changed_values[$contact_id][$key][$k]['old'] = $this->last_before_values[$key][$k];
           }
         }
       }
