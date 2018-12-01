@@ -44,7 +44,8 @@ class CRM_Nav_Config {
     'log_date', 'log_user_id', 'log_action', 'log_conn_id', 'website_type_id', 'modified_date',
     'email_greeting_display', 'postal_greeting_display', 'addressee_display', 'email_greeting_custom',
     'postal_greeting_id', 'postal_greeting_custom', 'addressee_custom', 'addressee_id',
-    'entity_id', 'id', 'hash',
+    'entity_id', 'id', 'hash', 'phone_numeric', 'contact_id', 'is_primary',
+    'location_type_id', 'phone_type_id',
   ];
 
   private static $local_config = [
