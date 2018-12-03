@@ -34,15 +34,26 @@ function civicrm_api3_nav_Sync($params) {
       }
     }
   }
-  $userID = CRM_Nav_Config::get('db_log_id');
+  $core_config = CRM_Core_Config::singleton();
+  $nav_userID = CRM_Nav_Config::get('db_log_id');
+  $current_id = CRM_Core_DAO::singleValueQuery('SELECT @civicrm_user_id');
+
   CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
-    array(1 => array($userID, 'Integer'))
+    array(1 => array($nav_userID, 'Integer'))
   );
+
   $runner = new CRM_Nav_Sync($params['poll_size'], $params['debug'], $params['entity']);
   try {
     $number_of_parsed_entries = $runner->run();
   } catch (Exception $e) {
+    CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+      array(1 => array($current_id, 'Integer'))
+    );
     throw new API_Exception("Error occurred while parsing Navision Records. Error Message: " . $e->getMessage());
   }
+
+  CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+    array(1 => array($current_id, 'Integer'))
+  );
   return civicrm_api3_create_success(array($number_of_parsed_entries), $params, 'Nav', 'Sync');
 }

@@ -76,15 +76,18 @@ class CRM_Nav_Sync {
   }
 
   private function set_consumed_records_transferred($type){
-    $contact_records  = $this->get_records($type);
-    foreach ($contact_records as $rec) {
+    $navision_records  = $this->get_records($type);
+    if (empty($navision_records)) {
+      return;
+    }
+    foreach ($navision_records as $rec) {
       $soap_array["{$type}_List"][$type][] = $rec->get_nav_after_data();
       $tmp_nav_data = $rec->get_nav_before_data();
       if (isset($tmp_nav_data)) {
         $soap_array["{$type}_List"][$type][] = $tmp_nav_data;
       }
     }
-    return; // for debugging reasons
+//    return; // for debugging reasons
     $updateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
     $soapConnector = $this->soap_connectors[$type];
     if (!isset($soapConnector)) {
