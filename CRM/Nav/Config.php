@@ -20,9 +20,9 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = TRUE;
+  private static $local        = FALSE;
 
-  private static $is_dev       = TRUE;
+  private static $is_dev       = FALSE;
 
   private static $soap_url     = [
     'pro' => 'http://10.1.0.143:7077/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
@@ -112,7 +112,7 @@ class CRM_Nav_Config {
   }
 
   private static $hbs_config   = [
-    'db_log_id'                       => '2',
+    'db_log_id'                       => '145801',
     'hbs_contact_id'                  => '4',
     'navision_custom_field'           => 'custom_147',
     'process_id'                      => 'custom_126',
