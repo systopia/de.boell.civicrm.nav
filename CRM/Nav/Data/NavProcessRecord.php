@@ -30,14 +30,14 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
    *
    * @throws \Exception
    */
-  public function __construct($nav_data_after, $nav_data_before = NULL) {
-    parent::__construct($nav_data_after, $nav_data_before);
+  public function __construct($nav_data_after, $nav_data_before = NULL, $debug = FALSE) {
+    parent::__construct($nav_data_after, $nav_data_before, $debug);
   }
 
   /**
    * convert_to_civi_data
    */
-  protected function convert_to_civi_data() {
+  public function convert_to_civi_data() {
     $nav_data = $this->get_nav_after_data();
     // get contact details
     $this->civi_data_after['Contact'] = [
@@ -129,9 +129,10 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
         // Promotionsstipendiat/in
         return CRM_Nav_Config::get('Graduation');
       default:
+        throw new Exception("Invalid Advancement Type {$advancement}");
         // default value Currently is just Studienstipendiat ?
-        $this->log("Couldn't map Advancement Type {$advancement} to relationship_type_id. Default (12 - Studienstipendiat/in) is used");
-        return CRM_Nav_Config::get('Study');
+//        $this->log("Couldn't map Advancement Type {$advancement} to relationship_type_id. Default (12 - Studienstipendiat/in) is used");
+//        return CRM_Nav_Config::get('Study');
     }
   }
 

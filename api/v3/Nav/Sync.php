@@ -26,19 +26,34 @@ function _civicrm_api3_nav_Sync_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_nav_Sync($params) {
-    if (isset($params['entity'])) {
-      $valid_values = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
-      foreach ($params['entity'] as $entity) {
-        if (!in_array($entity, $valid_values)) {
-          throw new API_Exception("Invalid entity parameter {$entity}");
-        }
+  if (isset($params['entity'])) {
+    $valid_values = array ('civiContact', 'civiProcess', 'civiContRelation', 'civiContStatus');
+    foreach ($params['entity'] as $entity) {
+      if (!in_array($entity, $valid_values)) {
+        throw new API_Exception("Invalid entity parameter {$entity}");
       }
     }
-    $runner = new CRM_Nav_Sync($params['poll_size'], $params['debug'], $params['entity']);
-    try {
-      $number_of_parsed_entries = $runner->run();
-    } catch (Exception $e) {
-      throw new API_Exception("Error occurred while parsing Navision Records. Error Message: " . $e->getMessage());
-    }
-    return civicrm_api3_create_success(array($number_of_parsed_entries), $params, 'Nav', 'Sync');
+  }
+  $core_config = CRM_Core_Config::singleton();
+  $nav_userID = CRM_Nav_Config::get('db_log_id');
+  $current_id = CRM_Core_DAO::singleValueQuery('SELECT @civicrm_user_id');
+
+  CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+    array(1 => array($nav_userID, 'Integer'))
+  );
+
+  $runner = new CRM_Nav_Sync($params['poll_size'], $params['debug'], $params['entity']);
+  try {
+    $number_of_parsed_entries = $runner->run();
+  } catch (Exception $e) {
+    CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+      array(1 => array($current_id, 'Integer'))
+    );
+    throw new API_Exception("Error occurred while parsing Navision Records. Error Message: " . $e->getMessage());
+  }
+
+  CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+    array(1 => array($current_id, 'Integer'))
+  );
+  return civicrm_api3_create_success(array($number_of_parsed_entries), $params, 'Nav', 'Sync');
 }

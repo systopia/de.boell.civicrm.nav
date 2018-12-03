@@ -51,6 +51,13 @@ class CRM_Nav_Exporter_Mailer {
       'Website' => 'Webseite',
     ];
 
+    private $location_type_entities = [
+      'Address', 'Email', 'Phone',
+    ];
+
+    private $phone_types = [];
+    private $location_types = [];
+
   /**
    * CRM_Nav_Exporter_Mailer constructor.
    */
@@ -89,9 +96,11 @@ class CRM_Nav_Exporter_Mailer {
     $values['contact_id'] = $this->sender_contact_id;
 
     $this->add_translations($content);
+    $contact_name = $this->get_contact_name($contact_id);
     $smarty_variables = [
       'timestamp'    => $timestamp,
       'contact_id'   => $contact_id,
+      'contact_name' => $contact_name,
       'navision_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['navision_id'],
       'creditor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['creditor_id'],
       'debitor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['debitor_id'],
@@ -111,11 +120,14 @@ class CRM_Nav_Exporter_Mailer {
     foreach ($content as $entity => &$values) {
       if ($entity == 'CustomContact') {
         // write default values to 'translation' field
-        foreach ($values as $table_name => &$table_values) {
-          if (array_key_exists($table_name, $this->custom_contact_translation)) {
-            $table_values['translation'] = $this->custom_contact_translation[$table_name];
-          } else {
-            $table_values['translation'] = $table_name;
+        foreach ($values as $entity_id => &$e_values) {
+          foreach ($e_values as $table_name => &$table_values) {
+            if (array_key_exists($table_name, $this->custom_contact_translation)) {
+              $table_values['translation'] = $this->custom_contact_translation[$table_name];
+            }
+            else {
+              $table_values['translation'] = $table_name;
+            }
           }
         }
         continue;
@@ -131,12 +143,17 @@ class CRM_Nav_Exporter_Mailer {
         CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Failed to get DAO Fields for Entity {$entity}");
         continue;
       }
-
-      foreach ($values as $table_name => &$table_values) {
-        if (isset($entity_fields[$table_name]['title'])) {
-          $table_values['translation'] = $entity_fields[$table_name]['title'];
-        } else {
-          $table_values['translation'] = $table_name;
+      foreach ($values as $entity_id => &$e_values) {
+        foreach ($e_values as $table_name => &$table_values) {
+          if (isset($entity_fields[$table_name]['title'])) {
+            if (in_array($entity, $this->location_type_entities)) {
+              $table_values['translation'] = $this->get_location_type($entity, $entity_id, $entity_fields[$table_name]['title']);
+            } else {
+              $table_values['translation'] = $entity_fields[$table_name]['title'];
+            }
+          } else {
+            $table_values['translation'] = $table_name;
+          }
         }
       }
     }
@@ -148,6 +165,80 @@ class CRM_Nav_Exporter_Mailer {
       // Add Entity translation and move array
       $content[$this->entity_mapper[$entity]] = $values;
       unset($content[$entity]);
+    }
+  }
+
+  /**
+   * @param $entity
+   * @param $entity_id
+   * @param $translated_entity
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_location_type($entity, $entity_id, $translated_entity) {
+    $result = civicrm_api3($entity, 'getsingle', array(
+      'sequential' => 1,
+      'id' => $entity_id,
+    ));
+    $this->get_location_type_mapping();
+    if ($entity == 'Phone') {
+      $this->get_phone_type();
+      return $this->phone_types[$result['phone_type_id']] . " (" . $this->location_types[$result['location_type_id']] . ")";
+    }
+    return $translated_entity . " (" . $this->location_types[$result['location_type_id']] . ")";
+  }
+
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_location_type_mapping() {
+    $result = civicrm_api3('LocationType', 'get', array(
+      'sequential' => 1,
+    ));
+    foreach ($result['values'] as $location_types) {
+      $this->location_types[$location_types['id']] = $location_types['name'];
+    }
+  }
+
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_phone_type() {
+    if (empty($this->phone_types)) {
+      $result = civicrm_api3('OptionValue', 'get', array(
+        'sequential' => 1,
+        'option_group_id' => "phone_type",
+      ));
+      foreach ($result['values'] as $values) {
+        $this->phone_types[$values['value']] = $values['label'];
+      }
+    }
+  }
+
+  /**
+   * Get contact name (first_name last_name, or if those are
+   * empty display_name)
+   *
+   * @param $contact_id
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_contact_name($contact_id) {
+    $result = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'return' => array("first_name", "last_name", "display_name"),
+      'id' => $contact_id,
+    ));
+    if ($result['count'] == '1') {
+      if (empty($result['values']['0']['first_name']) && empty($result['values']['0']['last_name'])) {
+        // use display name instead
+        $name = $result['values']['0']['display_name'];
+      } else {
+        $name = $result['values']['0']['first_name'] . " " . $result['values']['0']['last_name'];
+      }
+      return $name;
     }
   }
 
@@ -194,6 +285,12 @@ class CRM_Nav_Exporter_Mailer {
     return $result['id'];
   }
 
+  /**
+   * @param $supervisor_suffix
+   * @param $template_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function set_studienwerk_subject($supervisor_suffix, $template_id) {
     if ($supervisor_suffix != not_set) {
       $subject = $supervisor_suffix . " - " . $this->subject;

@@ -33,16 +33,16 @@ class CRM_Nav_Data_NavRelationshipRecord extends CRM_Nav_Data_NavDataRecordBase 
    *
    * @throws \Exception
    */
-  public function __construct($nav_data_after, $nav_data_before = NULL) {
+  public function __construct($nav_data_after, $nav_data_before = NULL, $debug = FALSE) {
     $this->creditor_custom_field_id = CRM_Nav_Config::get('creditor_custom_field_id');
     $this->debitor_custom_field_id = CRM_Nav_Config::get('debitor_custom_field_id');
-    parent::__construct($nav_data_after, $nav_data_before);
+    parent::__construct($nav_data_after, $nav_data_before, $debug);
   }
 
   /**
    * @throws \Exception
    */
-  protected function convert_to_civi_data() {
+  public function convert_to_civi_data() {
     $nav_data                         = $this->get_nav_after_data();
     $relation_code = $this->get_nav_value_if_exist($nav_data, 'Business_Relation_Code');
     $this->civi_data_after['Contact'] = array(

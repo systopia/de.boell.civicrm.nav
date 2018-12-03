@@ -32,6 +32,9 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
 
   private $_timestamp;
   private $_execute_timestamp;
+  private $email_counter;
+  private $error_counter;
+  private $entity_counter;
 
   private $Contact;
   private $Address;
@@ -64,7 +67,10 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
       $this->_entities = [$entity];
     }
 
-    $this->debug = $debug;
+    $this->debug          = $debug;
+    $this->email_counter  = '0';
+    $this->error_counter  = '0';
+    $this->entity_counter = '0';
 
     $this->_timestamp = CRM_Nav_Config::get_last_timestamp();
     if (empty($this->_timestamp)) {
@@ -98,15 +104,29 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
 
     foreach ($stw_data as $supervisor => $contact_data) {
       foreach ($contact_data as $contact_id => $contact_values) {
-        $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $contact_id, $contact_values, $this->_timestamp, $supervisor);
+        try{
+          $mailer->create_email(CRM_Nav_Config::$studienwerk_temlpate_name, $contact_id, $contact_values, $this->_timestamp, $supervisor);
+          $this->email_counter += 1;
+        } catch (Exception $e) {
+          $this->error_counter += 1;
+          CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Create Mail failed for {$contact_id}. Values: " . json_encode($contact_values));
+          continue;
+        }
       }
     }
     foreach ($kred_deb_data as $contact_id => $contact_values) {
-      $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp);
+      try{
+        $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp);
+        $this->email_counter += 1;
+      } catch (Exception $e) {
+        $this->error_counter += 1;
+        CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Create Mail failed for {$contact_id}. Values: " . json_encode($contact_values));
+        continue;
+      }
     }
 
     // TODO: SET THIS For Live
-//    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
+    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
   }
 
   /**
@@ -117,6 +137,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     foreach ($this->_entities as $entity) {
       $entity_changed_data = $this->{$entity}->get_changed_studienwerk_data();
       foreach ($entity_changed_data as $supervisor => $values) {
+        $this->entity_counter += 1;
         foreach ($values as $contact_id => $entity_values) {
           $result_changed_data[$supervisor][$contact_id][$entity] = $entity_values;
         }
@@ -133,6 +154,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     foreach ($this->_entities as $entity) {
       $entity_changed_data = $this->{$entity}->get_changed_data();
       foreach ($entity_changed_data as $contact_id => $values) {
+        $this->entity_counter += 1;
         $result_changed_data[$contact_id][$entity] = $values;
       }
     }
@@ -159,7 +181,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
    * @return string
    */
   public function get_stats() {
-    return "Log Analyze Stats Runner - implement me!";
+    return "Tracked {$this->entity_counter} changed entities. Sent {$this->email_counter} Emails. Error Count: {$this->error_counter}";
   }
 
 }

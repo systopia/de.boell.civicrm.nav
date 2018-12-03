@@ -15,10 +15,21 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_ChangeTracker_RelationshipAnalyzer
+ */
 class CRM_Nav_ChangeTracker_RelationshipAnalyzer extends CRM_Nav_ChangeTracker_AnalyzerBase {
 
   private $relationship_cache;
 
+  /**
+   * CRM_Nav_ChangeTracker_RelationshipAnalyzer constructor.
+   *
+   * @param $timestamp
+   * @param $debug
+   *
+   * @throws \Exception
+   */
   public function __construct($timestamp, $debug) {
     $this->_select_fields = ['id', 'entity_id'];
     $this->type = 'Relationship';
@@ -28,10 +39,20 @@ class CRM_Nav_ChangeTracker_RelationshipAnalyzer extends CRM_Nav_ChangeTracker_A
     parent::__construct($timestamp, $debug);
   }
 
+  /**
+   * @return mixed|string
+   */
   protected function get_my_class_name() {
     return get_class();
   }
 
+
+  /**
+   * @param $query
+   *
+   * @return mixed|void
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function eval_query(&$query) {
     if (!isset($this->_record_ids[$query->id])) {
       $contact_id = $this->get_relationship_contact_id($query->entity_id);
@@ -44,6 +65,12 @@ class CRM_Nav_ChangeTracker_RelationshipAnalyzer extends CRM_Nav_ChangeTracker_A
     }
   }
 
+  /**
+   * @param $relationship_id
+   *
+   * @return mixed|string
+   * @throws \CiviCRM_API3_Exception
+   */
   private function get_relationship_contact_id($relationship_id) {
     if (isset($this->relationship_cache[$relationship_id])) {
       return $this->relationship_cache[$relationship_id];

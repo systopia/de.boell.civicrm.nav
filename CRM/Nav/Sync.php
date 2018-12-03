@@ -60,7 +60,8 @@ class CRM_Nav_Sync {
     $this->set_consumed_records_transferred('civiProcess');
     $this->set_consumed_records_transferred('civiContStatus');
 
-
+    // log errors
+    $this->cleanup_handling();
 
     return $this->number_of_records;
   }
@@ -75,15 +76,18 @@ class CRM_Nav_Sync {
   }
 
   private function set_consumed_records_transferred($type){
-    $contact_records  = $this->get_records($type);
-    foreach ($contact_records as $rec) {
+    $navision_records  = $this->get_records($type);
+    if (empty($navision_records)) {
+      return;
+    }
+    foreach ($navision_records as $rec) {
       $soap_array["{$type}_List"][$type][] = $rec->get_nav_after_data();
       $tmp_nav_data = $rec->get_nav_before_data();
       if (isset($tmp_nav_data)) {
         $soap_array["{$type}_List"][$type][] = $tmp_nav_data;
       }
     }
-    return; // for debugging reasons
+//    return; // for debugging reasons
     $updateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
     $soapConnector = $this->soap_connectors[$type];
     if (!isset($soapConnector)) {
@@ -92,7 +96,7 @@ class CRM_Nav_Sync {
     try{
       $soapConnector->executeCommand($updateMultipleCommand);
     } catch (Exception $e) {
-      $this->log($e->getMessage());
+      CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] ERROR " . $e->getMessage());
       throw new Exception("UpdateMultiple Command failed, didn't set DataRecords for type {$type} to Transferred. Message: " . $e->getMessage());
     }
   }
@@ -195,26 +199,37 @@ class CRM_Nav_Sync {
   /**
    *
    * create DataRecord for specified Navision Entity
+   *
    * @param      $data
    * @param      $entity
    * @param null $before
    *
-   * @return \CRM_Nav_Data_NavContact|\CRM_Nav_Data_NavProcess|\CRM_Nav_Data_NavRelationship|\CRM_Nav_Data_NavStatus
+   * @return \CRM_Nav_Data_NavContact|\CRM_Nav_Data_NavContactRecord|\CRM_Nav_Data_NavProcess|\CRM_Nav_Data_NavProcessRecord|\CRM_Nav_Data_NavRelationship|\CRM_Nav_Data_NavRelationshipRecord|\CRM_Nav_Data_NavStatus|\CRM_Nav_Data_NavStatusRecord
    * @throws \Exception
    */
   private function create_nav_data_record($data, $entity, $before = NULL) {
     switch ($entity) {
       case 'civiContact':
-        return new CRM_Nav_Data_NavContactRecord($data, $before, $this->debug);
+        $record = new CRM_Nav_Data_NavContactRecord($data, $before, $this->debug);
+        break;
       case 'civiProcess':
-        return new CRM_Nav_Data_NavProcessRecord($data, $before, $this->debug);
+        $record =  new CRM_Nav_Data_NavProcessRecord($data, $before, $this->debug);
+        break;
       case 'civiContRelation':
-        return new CRM_Nav_Data_NavRelationshipRecord($data, $before, $this->debug);
+        $record =  new CRM_Nav_Data_NavRelationshipRecord($data, $before, $this->debug);
+        break;
       case 'civiContStatus':
-        return new CRM_Nav_Data_NavStatusRecord($data, $before, $this->debug);
+        $record =  new CRM_Nav_Data_NavStatusRecord($data, $before, $this->debug);
+        break;
       default:
         throw new Exception("Invalid Navision Entity Type {$entity}. Couldn't create DataRecord.");
     }
+    try{
+      $record->convert_to_civi_data();
+    } catch (Exception $e) {
+      $record->set_error_message($e->getMessage());
+    }
+    return $record;
   }
 
   /**
@@ -242,7 +257,7 @@ class CRM_Nav_Sync {
   private function cleanup_handling() {
     foreach ($this->entity as $entity) {
       foreach ($this->get_records($entity) as $record) {
-        $error_handler  = new CRM_Nav_ErrorHandler($record, $this->debug);
+        $error_handler  = new CRM_Nav_Handler_ErrorHandler($record, $this->debug);
         $error_handler->process();
       }
     }

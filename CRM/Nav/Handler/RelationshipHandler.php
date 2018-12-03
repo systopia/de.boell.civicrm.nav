@@ -44,6 +44,10 @@ class CRM_Nav_Handler_RelationshipHandler extends CRM_Nav_Handler_HandlerBase {
     if (!$this->check_record_type()) {
       return;
     }
+    if (!empty($this->record->get_error_message())) {
+      return;
+    }
+
     $nav_id = $this->record->get_individual_navision_id();
     $contact_id = $this->get_contact_id_from_nav_id($nav_id);
     if (empty($contact_id)) {

@@ -55,7 +55,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $this->set_timestamp();
     $this->change_type = $this->get_nav_value_if_exist($this->nav_data_after, 'Change_Type');
     $this->compare_data();
-    $this->convert_to_civi_data();
+//    $this->convert_to_civi_data();
     $this->debug = $debug;
   }
 
@@ -209,7 +209,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     $dump['nav_before'] = $this->nav_data_before;
     $dump['civi_extra_data']  = $this->civi_data_after;
     $dump['changed_data']  = $this->changed_data;
-    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] DUMP: ". json_encode($dump));
+    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Record: ". json_encode($dump));
   }
 
   /**
@@ -258,5 +258,5 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
     }
   }
 
-  abstract protected function convert_to_civi_data();
+  abstract public function convert_to_civi_data();
 }

@@ -20,7 +20,14 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = TRUE;
+  private static $local        = FALSE;
+
+  private static $is_dev       = FALSE;
+
+  private static $soap_url     = [
+    'pro' => 'http://10.1.0.143:7077/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
+    'dev' => 'http://10.1.0.148:7037/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
+  ];
 
   private static $candidature_process_code_option_value_cache = [];
 
@@ -37,10 +44,12 @@ class CRM_Nav_Config {
     'log_date', 'log_user_id', 'log_action', 'log_conn_id', 'website_type_id', 'modified_date',
     'email_greeting_display', 'postal_greeting_display', 'addressee_display', 'email_greeting_custom',
     'postal_greeting_id', 'postal_greeting_custom', 'addressee_custom', 'addressee_id',
-    'entity_id', 'id', 'hash',
+    'entity_id', 'id', 'hash', 'phone_numeric', 'contact_id', 'is_primary',
+    'location_type_id', 'phone_type_id',
   ];
 
   private static $local_config = [
+    'db_log_id'                       => '222',
     'hbs_contact_id'                  => '4',
     'navision_custom_field'           => 'custom_41',
     'process_id'                      => 'custom_172',
@@ -103,6 +112,7 @@ class CRM_Nav_Config {
   }
 
   private static $hbs_config   = [
+    'db_log_id'                       => '145801',
     'hbs_contact_id'                  => '4',
     'navision_custom_field'           => 'custom_147',
     'process_id'                      => 'custom_126',
@@ -206,6 +216,18 @@ class CRM_Nav_Config {
    */
   public static function local() {
     return self::$local;
+  }
+
+  public static function is_dev() {
+    return self::$is_dev;
+  }
+
+  public static function get_soap_url() {
+    if (self::$is_dev) {
+      return self::$soap_url['dev'];
+    } else {
+      return self::$soap_url['pro'];
+    }
   }
 
   public static function get_last_timestamp() {
