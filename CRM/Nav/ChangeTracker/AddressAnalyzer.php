@@ -15,8 +15,19 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_ChangeTracker_AddressAnalyzer
+ */
 class CRM_Nav_ChangeTracker_AddressAnalyzer extends CRM_Nav_ChangeTracker_AnalyzerBase {
 
+  /**
+   * CRM_Nav_ChangeTracker_AddressAnalyzer constructor.
+   *
+   * @param $timestamp
+   * @param $debug
+   *
+   * @throws \Exception
+   */
   public function __construct($timestamp, $debug) {
     $this->_select_fields = ['id', 'contact_id'];
     $this->type = 'Address';
@@ -25,11 +36,17 @@ class CRM_Nav_ChangeTracker_AddressAnalyzer extends CRM_Nav_ChangeTracker_Analyz
   }
 
 
+  /**
+   * @return string
+   */
   protected function get_my_class_name() {
     return get_class();
   }
 
 
+  /**
+   * @param $query
+   */
   protected function eval_query(&$query) {
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->contact_id)) {

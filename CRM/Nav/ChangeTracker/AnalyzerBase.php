@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_ChangeTracker_AnalyzerBase
+ */
 abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
 
   protected $_record_ids;
@@ -36,6 +39,14 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
   protected $changed_studienwerk_values;
   protected $changed_values;
 
+  /**
+   * CRM_Nav_ChangeTracker_AnalyzerBase constructor.
+   *
+   * @param      $timestamp
+   * @param bool $debug
+   *
+   * @throws \Exception
+   */
   public function __construct($timestamp, $debug = FALSE) {
     $this->_timestamp = $timestamp;
     $this->debug = $debug;
@@ -50,7 +61,9 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
-
+  /**
+   *
+   */
   public function run() {
     $this->get_changed_navision_contacts($this->_select_fields);
     $this->parse_log_data_before();
@@ -58,14 +71,27 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $this->eval_data();
   }
 
+  /**
+   * @return array
+   */
   public function get_changed_studienwerk_data() {
     return $this->changed_studienwerk_values;
   }
 
+  /**
+   * @return array
+   */
   public function get_changed_data() {
     return $this->changed_values;
   }
 
+
+  /**
+   * @param $contact_id
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function is_nav_contact($contact_id) {
     if (isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id])) {
       return TRUE;
@@ -111,6 +137,10 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
+
+  /**
+   *
+   */
   protected function parse_log_data_before() {
     $sql = "select * FROM {$this->_log_table} WHERE log_date <= '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
@@ -123,6 +153,10 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
+
+  /**
+   *
+   */
   protected function parse_log_data_after() {
     $sql = "select * FROM {$this->_log_table} WHERE log_date > '{$this->_timestamp}'";
     $query = CRM_Core_DAO::executeQuery($sql);
@@ -135,6 +169,9 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
+  /**
+   * @param $message
+   */
   protected function log($message)  {
     if ($this->debug) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav - {$this->get_my_class_name()}] " . $message);
@@ -199,6 +236,13 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     }
   }
 
+
+  /**
+   * @param $contact_id
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
   private function is_studienwerk($contact_id) {
     if (isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor']) &&
         CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'] == '')
@@ -248,10 +292,22 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     return $supervisor;
   }
 
+  /**
+   * @return mixed
+   */
   abstract protected function get_my_class_name();
 
+  /**
+   * @param $query
+   *
+   * @return mixed
+   */
   abstract protected function eval_query(&$query);
 
+
+  /**
+   * @return mixed
+   */
   public function get_entity_type() {
     return $this->type;
   }

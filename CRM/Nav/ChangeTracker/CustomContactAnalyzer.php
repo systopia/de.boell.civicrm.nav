@@ -15,8 +15,19 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_ChangeTracker_CustomContactAnalyzer
+ */
 class CRM_Nav_ChangeTracker_CustomContactAnalyzer extends CRM_Nav_ChangeTracker_AnalyzerBase {
 
+  /**
+   * CRM_Nav_ChangeTracker_CustomContactAnalyzer constructor.
+   *
+   * @param $timestamp
+   * @param $debug
+   *
+   * @throws \Exception
+   */
   public function __construct($timestamp, $debug) {
     $this->_select_fields = ['id', 'entity_id'];
     $this->type = 'CustomContact';
@@ -24,10 +35,20 @@ class CRM_Nav_ChangeTracker_CustomContactAnalyzer extends CRM_Nav_ChangeTracker_
     parent::__construct($timestamp, $debug);
   }
 
+  /**
+   * @return mixed|string
+   */
   protected function get_my_class_name() {
     return get_class();
   }
 
+
+  /**
+   * @param $query
+   *
+   * @return mixed|void
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function eval_query(&$query) {
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->entity_id)) {

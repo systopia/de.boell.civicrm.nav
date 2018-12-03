@@ -15,6 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+/**
+ * Class CRM_Nav_ChangeTracker_EmailAnalyzer
+ */
 class CRM_Nav_ChangeTracker_EmailAnalyzer extends CRM_Nav_ChangeTracker_AnalyzerBase {
 
   public function __construct($timestamp, $debug) {
@@ -24,11 +27,21 @@ class CRM_Nav_ChangeTracker_EmailAnalyzer extends CRM_Nav_ChangeTracker_Analyzer
     parent::__construct($timestamp, $debug);
   }
 
+
+  /**
+   * @return mixed|string
+   */
   protected function get_my_class_name() {
     return get_class();
   }
 
 
+  /**
+   * @param $query
+   *
+   * @return mixed|void
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function eval_query(&$query) {
     if (!isset($this->_record_ids[$query->id])) {
       if ($this->is_nav_contact($query->contact_id)) {
