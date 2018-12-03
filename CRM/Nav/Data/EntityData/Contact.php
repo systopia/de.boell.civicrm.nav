@@ -69,6 +69,10 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    * @return mixed
    */
   public function get_contact_id() {
+    if (empty($this->_contact_id)) {
+      // double check - in case an earlier record created the contact!
+      $this->get_civi_ids();
+    }
     return $this->_contact_id;
   }
 
