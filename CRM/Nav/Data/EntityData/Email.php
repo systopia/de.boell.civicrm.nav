@@ -42,9 +42,9 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
    */
   public function __construct($email_1_org, $email_priv, $email_2_priv,
                               $private_location_type, $organization_location_type, $contact_id) {
-    $this->_email_org                  = $email_1_org;
-    $this->_email_priv                 = $email_priv;
-    $this->_email_priv_2               = $email_2_priv;
+    $this->_email_org                  = $this->normalize_emails($email_1_org);
+    $this->_email_priv                 = $this->normalize_emails($email_priv);
+    $this->_email_priv_2               = $this->normalize_emails($email_2_priv);
     $this->_location_type_private      = $private_location_type;
     $this->_location_type_organization = $organization_location_type;
 
@@ -178,15 +178,37 @@ class CRM_Nav_Data_EntityData_Email  extends CRM_Nav_Data_EntityData_Base {
   }
 
   /**
+   * @param $email_array
+   */
+  private function normalize_emails($email_array) {
+    $result = [];
+    foreach ($email_array as $email_key => $email) {
+      foreach ($email as $key => $value) {
+        if ($key == 'email') {
+          $result[$email_key][$key] = strtolower($value);
+        }
+        else {
+          $result[$email_key][$key] = $value;
+        }
+      }
+    }
+    return $result;
+  }
+
+  /**
    * @param $nav_email
    *
    * @return array|mixed
    */
   private function get_civi_email($nav_email) {
+    // Check before Emails
     foreach ($this->iterate_civi_emails() as $email) {
       if (isset($nav_email['before']) && $email['email'] == strtolower($nav_email['before']['email'])) {
         return $email;
       }
+    }
+    // Check after Emails
+    foreach ($this->iterate_civi_emails() as $email) {
       if (isset($nav_email['after']) && $email['email'] == strtolower($nav_email['after']['email'])) {
         return $email;
       }
