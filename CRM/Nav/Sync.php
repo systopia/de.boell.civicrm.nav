@@ -179,8 +179,7 @@ class CRM_Nav_Sync {
         if ($nav_entry['Change_Type'] == 'Change' && $nav_entry['Version'] == 'BEFORE') {
           $before = [$nav_entry['_TIMESTAMP'] => $nav_entry];
           continue;
-        }
-        else {
+        } else {
           if (!empty($before)) {
             // create record with before value as well
             $record = $this->create_nav_data_record($nav_entry, $entity, reset($before));
