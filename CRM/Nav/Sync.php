@@ -50,6 +50,9 @@ class CRM_Nav_Sync {
    */
   public function run() {
     $this->get_nav_data();
+    if (empty($this->data_records)) {
+      return 0;
+    }
     $this->sort_records();
     $this->handle_Nav_data();
     // FixMe: return actual number of parsed/added records or some sort of statistics here.
@@ -87,7 +90,7 @@ class CRM_Nav_Sync {
         $soap_array["{$type}_List"][$type][] = $tmp_nav_data;
       }
     }
-//    return; // for debugging reasons
+    return; // for debugging reasons
     $updateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
     $soapConnector = $this->soap_connectors[$type];
     if (!isset($soapConnector)) {
