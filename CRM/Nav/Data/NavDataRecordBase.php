@@ -176,7 +176,7 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
       }
       return $nav_data[$index];
     }
-    $this->log("Value not set for {$index}");
+//    $this->log("Value not set for {$index}");
     return "";
   }
 
