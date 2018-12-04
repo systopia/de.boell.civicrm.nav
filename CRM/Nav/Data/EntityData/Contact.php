@@ -151,6 +151,22 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       $this->civi_contact_data, $this->_individual_before,
       $this->changed_data['individual'], 'Contact'
       );
+    $this->find_missing_update_data();
+  }
+
+  /**
+   * Checks for Data that is equal in before and after, but not present in
+   * CiviCRM. If that's the case, it is added to the update array
+   * and will be added
+   */
+  private function find_missing_update_data() {
+    foreach ($this->_individual_after as $key => $value) {
+      // Check if we have a value in after, but not value in civi yet,
+      // then add to updates
+      if (isset($this->civi_contact_data[$key]) && empty($this->civi_contact_data[$key]) && !empty($value)) {
+        $this->conflict_data['updates'][$key] = $value;
+      }
+    }
   }
 
   /**
