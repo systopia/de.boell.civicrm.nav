@@ -268,11 +268,21 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       $this->log("Api command to get Emails Entities failed. Reason: {$result['error_message']}");
       return array();
     }
-    $contact_ids = array();
+    $contact_ids = [];
     foreach ($result['values'] as $val) {
       $contact_ids[] = $val['contact_id'];
     }
-    return $contact_ids;
+    // filter out deleted contcts etc ...
+    $result_ids = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'return' => array("id"),
+      'id' => array('IN' => array(1, 2, 3)),
+    ));
+    $res_ids = [];
+    foreach ($result_ids['values'] as $val) {
+      $res_ids[] = $val['contact_id'];
+    }
+    return $res_ids;
   }
 
   /**
@@ -364,12 +374,13 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    * @return string
    */
   private function find_contact_by_id_tracker() {
-    $id_table = CRM_Nav_Config::get('id_table');
-    $sql = "SELECT * FROM `{$id_table}` WHERE `identifier_type` = 'navision' AND `identifier` = '{$this->_navision_id}' GROUP BY id DESC LIMIT 0, 1;";
-    $query = CRM_Core_DAO::executeQuery($sql);
-    while($query->fetch()) {
-     return $query->entity_id;
+    $result = civicrm_api3('Contact', 'findbyidentity', [
+      'identifier' => $this->_navision_id,
+      'identifier_type' => "navision",
+    ]);
+    if ($result['count'] == '1') {
+      return $result['id'];
     }
-    return '';
+    return "";
   }
 }
