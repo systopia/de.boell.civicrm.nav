@@ -90,7 +90,7 @@ class CRM_Nav_Sync {
         $soap_array["{$type}_List"][$type][] = $tmp_nav_data;
       }
     }
-    return; // for debugging reasons
+//    return; // for debugging reasons
     $updateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
     $soapConnector = $this->soap_connectors[$type];
     if (!isset($soapConnector)) {
@@ -175,6 +175,15 @@ class CRM_Nav_Sync {
       }
         // temporary var to save before variable in case of a change record
       $before = [];
+      // if we only have ONE Entry, need to parse differently here
+      // there is no 'sub-array' with entries, instead all values are directly in
+      // $read_result['ReadMultiple_Result'][$entity]
+      if (!is_array(reset($read_result['ReadMultiple_Result'][$entity]))) {
+        $single_entry = reset($read_result['ReadMultiple_Result']);
+        $record = $this->create_nav_data_record($single_entry, $entity);
+        $this->data_records[$single_entry['_TIMESTAMP']] = $record;
+        return;
+      }
       foreach ($read_result['ReadMultiple_Result'][$entity] as $nav_entry) {
         // if type is change and we have a before value
         // store and create record with AFTER value next
