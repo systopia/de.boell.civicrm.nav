@@ -175,10 +175,35 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    */
   public function create_full() {
     $this->_contact_id      = $this->create_entity('Contact', $this->_individual_after)['id'];
+    $this->create_consent_record($this->_contact_id);
   }
 
+  /**
+   * @return mixed
+   */
   public function get_nav_id() {
     return $this->_navision_id;
+  }
+
+  /**
+   * @param $contact_id
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function create_consent_record($contact_id) {
+    if (empty($contact_id)) {
+      $this->log("No contact_id given, couldn't create consent record");
+    }
+    $result = civicrm_api3('ConsentRecord', 'create', array(
+      'sequential' => 1,
+      'contact_id' => $contact_id,
+      'category' => "10",
+      'source' => 1,
+      'note' => "NAV Schnittstelle",
+    ));
+    if ($result['is_error'] == '1') {
+      $this->log("Failed to create Consent record for Contact {$contact_id}");
+    }
   }
 
   /**
