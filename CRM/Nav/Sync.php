@@ -179,7 +179,7 @@ class CRM_Nav_Sync {
       // there is no 'sub-array' with entries, instead all values are directly in
       // $read_result['ReadMultiple_Result'][$entity]
       if (!is_array(reset($read_result['ReadMultiple_Result'][$entity]))) {
-        $single_entry = reset($read_result['ReadMultiple_Result']);
+        $single_entry = $read_result['ReadMultiple_Result'][$entity];
         $record = $this->create_nav_data_record($single_entry, $entity);
         $this->data_records[$single_entry['_TIMESTAMP']] = $record;
         return;

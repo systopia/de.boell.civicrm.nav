@@ -33,7 +33,7 @@ class CRM_Nav_SoapCommand_UpdateTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function setUp() {
-    $this->soapConnector = new CRM_Nav_SOAPConnector(FALSE);
+    $this->soapConnector = new CRM_Nav_SOAPConnector('civiContact', TRUE);
     parent::setUp();
   }
 
@@ -46,11 +46,18 @@ class CRM_Nav_SoapCommand_UpdateTest extends \PHPUnit_Framework_TestCase {
    * Gets the first record in the Navision Database and outputs the contents
    */
   public function testSoapUpdateCommand() {
-    // get contact #1
-    $r_params = array(
-      "Entry_No" => 1,
-    );
-    $readCommand = new CRM_Nav_SoapCommand_Read($r_params);
+//    $r_params = array(
+//      "Entry_No" => 451,
+//    );
+    $r_params = [
+      'filter'  =>
+        [
+          "Field"    => "Transferred",
+          "Criteria" => "0",
+        ],
+      'setSize' => '1',
+    ];
+    $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
     try{
       $this->soapConnector->executeCommand($readCommand);
     } catch (Exception $e) {
@@ -58,10 +65,25 @@ class CRM_Nav_SoapCommand_UpdateTest extends \PHPUnit_Framework_TestCase {
       throw new Exception("Read Command failed. Message: " . $e->getMessage());
     }
 
-    $update_params = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
-    $update_params['civiContact']['Transferred'] = 1;
+    $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
+    if (!is_array(reset($read_result['ReadMultiple_Result']['civiContact']))) {
+      $tmp = reset($read_result['ReadMultiple_Result']);
+      $tmp['Transferred'] = 1;
+    }
 
-    $testUpdateCommand = new CRM_Nav_SoapCommand_Update($update_params);
+    $soap_array["civiContact_List"]['CiviContact'][] = $tmp;
+    $testUpdateCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
+
+    try{
+      $this->soapConnector->executeCommand($testUpdateCommand);
+    } catch (Exception $e) {
+      error_log($e->getMessage());
+      throw new Exception("Update Command failed. Message: " . $e->getMessage());
+    }
+
+    return;
+
+    $testUpdateCommand = new CRM_Nav_SoapCommand_Update($read_result);
     try{
       $this->soapConnector->executeCommand($testUpdateCommand);
     } catch (Exception $e) {
