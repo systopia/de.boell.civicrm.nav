@@ -30,11 +30,11 @@ class CRM_Nav_Exporter_Mailer {
   private $to_name_sw              = 'Studienwerk HBS';
   private $to_name_kred            = 'Navision HBS';
 
-//  private $to_email_sw             = 'civicrm-stw@boell.de';
-//  private $to_email_kred           = 'kreditorenNAV2009@boell.de';
+  private $to_email_sw             = 'civicrm-stw@boell.de';
+  private $to_email_kred           = 'kreditorenNAV2009@boell.de';
 
-    private $to_email_sw             = 'batroff@systopia.de';
-    private $to_email_kred           = 'batroff@systopia.de';
+//    private $to_email_sw             = 'batroff@systopia.de';
+//    private $to_email_kred           = 'batroff@systopia.de';
 
     private $custom_contact_translation = [
       'navision_id' => 'Navision Id',
