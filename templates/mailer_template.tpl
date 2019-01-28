@@ -13,6 +13,9 @@
     <p>
         Debitor Id: {$debitor_id}
     </p>
+    <p>
+        <a href={$contact_link}>CiviCRM Profil</a>
+    </p>
 </h4>
 
 {foreach from=$contact_data item=entity_data key=entity_name}
