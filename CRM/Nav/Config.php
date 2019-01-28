@@ -20,7 +20,7 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = FALSE;
+  private static $local        = TRUE;
 
   private static $is_dev       = FALSE;
 

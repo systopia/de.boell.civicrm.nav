@@ -116,8 +116,10 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     }
     foreach ($kred_deb_data as $contact_id => $contact_values) {
       try{
-        $mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp);
-        $this->email_counter += 1;
+        // acount for when all elements are filtered out for kreditors (see array CRM_Nav_Config::$exclude_for_kreditoren, # )
+        if ($mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp) == "1") {
+          $this->email_counter += 1;
+        }
       } catch (Exception $e) {
         $this->error_counter += 1;
         CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Create Mail failed for {$contact_id}. Values: " . json_encode($contact_values));

@@ -84,6 +84,10 @@ class CRM_Nav_Exporter_Mailer {
         $values['to_email'] = $this->to_email_sw;
         break;
       case CRM_Nav_Config::$kreditoren_temlpate_name:
+        $this->filter_elements($content);
+        if (empty($content)) {
+          return "1";
+        }
         $template_id = $this->get_template_id($template_name);
         $values['to_name'] = $this->to_name_kred;
         $values['to_email'] = $this->to_email_kred;
@@ -97,7 +101,9 @@ class CRM_Nav_Exporter_Mailer {
 
     $this->add_translations($content);
     $contact_name = $this->get_contact_name($contact_id);
+    $contact_link = $this->generate_civicrm_user_link();
     $smarty_variables = [
+      'contact_link' => $contact_link,
       'timestamp'    => $timestamp,
       'contact_id'   => $contact_id,
       'contact_name' => $contact_name,
@@ -111,6 +117,7 @@ class CRM_Nav_Exporter_Mailer {
     if ($result['is_error'] == '1') {
       throw new Exception("Error sending Emails to {$template_name}");
     }
+    return "0";
   }
 
   /**
@@ -165,6 +172,31 @@ class CRM_Nav_Exporter_Mailer {
       // Add Entity translation and move array
       $content[$this->entity_mapper[$entity]] = $values;
       unset($content[$entity]);
+    }
+  }
+
+  /**
+   * Filter additional fields for kreditors defined in Config::$exclude_for_kreditoren
+   * @param $content
+   */
+  private  function filter_elements(&$content) {
+    foreach ($content as $entity => &$values) {
+      if ($entity != "Contact") {
+        continue;
+      }
+      foreach($values as $id => &$changed_values) {
+        foreach($changed_values as $name => $v) {
+          if (in_array($name, CRM_Nav_Config::$exclude_for_kreditoren)) {
+            unset($changed_values[$name]);
+          }
+        }
+        if (empty($values[$id])) {
+          unset($values[$id]);
+        }
+      }
+      if (empty($content[$entity])) {
+        unset ($content[$entity]);
+      }
     }
   }
 
@@ -302,5 +334,15 @@ class CRM_Nav_Exporter_Mailer {
       'id'    => $template_id,
       'msg_subject' => $subject,
     ]);
+  }
+
+
+  /**
+   * @param $contact_id
+   *
+   * @return string
+   */
+  private function generate_civicrm_user_link($contact_id) {
+    return CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contact_id");
   }
 }
