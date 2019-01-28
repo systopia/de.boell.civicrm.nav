@@ -103,7 +103,7 @@ class CRM_Nav_Exporter_Mailer {
       'contact_name' => $contact_name,
       'navision_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['navision_id'],
       'creditor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['creditor_id'],
-      'debitor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['debitor_id'],
+      'debitor_id'   => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['debitor_id'],
       'contact_data' => $content,
     ];
     $values['template_params'] = $smarty_variables;
