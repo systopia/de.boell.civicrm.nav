@@ -25,7 +25,7 @@ class CRM_Nav_Config {
   private static $is_dev       = FALSE;
 
   private static $soap_url     = [
-    'pro' => 'http://10.1.0.143:7077/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
+    'pro' => 'http://10.1.0.143:7077/NAVUSemployer_idER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
     'dev' => 'http://10.1.0.148:7037/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
   ];
 
@@ -46,7 +46,41 @@ class CRM_Nav_Config {
     'postal_greeting_id', 'postal_greeting_custom', 'addressee_custom', 'addressee_id',
     'entity_id', 'id', 'hash', 'phone_numeric', 'contact_id', 'is_primary',
     'location_type_id', 'phone_type_id',
+    'employer_id',
+    'organization_name',
+    'contact_type',
+    'contact_sub_type',
+    'do_not_email',
+    'do_not_phone',
+    'do_not_mail',
+    'do_not_sms',
+    'do_not_trade',
+    'is_opt_out',
+    'legal_identifier',
+    'display_name',
+    'nick_name',
+    'legal_name',
+    'image_URL',
+    'preferred_language',
+    'preferred_communication_method',
+    'birth_date',
+    'gender_id',
+    'hash',
+    'api_key',
+    'source',
+    'created_date',
+    'modified_date',
+    'is_deleted',
+    'sic_code',
+    'primary_contact_id',
   ];
+
+  /**
+   * @var array Not used yet - needs to be a filter specific for stw notifications
+   */
+  public static $exclude_for_kreditoren = [
+    'job_title',
+  ]
 
   private static $local_config = [
     'db_log_id'                       => '1',
