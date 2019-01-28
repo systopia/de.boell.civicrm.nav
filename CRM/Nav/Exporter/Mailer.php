@@ -292,7 +292,7 @@ class CRM_Nav_Exporter_Mailer {
    * @throws \CiviCRM_API3_Exception
    */
   private function set_studienwerk_subject($supervisor_suffix, $template_id) {
-    if ($supervisor_suffix != not_set) {
+    if ($supervisor_suffix != "not_set") {
       $subject = $supervisor_suffix . " - " . $this->subject;
     } else {
       $subject = $this->subject;

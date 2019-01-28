@@ -80,7 +80,7 @@ class CRM_Nav_Config {
    */
   public static $exclude_for_kreditoren = [
     'job_title',
-  ]
+  ];
 
   private static $local_config = [
     'db_log_id'                       => '1',
