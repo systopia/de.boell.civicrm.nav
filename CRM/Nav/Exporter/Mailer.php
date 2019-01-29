@@ -101,7 +101,7 @@ class CRM_Nav_Exporter_Mailer {
 
     $this->add_translations($content);
     $contact_name = $this->get_contact_name($contact_id);
-    $contact_link = $this->generate_civicrm_user_link();
+    $contact_link = $this->generate_civicrm_user_link($contact_id);
     $smarty_variables = [
       'contact_link' => $contact_link,
       'timestamp'    => $timestamp,
@@ -343,6 +343,6 @@ class CRM_Nav_Exporter_Mailer {
    * @return string
    */
   private function generate_civicrm_user_link($contact_id) {
-    return CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contact_id");
+    return CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact_id}", TRUE);
   }
 }
