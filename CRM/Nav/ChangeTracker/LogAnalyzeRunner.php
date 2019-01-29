@@ -23,7 +23,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
   private $_entities = [
     'Contact',
     'Address',
-    'CustomContact',
+//    'CustomContact',
     'Email',
     'Phone',
 //    'Relationship',
@@ -87,7 +87,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     $this->Phone = new CRM_Nav_ChangeTracker_PhoneAnalyzer($this->_timestamp, $debug);
     $this->Email = new CRM_Nav_ChangeTracker_EmailAnalyzer($this->_timestamp, $debug);
     $this->Website = new CRM_Nav_ChangeTracker_WebsiteAnalyzer($this->_timestamp, $debug);
-    $this->CustomContact = new CRM_Nav_ChangeTracker_CustomContactAnalyzer($this->_timestamp, $debug);
+//    $this->CustomContact = new CRM_Nav_ChangeTracker_CustomContactAnalyzer($this->_timestamp, $debug);
   }
 
   /**
@@ -117,7 +117,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     foreach ($kred_deb_data as $contact_id => $contact_values) {
       try{
         // acount for when all elements are filtered out for kreditors (see array CRM_Nav_Config::$exclude_for_kreditoren, # )
-        if ($mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp) == "1") {
+        if ($mailer->create_email(CRM_Nav_Config::$kreditoren_temlpate_name, $contact_id, $contact_values, $this->_timestamp) == "0") {
           $this->email_counter += 1;
         }
       } catch (Exception $e) {
@@ -128,7 +128,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     }
 
     // TODO: SET THIS For Live
-    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
+//    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
   }
 
   /**
