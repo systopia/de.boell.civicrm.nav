@@ -20,7 +20,7 @@
  */
 class CRM_Nav_Config {
 
-  private static $local        = FALSE;
+  private static $local        = TRUE;
 
   private static $is_dev       = FALSE;
 
@@ -73,6 +73,14 @@ class CRM_Nav_Config {
     'is_deleted',
     'sic_code',
     'primary_contact_id',
+    'prefix_id',
+    'suffix_id',
+    'sort_name',
+//    address
+    'geo_code_1',
+    'geo_code_2',
+    'manual_geo_code',
+
   ];
 
   /**
