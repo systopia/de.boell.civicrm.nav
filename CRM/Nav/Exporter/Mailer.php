@@ -165,6 +165,10 @@ class CRM_Nav_Exporter_Mailer {
           if ($table_name == 'country_id') {
             $this->set_country_id($table_values);
           }
+          // for master_id - use shared-Contact name and id in braces
+          if ($table_name == 'master_id') {
+            $this->set_master_address_id($table_values);
+          }
         }
       }
     }
@@ -343,8 +347,6 @@ class CRM_Nav_Exporter_Mailer {
 
   /**
    * @param $country_id
-   *
-   * @return string
    */
   private function set_country_id(&$values) {
     $country_list = CRM_Core_PseudoConstant::country();
@@ -360,7 +362,28 @@ class CRM_Nav_Exporter_Mailer {
         $values['new'] = $country_list[$old_country_id];
       }
     }
-    return "";
+  }
+
+  /**
+   * @param $values
+   */
+  private function set_master_address_id(&$values) {
+    $new_contact_id = $values['new'];
+    $result = civicrm_api3('Contact', 'getsingle', [
+      'id' => $new_contact_id,
+    ]);
+
+    $new_contact_name = $result['display_name'] . " (" . $new_contact_id . ")";
+    $values['new'] = $new_contact_name;
+    if (isset($values['old'])) {
+      $old_contact_id = $values['old'];
+      $result = civicrm_api3('Contact', 'getsingle', [
+        'id' => $old_contact_id,
+      ]);
+
+      $old_contact_name = $result['display_name'] . " (" . $old_contact_id . ")";
+      $values['old'] = $old_contact_name;
+    }
   }
 
 
