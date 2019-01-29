@@ -161,6 +161,10 @@ class CRM_Nav_Exporter_Mailer {
           } else {
             $table_values['translation'] = $table_name;
           }
+          // for country - get country name
+          if ($table_name == 'country_id') {
+            $this->set_country_id($table_values);
+          }
         }
       }
     }
@@ -334,6 +338,29 @@ class CRM_Nav_Exporter_Mailer {
       'id'    => $template_id,
       'msg_subject' => $subject,
     ]);
+  }
+
+
+  /**
+   * @param $country_id
+   *
+   * @return string
+   */
+  private function set_country_id(&$values) {
+    $country_list = CRM_Core_PseudoConstant::country();
+    // set translation for new
+    $new_country_id = $values['new'];
+    if (array_key_exists($new_country_id, $country_list)) {
+      $values['new'] = $country_list[$new_country_id];
+    }
+    //if isset old -> add translation as well
+    if(isset($values['old'])) {
+      $old_country_id = $values['old'];
+      if (array_key_exists($old_country_id, $country_list)) {
+        $values['new'] = $country_list[$old_country_id];
+      }
+    }
+    return "";
   }
 
 
