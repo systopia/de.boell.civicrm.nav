@@ -359,7 +359,7 @@ class CRM_Nav_Exporter_Mailer {
     if(isset($values['old'])) {
       $old_country_id = $values['old'];
       if (array_key_exists($old_country_id, $country_list)) {
-        $values['new'] = $country_list[$old_country_id];
+        $values['old'] = $country_list[$old_country_id];
       }
     }
   }
