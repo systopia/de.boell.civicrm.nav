@@ -372,16 +372,18 @@ class CRM_Nav_Exporter_Mailer {
     $result = civicrm_api3('Contact', 'getsingle', [
       'id' => $new_contact_id,
     ]);
+    $contact_link = $this->generate_civicrm_user_link($new_contact_id);
+    $new_contact_name = "<a href={$contact_link}>{$result['display_name']}</a>";
+    $values['new'] = $new_contact_name;
 
-    $new_contact_name = $result['display_name'] . " (" . $new_contact_id . ")";
     $values['new'] = $new_contact_name;
     if (isset($values['old'])) {
       $old_contact_id = $values['old'];
       $result = civicrm_api3('Contact', 'getsingle', [
         'id' => $old_contact_id,
       ]);
-
-      $old_contact_name = $result['display_name'] . " (" . $old_contact_id . ")";
+      $contact_link = $this->generate_civicrm_user_link($old_contact_id);
+      $old_contact_name = "<a href={$contact_link}>{$result['display_name']}</a>";
       $values['old'] = $old_contact_name;
     }
   }
