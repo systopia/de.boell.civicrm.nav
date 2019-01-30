@@ -25,7 +25,7 @@ class CRM_Nav_Config {
   private static $is_dev       = FALSE;
 
   private static $soap_url     = [
-    'pro' => 'http://10.1.0.143:7077/NAVUSemployer_idER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
+    'pro' => 'http://10.1.0.143:7077/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
     'dev' => 'http://10.1.0.148:7037/NAVUSER/WS/Heinrich%20Boell%20Stiftung%20e.V./Page/',
   ];
 
