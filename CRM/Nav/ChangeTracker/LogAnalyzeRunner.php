@@ -128,7 +128,7 @@ class CRM_Nav_ChangeTracker_LogAnalyzeRunner {
     }
 
     // TODO: SET THIS For Live
-//    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
+    CRM_Nav_Config::set_last_timestamp($this->_execute_timestamp);
   }
 
   /**
