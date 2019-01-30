@@ -46,14 +46,18 @@ function civicrm_api3_nav_Sync($params) {
   try {
     $number_of_parsed_entries = $runner->run();
   } catch (Exception $e) {
-    CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
-      array(1 => array($current_id, 'Integer'))
-    );
+    if (!empty($current_id)) {
+      CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+        array(1 => array($current_id, 'Integer'))
+      );
+    }
     throw new API_Exception("Error occurred while parsing Navision Records. Error Message: " . $e->getMessage());
   }
 
-  CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
-    array(1 => array($current_id, 'Integer'))
-  );
+  if (!empty($current_id)) {
+    CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+      array(1 => array($current_id, 'Integer'))
+    );
+  }
   return civicrm_api3_create_success(array($number_of_parsed_entries), $params, 'Nav', 'Sync');
 }
