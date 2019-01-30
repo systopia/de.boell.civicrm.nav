@@ -1,7 +1,7 @@
 <h2>Änderungen in CiviCRM an NAV-Kontakten, {$timestamp}</h2>
 
 <h2>
-    Kontakt: {$contact_name} ({$contact_id})
+    Kontakt: <a href={$contact_link}>{$contact_name}</a> ({$contact_id})
 </h2>
 <h4>
     <p>

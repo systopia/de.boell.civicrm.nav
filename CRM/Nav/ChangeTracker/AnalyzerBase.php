@@ -255,7 +255,11 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     $result = civicrm_api3('Relationship', 'get', array(
       'sequential' => 1,
       'contact_id_a' => $contact_id,
-      'relationship_type_id' => array('IN' => array(CRM_Nav_Config::get('Stipendiat_in'), CRM_Nav_Config::get('Promotionsstipendiat_in'))),
+      'relationship_type_id' => array('IN' => array(CRM_Nav_Config::get('Stipendiat_in'),
+                                                    CRM_Nav_Config::get('Promotionsstipendiat_in'),
+                                                    CRM_Nav_Config::get('Vertrauensdozent_in'),
+                                                    CRM_Nav_Config::get('Auswahlkommissionsmitglied'),
+        )),
     ));
     if ($result['count'] > 0) {
       // chache result

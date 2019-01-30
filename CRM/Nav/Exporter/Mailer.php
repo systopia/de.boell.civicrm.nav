@@ -84,6 +84,10 @@ class CRM_Nav_Exporter_Mailer {
         $values['to_email'] = $this->to_email_sw;
         break;
       case CRM_Nav_Config::$kreditoren_temlpate_name:
+        $this->filter_elements($content);
+        if (empty($content)) {
+          return "1";
+        }
         $template_id = $this->get_template_id($template_name);
         $values['to_name'] = $this->to_name_kred;
         $values['to_email'] = $this->to_email_kred;
@@ -97,13 +101,15 @@ class CRM_Nav_Exporter_Mailer {
 
     $this->add_translations($content);
     $contact_name = $this->get_contact_name($contact_id);
+    $contact_link = $this->generate_civicrm_user_link($contact_id);
     $smarty_variables = [
+      'contact_link' => $contact_link,
       'timestamp'    => $timestamp,
       'contact_id'   => $contact_id,
       'contact_name' => $contact_name,
       'navision_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['navision_id'],
       'creditor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['creditor_id'],
-      'debitor_id'  => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['debitor_id'],
+      'debitor_id'   => CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['debitor_id'],
       'contact_data' => $content,
     ];
     $values['template_params'] = $smarty_variables;
@@ -111,6 +117,7 @@ class CRM_Nav_Exporter_Mailer {
     if ($result['is_error'] == '1') {
       throw new Exception("Error sending Emails to {$template_name}");
     }
+    return "0";
   }
 
   /**
@@ -154,6 +161,14 @@ class CRM_Nav_Exporter_Mailer {
           } else {
             $table_values['translation'] = $table_name;
           }
+          // for country - get country name
+          if ($table_name == 'country_id') {
+            $this->set_country_id($table_values);
+          }
+          // for master_id - use shared-Contact name and id in braces
+          if ($table_name == 'master_id') {
+            $this->set_master_address_id($table_values);
+          }
         }
       }
     }
@@ -165,6 +180,31 @@ class CRM_Nav_Exporter_Mailer {
       // Add Entity translation and move array
       $content[$this->entity_mapper[$entity]] = $values;
       unset($content[$entity]);
+    }
+  }
+
+  /**
+   * Filter additional fields for kreditors defined in Config::$exclude_for_kreditoren
+   * @param $content
+   */
+  private  function filter_elements(&$content) {
+    foreach ($content as $entity => &$values) {
+      if ($entity != "Contact") {
+        continue;
+      }
+      foreach($values as $id => &$changed_values) {
+        foreach($changed_values as $name => $v) {
+          if (in_array($name, CRM_Nav_Config::$exclude_for_kreditoren)) {
+            unset($changed_values[$name]);
+          }
+        }
+        if (empty($values[$id])) {
+          unset($values[$id]);
+        }
+      }
+      if (empty($content[$entity])) {
+        unset ($content[$entity]);
+      }
     }
   }
 
@@ -292,7 +332,7 @@ class CRM_Nav_Exporter_Mailer {
    * @throws \CiviCRM_API3_Exception
    */
   private function set_studienwerk_subject($supervisor_suffix, $template_id) {
-    if ($supervisor_suffix != not_set) {
+    if ($supervisor_suffix != "not_set") {
       $subject = $supervisor_suffix . " - " . $this->subject;
     } else {
       $subject = $this->subject;
@@ -302,5 +342,59 @@ class CRM_Nav_Exporter_Mailer {
       'id'    => $template_id,
       'msg_subject' => $subject,
     ]);
+  }
+
+
+  /**
+   * @param $country_id
+   */
+  private function set_country_id(&$values) {
+    $country_list = CRM_Core_PseudoConstant::country();
+    // set translation for new
+    $new_country_id = $values['new'];
+    if (array_key_exists($new_country_id, $country_list)) {
+      $values['new'] = $country_list[$new_country_id];
+    }
+    //if isset old -> add translation as well
+    if(isset($values['old'])) {
+      $old_country_id = $values['old'];
+      if (array_key_exists($old_country_id, $country_list)) {
+        $values['old'] = $country_list[$old_country_id];
+      }
+    }
+  }
+
+  /**
+   * @param $values
+   */
+  private function set_master_address_id(&$values) {
+    $new_contact_id = $values['new'];
+    $result = civicrm_api3('Contact', 'getsingle', [
+      'id' => $new_contact_id,
+    ]);
+    $contact_link = $this->generate_civicrm_user_link($new_contact_id);
+    $new_contact_name = "<a href={$contact_link}>{$result['display_name']}</a>";
+    $values['new'] = $new_contact_name;
+
+    $values['new'] = $new_contact_name;
+    if (isset($values['old'])) {
+      $old_contact_id = $values['old'];
+      $result = civicrm_api3('Contact', 'getsingle', [
+        'id' => $old_contact_id,
+      ]);
+      $contact_link = $this->generate_civicrm_user_link($old_contact_id);
+      $old_contact_name = "<a href={$contact_link}>{$result['display_name']}</a>";
+      $values['old'] = $old_contact_name;
+    }
+  }
+
+
+  /**
+   * @param $contact_id
+   *
+   * @return string
+   */
+  private function generate_civicrm_user_link($contact_id) {
+    return CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact_id}", TRUE);
   }
 }
