@@ -115,6 +115,9 @@ abstract class CRM_Nav_Data_NavDataRecordBase {
    */
   private function check_delete_data($before, $after) {
     $delete_data = [];
+    if (empty($before)) {
+      return $delete_data;
+    }
     foreach ($before as $key => $value) {
       if (!isset($after[$key])) {
         $delete_data[$key] = $value;
