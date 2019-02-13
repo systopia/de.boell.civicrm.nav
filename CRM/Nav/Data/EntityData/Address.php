@@ -47,6 +47,8 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    *
    * @param $is_organization
    *
+   * @param bool $disconnect
+   *
    * @throws \CiviCRM_API3_Exception
    */
   public function __construct($before_private, $after_private, $contact_id, $organization_id,
