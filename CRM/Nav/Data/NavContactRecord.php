@@ -170,7 +170,7 @@ class CRM_Nav_Data_NavContactRecord extends CRM_Nav_Data_NavDataRecordBase {
   }
 
   public function is_delete() {
-    if (($this->get_nav_after_data()['Delete_Flag']) || $this->get_contact_type() == 'Delete') {
+    if (($this->get_nav_after_data()['Delete_Flag'])) {
       return TRUE;
     }
     return FALSE;

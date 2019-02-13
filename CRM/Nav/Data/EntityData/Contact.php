@@ -47,7 +47,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    * @param $after_company
    * @param $nav_id
    * @param $lookup_data
-   * @param $parent
+   * @param $is_organization
    *
    * @throws \CiviCRM_API3_Exception
    */
@@ -80,6 +80,10 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    * @return mixed
    */
   public function get_org_id() {
+    if (empty($this->_organisation_id)) {
+      // double check - in case an earlier record created the organisation!
+      $this->get_civi_ids();
+    }
     return $this->_organisation_id;
   }
 

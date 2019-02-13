@@ -90,7 +90,9 @@ class CRM_Nav_Sync {
         $soap_array["{$type}_List"][$type][] = $tmp_nav_data;
       }
     }
-//    return; // for debugging reasons
+    if (CRM_Nav_Config::local()) {
+      return; // don't update entires for local testing
+    }
     $updateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($soap_array);
     $soapConnector = $this->soap_connectors[$type];
     if (!isset($soapConnector)) {

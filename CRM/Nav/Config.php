@@ -91,8 +91,8 @@ class CRM_Nav_Config {
   ];
 
   private static $local_config = [
-    'db_log_id'                       => '1',
-    'hbs_contact_id'                  => '2',
+    'db_log_id'                       => '2',
+    'hbs_contact_id'                  => '1',
     'navision_custom_field'           => 'custom_88',
     'process_id'                      => 'custom_52',
     'org_name_1'                      => 'custom_92',
@@ -105,6 +105,7 @@ class CRM_Nav_Config {
     'Stipendiat_in'                   => '12',
     'Promotionsstipendiat_in'         => '11',
     'Auswahlkommissionsmitglied'      => '13',
+//    todo --> Verify Mapping
     'Allowance_to'                    => 'custom_54',
     'Angestrebter_Studienabschluss'   => 'custom_56',
     'Process_Entry_No'                => 'custom_52',
@@ -147,7 +148,7 @@ class CRM_Nav_Config {
       }
       return "";
     }
-    if (isset(self::$local_config[$attribute])) {
+    if (isset(self::$hbs_config[$attribute])) {
       return self::$hbs_config[$attribute];
     }
     return "";
