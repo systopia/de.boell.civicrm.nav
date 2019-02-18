@@ -114,7 +114,7 @@ class CRM_Nav_Config {
     'Subject_Group'                   => 'custom_61',
     'Field_of_Study'                  => 'custom_62',
     'Promotionsfach'                  => 'custom_59',
-    'Promotionsthema'                 => 'custom_600',
+    'Promotionsthema'                 => 'custom_60',
     'Project_Controller'              => 'custom_63',
     'Consultant'                      => 'custom_64',
     'Next_Report_to'                  => 'custom_55',
