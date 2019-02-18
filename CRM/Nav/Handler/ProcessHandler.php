@@ -52,10 +52,12 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
     if ($this->check_delete_record()) {
       $relationship_id = $this->get_relationship($this->record->get_process_id());
       $this->delete_entity($relationship_id, 'Relationship');
+      $this->record->set_consumed();
       return;
     }
     if ($this->check_new_record()) {
       $this->write_relationship_to_db($contact_id, "");
+      $this->record->set_consumed();
       return;
     }
     $relationship_id = $this->get_relationship($this->record->get_process_id());
