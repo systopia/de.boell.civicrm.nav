@@ -10,7 +10,7 @@ use CRM_Nav_ExtensionUtil as E;
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
  */
 function _civicrm_api3_nav_Sync_spec(&$spec) {
-  $spec['poll_size']['api.default'] = 10;
+  $spec['poll_size']['api.default'] = 100;
   $spec['entity']['api.default'] = "";
   $spec['entity']['api.description'] = "Restrict api call to nav data sources. Can be 'civiContact', 'civiContRelation', 'civiContStatus', 'civiProcess'";
   $spec['debug']['api.default'] = FALSE;
