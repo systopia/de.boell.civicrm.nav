@@ -80,7 +80,12 @@ class CRM_Nav_Config {
     'geo_code_1',
     'geo_code_2',
     'manual_geo_code',
-
+//    email
+    'is_billing',
+    'is_bulkmail',
+    'reset_date',
+    'signature_text',
+    'signature_html',
   ];
 
   /**
