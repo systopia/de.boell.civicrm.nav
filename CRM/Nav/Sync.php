@@ -53,6 +53,7 @@ class CRM_Nav_Sync {
     if (empty($this->data_records)) {
       return 0;
     }
+
     $this->sort_records();
     $this->handle_Nav_data();
     // FixMe: return actual number of parsed/added records or some sort of statistics here.
@@ -182,9 +183,12 @@ class CRM_Nav_Sync {
       // $read_result['ReadMultiple_Result'][$entity]
       if (!is_array(reset($read_result['ReadMultiple_Result'][$entity]))) {
         $single_entry = $read_result['ReadMultiple_Result'][$entity];
+        if (empty($single_entry)) {
+          continue;
+        }
         $record = $this->create_nav_data_record($single_entry, $entity);
         $this->data_records[$single_entry['_TIMESTAMP']] = $record;
-        return;
+        continue;
       }
       foreach ($read_result['ReadMultiple_Result'][$entity] as $nav_entry) {
         // if type is change and we have a before value
