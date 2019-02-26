@@ -51,76 +51,76 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
   /**
    * test the Navision API UpdateMultiple Contacts Command
    */
-  public function testSoapUpdateMultipleContactsCommand() {
-    // get contact #1
-    $r_params = array( 'filter' =>
-      array(
-        "Field"     => "Transferred",
-        "Criteria"  => "0",
-      ),
-      'setSize' => '2',
-    );
-    $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
-    try{
-      $this->soapConnectorContact->executeCommand($readCommand);
-    } catch (Exception $e) {
-      error_log($e->getMessage());
-      throw new Exception("ReadMultiple Command failed. Message: " . $e->getMessage());
-    }
-    $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
-    foreach ($read_result['ReadMultiple_Result']['civiContact'] as &$read_entry) {
-      $read_entry['Transferred'] = 1;
-    }
-    $update_params['civiContact_List'] = $read_result['ReadMultiple_Result'];
-
-    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
-    try{
-      $this->soapConnectorContact->executeCommand($testUpdateMultipleCommand);
-    } catch (Exception $e) {
-      error_log($e->getMessage());
-      throw new Exception("UpdateMultipleContacts Command failed. Message: " . $e->getMessage());
-    }
-
-    print "UpdateMultiple Contacts API call successful! \n";
-    print_r($testUpdateMultipleCommand->getSoapResult());
-  }
+//  public function testSoapUpdateMultipleContactsCommand() {
+//    // get contact #1
+//    $r_params = array( 'filter' =>
+//      array(
+//        "Field"     => "Transferred",
+//        "Criteria"  => "0",
+//      ),
+//      'setSize' => '2',
+//    );
+//    $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
+//    try{
+//      $this->soapConnectorContact->executeCommand($readCommand);
+//    } catch (Exception $e) {
+//      error_log($e->getMessage());
+//      throw new Exception("ReadMultiple Command failed. Message: " . $e->getMessage());
+//    }
+//    $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
+//    foreach ($read_result['ReadMultiple_Result']['civiContact'] as &$read_entry) {
+//      $read_entry['Transferred'] = 1;
+//    }
+//    $update_params['civiContact_List'] = $read_result['ReadMultiple_Result'];
+//
+//    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
+//    try{
+//      $this->soapConnectorContact->executeCommand($testUpdateMultipleCommand);
+//    } catch (Exception $e) {
+//      error_log($e->getMessage());
+//      throw new Exception("UpdateMultipleContacts Command failed. Message: " . $e->getMessage());
+//    }
+//
+//    print "UpdateMultiple Contacts API call successful! \n";
+//    print_r($testUpdateMultipleCommand->getSoapResult());
+//  }
 
   /**
    * test the Navision API UpdateMultiple Relation Command
    */
-  public function testSoapUpdateMultipleRelationCommand() {
-    // get contact #1
-    $r_params = array( 'filter' =>
-      array(
-        "Field"     => "Transferred",
-        "Criteria"  => "0",
-      ),
-      'setSize' => '2',
-    );
-    $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
-    try{
-      $this->soapConnectorRelationship->executeCommand($readCommand);
-    } catch (Exception $e) {
-      error_log($e->getMessage());
-      throw new Exception("ReadMultiple CiviContRelation Command failed. Message: " . $e->getMessage());
-    }
-    $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
-    foreach ($read_result['ReadMultiple_Result']['civiContRelation'] as &$read_entry) {
-      $read_entry['Transferred'] = 1;
-    }
-    $update_params['civiContRelation_List'] = $read_result['ReadMultiple_Result'];
-
-    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
-    try{
-      $this->soapConnectorRelationship->executeCommand($testUpdateMultipleCommand);
-    } catch (Exception $e) {
-      error_log($e->getMessage());
-      throw new Exception("UpdateMultiple CiviContRelation Command failed. Message: " . $e->getMessage());
-    }
-
-    print "UpdateMultiple Relation API call successful! \n";
-    print_r($testUpdateMultipleCommand->getSoapResult());
-  }
+//  public function testSoapUpdateMultipleRelationCommand() {
+//    // get contact #1
+//    $r_params = array( 'filter' =>
+//      array(
+//        "Field"     => "Transferred",
+//        "Criteria"  => "0",
+//      ),
+//      'setSize' => '2',
+//    );
+//    $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
+//    try{
+//      $this->soapConnectorRelationship->executeCommand($readCommand);
+//    } catch (Exception $e) {
+//      error_log($e->getMessage());
+//      throw new Exception("ReadMultiple CiviContRelation Command failed. Message: " . $e->getMessage());
+//    }
+//    $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
+//    foreach ($read_result['ReadMultiple_Result']['civiContRelation'] as &$read_entry) {
+//      $read_entry['Transferred'] = 1;
+//    }
+//    $update_params['civiContRelation_List'] = $read_result['ReadMultiple_Result'];
+//
+//    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
+//    try{
+//      $this->soapConnectorRelationship->executeCommand($testUpdateMultipleCommand);
+//    } catch (Exception $e) {
+//      error_log($e->getMessage());
+//      throw new Exception("UpdateMultiple CiviContRelation Command failed. Message: " . $e->getMessage());
+//    }
+//
+//    print "UpdateMultiple Relation API call successful! \n";
+//    print_r($testUpdateMultipleCommand->getSoapResult());
+//  }
 
   /**
    * test the Navision API UpdateMultiple Process Command
@@ -130,9 +130,9 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
     $r_params = array( 'filter' =>
       array(
         "Field"     => "Transferred",
-        "Criteria"  => "0",
+        "Criteria"  => "1",
       ),
-      'setSize' => '2',
+      'setSize' => '200',
     );
     $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
     try{
@@ -143,7 +143,7 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
     }
     $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
     foreach ($read_result['ReadMultiple_Result']['civiProcess'] as &$read_entry) {
-      $read_entry['Transferred'] = 1;
+      $read_entry['Transferred'] = 0;
     }
     $update_params['civiProcess_List'] = $read_result['ReadMultiple_Result'];
 
@@ -162,38 +162,38 @@ class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase
   /**
    * test the Navision API UpdateMultiple Status Command
    */
-  public function testSoapUpdateMultipleStatusCommand() {
-    // get contact #1
-    $r_params = array( 'filter' =>
-      array(
-        "Field"     => "Transferred",
-        "Criteria"  => "0",
-      ),
-      'setSize' => '2',
-    );
-    $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
-    try{
-      $this->soapConnectorContactStatus->executeCommand($readCommand);
-    } catch (Exception $e) {
-      error_log($e->getMessage());
-      throw new Exception("ReadMultiple civiContStatus Command failed. Message: " . $e->getMessage());
-    }
-    $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
-    foreach ($read_result['ReadMultiple_Result']['civiContStatus'] as &$read_entry) {
-      $read_entry['Transferred'] = 1;
-    }
-    $update_params['civiContStatus_List'] = $read_result['ReadMultiple_Result'];
-
-    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
-    try{
-      $this->soapConnectorContactStatus->executeCommand($testUpdateMultipleCommand);
-    } catch (Exception $e) {
-      error_log($e->getMessage());
-      throw new Exception("UpdateMultiple civiContStatus Command failed. Message: " . $e->getMessage());
-    }
-
-    print "UpdateMultiple Status Status API call successful! \n";
-    print_r($testUpdateMultipleCommand->getSoapResult());
-  }
+//  public function testSoapUpdateMultipleStatusCommand() {
+//    // get contact #1
+//    $r_params = array( 'filter' =>
+//      array(
+//        "Field"     => "Transferred",
+//        "Criteria"  => "0",
+//      ),
+//      'setSize' => '2',
+//    );
+//    $readCommand = new CRM_Nav_SoapCommand_ReadMultiple($r_params);
+//    try{
+//      $this->soapConnectorContactStatus->executeCommand($readCommand);
+//    } catch (Exception $e) {
+//      error_log($e->getMessage());
+//      throw new Exception("ReadMultiple civiContStatus Command failed. Message: " . $e->getMessage());
+//    }
+//    $read_result = json_decode(json_encode($readCommand->getSoapResult()), TRUE);
+//    foreach ($read_result['ReadMultiple_Result']['civiContStatus'] as &$read_entry) {
+//      $read_entry['Transferred'] = 1;
+//    }
+//    $update_params['civiContStatus_List'] = $read_result['ReadMultiple_Result'];
+//
+//    $testUpdateMultipleCommand = new CRM_Nav_SoapCommand_UpdateMultiple($update_params);
+//    try{
+//      $this->soapConnectorContactStatus->executeCommand($testUpdateMultipleCommand);
+//    } catch (Exception $e) {
+//      error_log($e->getMessage());
+//      throw new Exception("UpdateMultiple civiContStatus Command failed. Message: " . $e->getMessage());
+//    }
+//
+//    print "UpdateMultiple Status Status API call successful! \n";
+//    print_r($testUpdateMultipleCommand->getSoapResult());
+//  }
 
 }
