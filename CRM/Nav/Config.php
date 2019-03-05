@@ -76,6 +76,7 @@ class CRM_Nav_Config {
     'prefix_id',
     'suffix_id',
     'sort_name',
+    'external_identifier',
 //    address
     'geo_code_1',
     'geo_code_2',
