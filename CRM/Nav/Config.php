@@ -85,6 +85,8 @@ class CRM_Nav_Config {
     'is_billing',
     'is_bulkmail',
     'reset_date',
+    'on_hold',
+    'hold_date',
     'signature_text',
     'signature_html',
   ];
