@@ -269,6 +269,19 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       }
       CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'] = $supervisor;
       return TRUE;
+    } else {
+//      check for relationship to 'Fachbeirat Contact' fachbeirat_contact_id
+      $fachbeirat_contact_id = CRM_Nav_Config::get('fachbeirat_contact_id');
+      $result = civicrm_api3('Relationship', 'get', array(
+        'sequential' => 1,
+        'contact_id_a' => $contact_id,
+        'contact_id_b' => $fachbeirat_contact_id,
+      ));
+      if ($result['count'] > 0) {
+        $supervisor = 'Fachbeirat';
+        CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'] = $supervisor;
+        return TRUE;
+      }
     }
     CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'] = '';
     return FALSE;

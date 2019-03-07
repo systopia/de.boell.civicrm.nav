@@ -99,8 +99,9 @@ class CRM_Nav_Config {
   ];
 
   private static $local_config = [
-    'db_log_id'                       => '2',
+    'db_log_id'                       => '3',
     'hbs_contact_id'                  => '1',
+    'fachbeirat_contact_id'           => '31',
     'navision_custom_field'           => 'custom_88',
     'process_id'                      => 'custom_52',
     'org_name_1'                      => 'custom_92',
@@ -165,6 +166,7 @@ class CRM_Nav_Config {
   private static $hbs_config   = [
     'db_log_id'                       => '145801',
     'hbs_contact_id'                  => '4',
+    'fachbeirat_contact_id'           => '78734',
     'navision_custom_field'           => 'custom_147',
     'process_id'                      => 'custom_126',
     'org_name_1'                      => 'custom_106',
