@@ -368,7 +368,7 @@ class CRM_Nav_Exporter_Mailer {
    * @param $values
    */
   private function set_master_address_id(&$values) {
-    $new_contact_id = $values['new'];
+    $new_contact_id = $this->get_contact_id_from_master_id($values['new']);
     $result = civicrm_api3('Contact', 'getsingle', [
       'id' => $new_contact_id,
     ]);
@@ -378,7 +378,7 @@ class CRM_Nav_Exporter_Mailer {
 
     $values['new'] = $new_contact_name;
     if (isset($values['old'])) {
-      $old_contact_id = $values['old'];
+      $old_contact_id = $this->get_contact_id_from_master_id($values['old']);
       $result = civicrm_api3('Contact', 'getsingle', [
         'id' => $old_contact_id,
       ]);
@@ -386,6 +386,20 @@ class CRM_Nav_Exporter_Mailer {
       $old_contact_name = "<a href={$contact_link}>{$result['display_name']}</a>";
       $values['old'] = $old_contact_name;
     }
+  }
+
+  /**
+   * Get contact_id from master_id
+   * @param $master_id
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_contact_id_from_master_id($master_id) {
+    $result = civicrm_api3('Address', 'getsingle', [
+      'id' => $master_id,
+    ]);
+    return $result['contact_id'];
   }
 
 
