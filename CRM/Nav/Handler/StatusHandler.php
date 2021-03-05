@@ -77,7 +77,11 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
    * @throws \CiviCRM_API3_Exception
    */
   private function write_relationship_to_db($contact_id, $relationship_id, $relationship_data) {
-    $relationship_data['id'] = $relationship_id;
+    // see https://projekte.systopia.de/issues/13750
+    // empty parameter not accepted here. We create a new Relationship
+    if (!empty($relationship_id)) {
+      $relationship_data['id'] = $relationship_id;
+    }
     $relationship_data['contact_id_a'] = $contact_id;
     $relationship_data['contact_id_b'] = $this->hbs_contact_id;
 
