@@ -204,7 +204,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   protected function create_entity($entity, $values) {
-    $result = civicrm_api3($entity, 'create', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api($entity, 'create', $values);
     if ($result['is_error']) {
       $this->log("Failed to create {$entity}-Entity with values " . json_encode($values));
     }
@@ -219,7 +219,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   protected function get_entity($entity, $values) {
-    $result = civicrm_api3($entity, 'get', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api($entity, 'get', $values);
     if ($result['is_error']) {
       $this->log("Failed to get {$entity}-Entity with values " . json_encode($values));
     }
@@ -234,7 +234,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   protected function delete_entity($entity, $entity_id) {
-    $result = civicrm_api3($entity, 'delete', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api($entity, 'delete', array(
       'sequential' => 1,
       'id' => $entity_id,
     ));
@@ -251,7 +251,7 @@ abstract  class CRM_Nav_Data_EntityData_Base {
    * @throws \CiviCRM_API3_Exception
    */
   protected function i3val_update($values) {
-    $result = civicrm_api3('Contact', 'request_update', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'request_update', $values);
     if ($result['is_error']) {
       $this->log("i3Val Request update failed for values " . json_encode($values));
     }

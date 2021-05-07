@@ -231,7 +231,7 @@ class CRM_Nav_Config {
    * @throws \CiviCRM_API3_Exception
    */
   private static function create_option_value($check_option_value) {
-    $result = civicrm_api3('OptionValue', 'create', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'create', array(
       'sequential' => 1,
       'option_group_id' => self::get('bewerbungscode_option_group'),
       'label' => $check_option_value,
@@ -252,7 +252,7 @@ class CRM_Nav_Config {
       return;
     }
     $option_group = self::get('bewerbungscode_option_group');
-    $result = civicrm_api3('OptionValue', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'get', array(
       'sequential' => 1,
       'option_group_id' => $option_group,
     ));

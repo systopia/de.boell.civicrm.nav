@@ -96,7 +96,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     if (isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id])) {
       return TRUE;
     }
-    $result = civicrm_api3('Contact', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'get', array(
       'sequential' => 1,
       'return' => array(CRM_Nav_Config::get('navision_custom_field'), CRM_Nav_Config::get('creditor_custom_field_id'), CRM_Nav_Config::get('debitor_custom_field_id')),
       'id' => $contact_id,
@@ -252,7 +252,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     if (isset(CRM_Nav_ChangeTracker_LogAnalyzeRunner::$nav_id_cache[$contact_id]['supervisor'])) {
       return TRUE;
     }
-    $result = civicrm_api3('Relationship', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'get', array(
       'sequential' => 1,
       'contact_id_a' => $contact_id,
       'relationship_type_id' => array('IN' => array(CRM_Nav_Config::get('Stipendiat_in'),
@@ -272,7 +272,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
     } else {
 //      check for relationship to 'Fachbeirat Contact' fachbeirat_contact_id
       $fachbeirat_contact_id = CRM_Nav_Config::get('fachbeirat_contact_id');
-      $result = civicrm_api3('Relationship', 'get', array(
+      $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'get', array(
         'sequential' => 1,
         'contact_id_a' => $contact_id,
         'contact_id_b' => $fachbeirat_contact_id,

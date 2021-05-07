@@ -198,7 +198,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     if (empty($contact_id)) {
       $this->log("No contact_id given, couldn't create consent record");
     }
-    $result = civicrm_api3('ConsentRecord', 'create', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('ConsentRecord', 'create', array(
       'sequential' => 1,
       'contact_id' => $contact_id,
       'category' => "10",
@@ -289,7 +289,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     if (empty($emails)) {
       return array();
     }
-    $result = civicrm_api3('Email', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Email', 'get', array(
       'sequential' => 1,
       'email' => array('IN' => $emails),
     ));
@@ -302,7 +302,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       $contact_ids[] = $val['contact_id'];
     }
     // filter out deleted contcts etc ...
-    $result_ids = civicrm_api3('Contact', 'get', array(
+    $result_ids = CRM_Nav_Utils::civicrm_nav_api('Contact', 'get', array(
       'sequential' => 1,
       'return' => array("id"),
       'id' => array('IN' => array(1, 2, 3)),
@@ -335,7 +335,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       }
       $lookup_details = $contact_details['after'];
     }
-    $result = civicrm_api3('Contact', 'get', $lookup_details);
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'get', $lookup_details);
     if ($result['is_error'] == '1') {
       $this->log("Error occured while looking up contacts. Message: " . $result['error_message']);
       return "";
@@ -354,7 +354,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
     if (empty($this->_contact_id)) {
       return;
     }
-    $result = civicrm_api3('Contact', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'get', array(
       'sequential' => 1,
       'id' => $this->_contact_id,
       'return' => array("id",
@@ -403,7 +403,7 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
    * @return string
    */
   private function find_contact_by_id_tracker() {
-    $result = civicrm_api3('Contact', 'findbyidentity', [
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'findbyidentity', [
       'identifier' => $this->_navision_id,
       'identifier_type' => "navision",
     ]);

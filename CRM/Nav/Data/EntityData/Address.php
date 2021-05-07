@@ -271,7 +271,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       return;
     }
     // get all addresses from contact with master_id NOT NULL (Should return just one address)
-    $result = civicrm_api3('Address', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Address', 'get', array(
       'sequential' => 1,
       'contact_id' => $this->_contact_id,
       'master_id' => array('IS NOT NULL' => 1),
@@ -289,7 +289,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
       return;
     }
     $country_iso_code = $this->changed_data['country_id'];
-    $result = civicrm_api3('Country', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Country', 'get', array(
       'sequential' => 1,
       'iso_code' => $country_iso_code,
     ));
@@ -361,7 +361,7 @@ class CRM_Nav_Data_EntityData_Address  extends CRM_Nav_Data_EntityData_Base {
    */
   private function create_relationship($contact_id, $organization_id) {
     try {
-      $result = civicrm_api3('Relationship', 'create', [
+      $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'create', [
         'sequential'           => 1,
         'contact_id_a'         => $contact_id,
         'contact_id_b'         => $organization_id,

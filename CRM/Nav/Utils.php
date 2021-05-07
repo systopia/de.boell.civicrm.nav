@@ -26,7 +26,7 @@ class CRM_Nav_Utils {
    * @param $params
    * @throws CiviCRM_API3_Exception
    */
-  public static function civicrma_nav_api($entity, $action, $params) {
+  public static function civicrm_nav_api($entity, $action, $params) {
     // parameter validation
     foreach ($params as $key => &$value) {
       if (empty($value)) {
