@@ -27,6 +27,8 @@ class CRM_Nav_Utils {
    * @throws CiviCRM_API3_Exception
    */
   public static function civicrm_nav_api($entity, $action, $params) {
+    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] API Params for {$entity}.{$action}: " . json_encode($params));
+
     // parameter validation
     foreach ($params as $key => &$value) {
       if (empty($value)) {
@@ -35,8 +37,12 @@ class CRM_Nav_Utils {
         CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Cleaning up API Params for {$entity}.{$action} - {$key}");
       }
     }
+    if (empty($params)) {
+      CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Empty Parameter array");
+      throw new API_Exception("Empty Parameter array");
+    }
     // call civicrm_api
-    civicrm_api3($entity,$action, $params);
+    return civicrm_api3($entity,$action, $params);
   }
 
 
