@@ -113,7 +113,7 @@ class CRM_Nav_Mapping {
     '87' => '',
     '88' => '',
     '89' => '',
-    '90' => '',
+    '90' => 'Außereuropäische Sprach- und Kulturwissenschaften',
     '91' => '',
     '92' => '',
     '93' => '',
@@ -139,23 +139,23 @@ class CRM_Nav_Mapping {
    */
   public static function get_civi_studienbereich_value($id) {
     if (!array_key_exists($id, self::$nav_studienbereich)) {
-      throw new CRM_Nav_InvalidMappingKey("Invalid Studienbereich id ('{$id}')");
+      throw new CRM_Nav_Exceptions_InvalidMappingKey("Invalid Studienbereich id ('{$id}')");
     }
-    if (empty(self::nav_studienbereich[$id])) {
-      throw new CRM_Nav_EmptyStudienbereichMapping("No Mapping available for id {$id}");
+    if (empty(self::$nav_studienbereich[$id])) {
+      throw new CRM_Nav_Exceptions_EmptyStudienbereichMapping("No Mapping available for id {$id}");
     }
     $result = civicrm_api3('OptionValue', 'get', [
       'sequential' => 1,
       'label' => self::$nav_studienbereich[$id],
     ]);
     if ($result['is_error'] != '0') {
-      throw new CRM_Nav_InternalApiError('Internal API Error');
+      throw new CRM_Nav_Exceptions_InternalApiError('Internal API Error: ' . $result['error_message']);
     }
     if ($result['count'] == '0') {
-      throw new CRM_Nav_MappingNotFound("No Result found for mapping Entry ('{$id}')");
+      throw new CRM_Nav_Exceptions_MappingNotFound("No Result found for mapping Entry ('{$id}')");
     }
     if ($result['count'] > '1') {
-      throw new CRM_Nav_MultipleMappingMatches("Found {$result['count']} matches for id '{$id}'");
+      throw new CRM_Nav_Exceptions_MultipleMappingMatches("Found {$result['count']} matches for id '{$id}'");
     }
     foreach ($result['values'] as $values) {
       return $values['value'];

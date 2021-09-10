@@ -15,38 +15,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
 /**
  * No Mapping available
- * Class CRM_Nav_EmptyStudienbereich_Mapping
+ * Class CRM_Nav_Exceptions_EmptyStudienbereichMapping
  */
-class CRM_Nav_EmptyStudienbereichMapping extends Exception
-{}
-
-/**
- * Invalid mapping Key
- * Class CRM_Nav_InvalidMappingKey
- */
-class CRM_Nav_InvalidMappingKey extends Exception
-{}
-
-/**
- * Api Error
- * Class CRM_Nav_InternalApiError
- */
-class CRM_Nav_InternalApiError extends Exception
-{}
-
-/**
- * Mapping in CiviCRM not found
- * Class CRM_Nav_MappingNotFound
- */
-class CRM_Nav_MappingNotFound extends Exception
-{}
-
-/**
- * More than one Match found for that mapping
- * Class CRM_Nav_MultipleMappingMatches
- */
-class CRM_Nav_MultipleMappingMatches extends Exception
+class CRM_Nav_Exceptions_EmptyStudienbereichMapping extends Exception
 {}
