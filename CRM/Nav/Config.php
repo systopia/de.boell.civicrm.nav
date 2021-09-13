@@ -100,7 +100,7 @@ class CRM_Nav_Config {
 
   private static $local_config = [
     'db_log_id'                       => '4',
-    'hbs_contact_id'                  => '3',
+    'hbs_contact_id'                  => '7',
     'fachbeirat_contact_id'           => '5',
     'navision_custom_field'           => 'custom_37',
     'process_id'                      => 'custom_1',
