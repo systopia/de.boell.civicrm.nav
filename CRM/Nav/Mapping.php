@@ -144,7 +144,7 @@ class CRM_Nav_Mapping {
     if (empty(self::$nav_studienbereich[$id])) {
       throw new CRM_Nav_Exceptions_EmptyStudienbereichMapping("No Mapping available for id {$id}");
     }
-    $result = CRM_Nav_Utils::civicrm_api3('OptionValue', 'get', [
+    $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'get', [
       'sequential' => 1,
       'label' => self::$nav_studienbereich[$id],
     ]);
