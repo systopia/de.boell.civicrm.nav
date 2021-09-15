@@ -133,7 +133,8 @@ class CRM_Nav_Sync {
         $status_handler->process();
         $relationship_handler->process();
       } catch (Exception $e) {
-        $this->log("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}. Message: " . $e->getMessage());
+        $exception_type = get_class($e);
+        $this->log("Couldn't handle Record with timestamp {$timestamp} of type {$record->get_type()}. ({$exception_type}) Message: " . $e->getMessage());
         $record->set_error_message($e->getMessage());
       }
     }
