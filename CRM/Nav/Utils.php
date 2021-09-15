@@ -39,7 +39,7 @@ class CRM_Nav_Utils {
     }
     if (empty($params)) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Empty Parameter array");
-      throw new API_Exception("Empty Parameter array");
+      throw new CRM_Nav_Exceptions_EmptyApiParameterArray("Empty Parameter array");
     }
     // call civicrm_api
     return civicrm_api3($entity,$action, $params);
