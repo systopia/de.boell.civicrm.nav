@@ -16,15 +16,20 @@
 +--------------------------------------------------------*/
 
 /**
- * Class CRM_Nav_Sync
+ * Class CRM_Nav_Utils
  */
 class CRM_Nav_Utils {
 
   /**
+   * Api Wrapper to validate API Arguments. Initially this extension was created for CiviCRM 5.4, and an older 4.7.x version.
+   * In newer versions, it is not possible to provide empty parameters to the API.
+   * This function filters empty parameters and then call the API.
+   * If Arguments afterwards are empty, CRM_Nav_Exceptions_EmptyApiParameterArray is thrown.
+   *
    * @param $entity
    * @param $action
    * @param $params
-   * @throws CiviCRM_API3_Exception
+   * @throws CiviCRM_API3_Exception|CRM_Nav_Exceptions_EmptyApiParameterArray
    */
   public static function civicrm_nav_api($entity, $action, $params) {
     CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] API Params for {$entity}.{$action}: " . json_encode($params));
