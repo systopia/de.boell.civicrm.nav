@@ -126,7 +126,12 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
   protected function fix_relationship_field_of_study(&$values)
   {
     $field_of_study = CRM_Nav_Config::get('Field_of_Study');
-    $values[$field_of_study] = CRM_Nav_Mapping::get_civi_studienbereich_value($values[$field_of_study]);
+    try {
+      $values[$field_of_study] = CRM_Nav_Mapping::get_civi_studienbereich_value($values[$field_of_study]);
+    } catch (Exception $e) {
+      $exception_type = get_class($e);
+      $this->log($exception_type . " : " . $e->getMessage());
+    }
   }
 
   /**
