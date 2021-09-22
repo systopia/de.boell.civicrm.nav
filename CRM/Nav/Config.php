@@ -255,11 +255,14 @@ class CRM_Nav_Config {
     $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'get', array(
       'sequential' => 1,
       'option_group_id' => $option_group,
+      'options' => [
+        'limit' => 0
+      ]
     ));
     if ($result['is_error'] != '1') {
       self::$candidature_process_code_option_value_cache = [];  // clear cache
       foreach ($result['values'] as $val) {
-        self::$candidature_process_code_option_value_cache[] = $val['name'];
+        self::$candidature_process_code_option_value_cache[] = $val['label'];
       }
     }
   }
