@@ -50,6 +50,7 @@ class CRM_Nav_Sync {
    */
   public function run() {
     $this->get_nav_data();
+    CRM_Core_Error::debug_log_message("Debug Data: " . json_encode($this->data_records));
     if (empty($this->data_records)) {
       return 0;
     }
@@ -123,6 +124,7 @@ class CRM_Nav_Sync {
    */
   private function handle_Nav_data() {
     foreach ($this->data_records as $timestamp => $record) {
+      $this->log("DEBUG Record: " . $record->get_summary('json'));
       try {
         $contact_handler      = new CRM_Nav_Handler_ContactHandler($record, $this->debug);
         $process_handler      = new CRM_Nav_Handler_ProcessHandler($record, $this->debug);
