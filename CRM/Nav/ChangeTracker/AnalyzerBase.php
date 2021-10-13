@@ -257,6 +257,7 @@ abstract class CRM_Nav_ChangeTracker_AnalyzerBase {
       'contact_id_a' => $contact_id,
       'relationship_type_id' => array('IN' => array(CRM_Nav_Config::get('Stipendiat_in'),
                                                     CRM_Nav_Config::get('Promotionsstipendiat_in'),
+                                                    CRM_Nav_Config::get('Sonstige_Stipendiat_in'),
                                                     CRM_Nav_Config::get('Vertrauensdozent_in'),
                                                     CRM_Nav_Config::get('Auswahlkommissionsmitglied'),
         )),

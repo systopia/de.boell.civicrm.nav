@@ -37,6 +37,7 @@ class CRM_Nav_Data_NavStatusRecord extends CRM_Nav_Data_NavDataRecordBase {
     $this->relationship_type_mapping = [
     'Vertrauensdozent_in'       => CRM_Nav_Config::get('Vertrauensdozent_in'),
     'Stipendiat_in'             => CRM_Nav_Config::get('Stipendiat_in'),
+    'Sonstige_Stipendiat_in'    => CRM_Nav_Config::get('Sonstige_Stipendiat_in'),
     'Promotionsstipendiat_in'   => CRM_Nav_Config::get('Promotionsstipendiat_in'),
     'Auswahlkommissionsmitglied'=> CRM_Nav_Config::get('Auswahlkommissionsmitglied'),
     ];

@@ -43,8 +43,16 @@ class CRM_Nav_Utils {
       }
     }
     if (empty($params)) {
-      CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Empty Parameter array");
-      throw new CRM_Nav_Exceptions_EmptyApiParameterArray("Empty Parameter array");
+      CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Empty Parameter array for {$entity}.{$action}");
+      // throwing an Exception here breaks the rest of the code. Would need to be catched all over.
+      // Instead we replicate behavior from before the API Parameter validation, and return an empty result instead.
+      // throw new CRM_Nav_Exceptions_EmptyApiParameterArray("Empty Parameter array for {$entity}.{$action}");
+      return [
+        "is_error" => 0,
+        "version" => 3,
+        "count" => 0,
+        "values" => [],
+      ];
     }
     // call civicrm_api
     return civicrm_api3($entity,$action, $params);
