@@ -128,6 +128,9 @@ class CRM_Nav_Data_NavProcessRecord extends CRM_Nav_Data_NavDataRecordBase {
       case "Graduation":
         // Promotionsstipendiat/in
         return CRM_Nav_Config::get('Graduation');
+      case "Sonstige":
+        // Sonstiges Stipendium
+        return CRM_Nav_Config::get('Sonstige_Stipendiat_in');
       default:
         throw new Exception("Invalid Advancement Type {$advancement}");
         // default value Currently is just Studienstipendiat ?
