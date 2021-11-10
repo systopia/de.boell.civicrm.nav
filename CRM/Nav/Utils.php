@@ -35,13 +35,13 @@ class CRM_Nav_Utils {
     CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] API Params for {$entity}.{$action}: " . json_encode($params));
 
     // parameter validation
-    foreach ($params as $key => &$value) {
-      if (empty($value)) {
-        unset($params[$key]);
-        // debugging output
-        CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Cleaning up API Params for {$entity}.{$action} - {$key}");
-      }
-    }
+//    foreach ($params as $key => &$value) {
+//      if (empty($value)) {
+//        unset($params[$key]);
+//        // debugging output
+//        CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Cleaning up API Params for {$entity}.{$action} - {$key}");
+//      }
+//    }
     if (empty($params)) {
       CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] Empty Parameter array for {$entity}.{$action}");
       // throwing an Exception here breaks the rest of the code. Would need to be catched all over.
