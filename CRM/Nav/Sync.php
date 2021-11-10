@@ -60,10 +60,11 @@ class CRM_Nav_Sync {
     // FixMe: return actual number of parsed/added records or some sort of statistics here.
     //        For now we just return the number of records
 
-    $this->set_consumed_records_transferred('civiContact');
-    $this->set_consumed_records_transferred('civiContRelation');
-    $this->set_consumed_records_transferred('civiProcess');
-    $this->set_consumed_records_transferred('civiContStatus');
+    // for testing purposes don't set to transfered!
+//    $this->set_consumed_records_transferred('civiContact');
+//    $this->set_consumed_records_transferred('civiContRelation');
+//    $this->set_consumed_records_transferred('civiProcess');
+//    $this->set_consumed_records_transferred('civiContStatus');
 
     // log errors
     $this->cleanup_handling();
