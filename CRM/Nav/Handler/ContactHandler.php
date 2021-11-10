@@ -109,9 +109,9 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       'sequential' => 1,
       'contact_type' => "Individual",
       'id' => $contact_id,
-      $this->navision_custom_field => "",
+      $this->navision_custom_field => " ",
     ));
-    if ($result['is_error'] != '1') {
+    if ($result['is_error'] == '1') {
       throw new Exception("Error occured while removing NavisionId from Contact {$contact_id}. Error Message: {$result['error_message']}");
     }
   }
