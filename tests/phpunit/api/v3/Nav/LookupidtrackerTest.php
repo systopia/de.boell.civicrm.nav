@@ -42,7 +42,7 @@ class api_v3_Nav_LookUpIdTrackerTest extends \PHPUnit_Framework_TestCase impleme
    * Note how the function name begins with the word "test".
    */
   public function testApiExample() {
-//    $result = civicrm_api3('Nav', 'LookUpIdTracker', array('magicword' => 'sesame'));
+//    $result = CRM_Nav_Utils::civicrma_nav_api('Nav', 'LookUpIdTracker', array('magicword' => 'sesame'));
 //    $this->assertEquals('Twelve', $result['values'][12]['name']);
   }
 

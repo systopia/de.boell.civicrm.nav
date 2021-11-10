@@ -113,7 +113,7 @@ class CRM_Nav_Exporter_Mailer {
       'contact_data' => $content,
     ];
     $values['template_params'] = $smarty_variables;
-    $result = civicrm_api3('MessageTemplate', 'send', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api('MessageTemplate', 'send', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("Error sending Emails to {$template_name}");
     }
@@ -217,7 +217,7 @@ class CRM_Nav_Exporter_Mailer {
    * @throws \CiviCRM_API3_Exception
    */
   private function get_location_type($entity, $entity_id, $translated_entity) {
-    $result = civicrm_api3($entity, 'getsingle', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api($entity, 'getsingle', array(
       'sequential' => 1,
       'id' => $entity_id,
     ));
@@ -233,7 +233,7 @@ class CRM_Nav_Exporter_Mailer {
    * @throws \CiviCRM_API3_Exception
    */
   private function get_location_type_mapping() {
-    $result = civicrm_api3('LocationType', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('LocationType', 'get', array(
       'sequential' => 1,
     ));
     foreach ($result['values'] as $location_types) {
@@ -246,7 +246,7 @@ class CRM_Nav_Exporter_Mailer {
    */
   private function get_phone_type() {
     if (empty($this->phone_types)) {
-      $result = civicrm_api3('OptionValue', 'get', array(
+      $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'get', array(
         'sequential' => 1,
         'option_group_id' => "phone_type",
       ));
@@ -266,7 +266,7 @@ class CRM_Nav_Exporter_Mailer {
    * @throws \CiviCRM_API3_Exception
    */
   private function get_contact_name($contact_id) {
-    $result = civicrm_api3('Contact', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'get', array(
       'sequential' => 1,
       'return' => array("first_name", "last_name", "display_name"),
       'id' => $contact_id,
@@ -289,7 +289,7 @@ class CRM_Nav_Exporter_Mailer {
    * @throws \CiviCRM_API3_Exception
    */
   private function get_template_id($template_name) {
-    $result = civicrm_api3('MessageTemplate', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('MessageTemplate', 'get', array(
       'sequential' => 1,
       'msg_title' => $template_name,
     ));
@@ -313,7 +313,7 @@ class CRM_Nav_Exporter_Mailer {
    */
   private function create_template($template_name) {
     $template_content = file_get_contents(__DIR__ . "/../../../templates/mailer_template.tpl");
-    $result = civicrm_api3('MessageTemplate', 'create', [
+    $result = CRM_Nav_Utils::civicrm_nav_api('MessageTemplate', 'create', [
       'sequential'  => 1,
       'msg_title'   => $template_name,
       'msg_html'    => $template_content,
@@ -337,7 +337,7 @@ class CRM_Nav_Exporter_Mailer {
     } else {
       $subject = $this->subject;
     }
-    $result = civicrm_api3('MessageTemplate', 'create', [
+    $result = CRM_Nav_Utils::civicrm_nav_api('MessageTemplate', 'create', [
       'sequential'  => 1,
       'id'    => $template_id,
       'msg_subject' => $subject,
@@ -369,7 +369,7 @@ class CRM_Nav_Exporter_Mailer {
    */
   private function set_master_address_id(&$values) {
     $new_contact_id = $this->get_contact_id_from_master_id($values['new']);
-    $result = civicrm_api3('Contact', 'getsingle', [
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'getsingle', [
       'id' => $new_contact_id,
     ]);
     $contact_link = $this->generate_civicrm_user_link($new_contact_id);
@@ -379,7 +379,7 @@ class CRM_Nav_Exporter_Mailer {
     $values['new'] = $new_contact_name;
     if (isset($values['old'])) {
       $old_contact_id = $this->get_contact_id_from_master_id($values['old']);
-      $result = civicrm_api3('Contact', 'getsingle', [
+      $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'getsingle', [
         'id' => $old_contact_id,
       ]);
       $contact_link = $this->generate_civicrm_user_link($old_contact_id);
@@ -396,7 +396,7 @@ class CRM_Nav_Exporter_Mailer {
    * @throws \CiviCRM_API3_Exception
    */
   private function get_contact_id_from_master_id($master_id) {
-    $result = civicrm_api3('Address', 'getsingle', [
+    $result = CRM_Nav_Utils::civicrm_nav_api('Address', 'getsingle', [
       'id' => $master_id,
     ]);
     return $result['contact_id'];

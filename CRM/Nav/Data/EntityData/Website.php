@@ -123,7 +123,7 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     if (isset($this->_website_before['url'])) {
       $values['url'] = ['LIKE' => "%{$this->parse_civi_url($this->_website_before['url'])}"];
     }
-    $result = civicrm_api3('Website', 'get', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api('Website', 'get', $values);
     if ($result['is_error']) {
       $this->log("Couldn't get civi data for Website {$this->_contact_id}. Error: {$result['error_message']}");
       return;
@@ -131,7 +131,7 @@ class CRM_Nav_Data_EntityData_Website  extends CRM_Nav_Data_EntityData_Base {
     if ($result['count'] == '0') {
       // nothing found, get all websites for contact and compare to _website_after/before
       unset($values['url']);
-      $result = civicrm_api3('Website', 'get', $values);
+      $result = CRM_Nav_Utils::civicrm_nav_api('Website', 'get', $values);
       if ($result['is_error']) {
         $this->log("Couldn't get civi data for Website {$this->_contact_id}. Error: {$result['error_message']}");
         return;

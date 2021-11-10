@@ -88,7 +88,7 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
       'id'          => $contact_id,
       $this->navision_custom_field  =>  $nav_id,
     );
-    $result = civicrm_api3('Contact', 'create', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'create', $values);
     if ($result['is_error'] == 1) {
       $this->log("Couldn't add Navision ID to contact ({$contact_id}).");
       throw new Exception("Couldn't add Navision ID to contact ({$contact_id}).");
@@ -105,13 +105,13 @@ class CRM_Nav_Handler_ContactHandler extends CRM_Nav_Handler_HandlerBase {
     if (empty($contact_id)) {
       return;
     }
-    $result = civicrm_api3('Contact', 'create', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'create', array(
       'sequential' => 1,
       'contact_type' => "Individual",
       'id' => $contact_id,
-      $this->navision_custom_field => "",
+      $this->navision_custom_field => " ",
     ));
-    if ($result['is_error'] != '1') {
+    if ($result['is_error'] == '1') {
       throw new Exception("Error occured while removing NavisionId from Contact {$contact_id}. Error Message: {$result['error_message']}");
     }
   }

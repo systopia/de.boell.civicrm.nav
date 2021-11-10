@@ -75,7 +75,7 @@ class CRM_Nav_ChangeTracker_RelationshipAnalyzer extends CRM_Nav_ChangeTracker_A
     if (isset($this->relationship_cache[$relationship_id])) {
       return $this->relationship_cache[$relationship_id];
     }
-    $result = civicrm_api3('Relationship', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'get', array(
       'sequential' => 1,
       'return' => array("contact_id_a"),
       'id' => $relationship_id,

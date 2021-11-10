@@ -69,7 +69,7 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
    * @throws \CiviCRM_API3_Exception
    */
   private function get_relationship($process_id) {
-    $result = civicrm_api3('Relationship', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'get', array(
       'sequential' => 1,
       'is_active' => 1,
       $this->process_id => $process_id,
@@ -98,12 +98,35 @@ class CRM_Nav_Handler_ProcessHandler extends CRM_Nav_Handler_HandlerBase {
       $values['id'] = $relationship_id;
     }
     $values = $values + $this->record->get_relationship_data();
+
     // TODO: if other Option Values need creation it shall be done here
     CRM_Nav_Config::check_or_create_option_value($values[CRM_Nav_Config::get('Candidature_Process_Code')]);
-    $result = civicrm_api3('Relationship', 'create', $values);
+
+    // #14548 Fix Studienbereich lookup
+    $this->fix_relationship_field_of_study($values);
+
+    $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'create', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("[ProcessHandler] Couldn't write Relationship to DB. '{$result['error_message']}'");
     }
+  }
+
+  /**
+   * Overwrite Navision Studienbereich with Mapping. In the past we had
+   * Problems with values changing in Navision, and those changes weren't reflected in CiviCRM.
+   *
+   * To prevent that we have a mapping table id => label for the Navision Id, and we make a dynamic lookup to
+   * the ID in CiviCRM via API.
+   *
+   * If Values change, they only need to be changed in CRM_Nav_Mapping::$nav_studienbereich
+   *
+   * @param $values
+   * @throws CiviCRM_API3_Exception
+   */
+  protected function fix_relationship_field_of_study(&$values)
+  {
+    $field_of_study = CRM_Nav_Config::get('Field_of_Study');
+    $values[$field_of_study] = CRM_Nav_Mapping::get_civi_studienbereich_value($values[$field_of_study]);
   }
 
   /**

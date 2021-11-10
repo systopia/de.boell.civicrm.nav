@@ -99,37 +99,39 @@ class CRM_Nav_Config {
   ];
 
   private static $local_config = [
-    'db_log_id'                       => '3',
-    'hbs_contact_id'                  => '1',
-    'fachbeirat_contact_id'           => '31',
-    'navision_custom_field'           => 'custom_88',
-    'process_id'                      => 'custom_52',
-    'org_name_1'                      => 'custom_92',
-    'org_name_2'                      => 'custom_93',
+    'db_log_id'                       => '4',
+    'hbs_contact_id'                  => '7',
+    'fachbeirat_contact_id'           => '5',
+    'navision_custom_field'           => 'custom_37',
+    'process_id'                      => 'custom_1',
+    'org_name_1'                      => 'custom_41',
+    'org_name_2'                      => 'custom_42',
     'location_type_private'           => '6',
     'location_type_organization'      => '8',
-    'creditor_custom_field_id'        => 'custom_89',
-    'debitor_custom_field_id'         => 'custom_90',
+    'creditor_custom_field_id'        => 'custom_38',
+    'debitor_custom_field_id'         => 'custom_39',
     'Vertrauensdozent_in'             => '14',
     'Stipendiat_in'                   => '12',
+    'Sonstige_Stipendiat_in'          => '17',
     'Promotionsstipendiat_in'         => '11',
     'Auswahlkommissionsmitglied'      => '13',
 //    todo --> Verify Mapping
-    'Allowance_to'                    => 'custom_54',
-    'Angestrebter_Studienabschluss'   => 'custom_56',
-    'Process_Entry_No'                => 'custom_52',
-    'Candidature_Process_Code'        => 'custom_53',
-    'Hauptfach_1'                     => 'custom_58',
-    'Subject_Group'                   => 'custom_61',
-    'Field_of_Study'                  => 'custom_62',
-    'Promotionsfach'                  => 'custom_59',
-    'Promotionsthema'                 => 'custom_60',
-    'Project_Controller'              => 'custom_63',
-    'Consultant'                      => 'custom_64',
-    'Next_Report_to'                  => 'custom_55',
-    'Subsidie'                        => 'custom_57',
+    'Allowance_to'                    => 'custom_3',
+    'Angestrebter_Studienabschluss'   => 'custom_5',
+    'Process_Entry_No'                => 'custom_1',
+    'Candidature_Process_Code'        => 'custom_2',
+    'Hauptfach_1'                     => 'custom_7',
+    'Subject_Group'                   => 'custom_10',
+    'Field_of_Study'                  => 'custom_11',
+    'Promotionsfach'                  => 'custom_8',
+    'Promotionsthema'                 => 'custom_9',
+    'Project_Controller'              => 'custom_12',
+    'Consultant'                      => 'custom_13',
+    'Next_Report_to'                  => 'custom_4',
+    'Subsidie'                        => 'custom_6',
     'Graduation'                      => '11',
     'Study'                           => '12',
+    'Sonstige'                        => '17',
     'bewerbungscode_option_group'     => 'bewerbung_vorgang_code',
     'Advancement_to'                  => 'end_date',
     'Förderbeginn'                    => 'start_date',
@@ -178,6 +180,7 @@ class CRM_Nav_Config {
     'Vertrauensdozent_in'             => '15',
     'Stipendiat_in'                   => '12',
     'Promotionsstipendiat_in'         => '11',
+    'Sonstige_Stipendiat_in'          => '20',
     'Auswahlkommissionsmitglied'      => '14',
     'Allowance_to'                    => 'custom_139',
     'Angestrebter_Studienabschluss'   => 'custom_130',
@@ -194,6 +197,7 @@ class CRM_Nav_Config {
     'Subsidie'                        => 'custom_131',
     'Graduation'                      => '11',
     'Study'                           => '12',
+    'Sonstige'                        => '20',
     'bewerbungscode_option_group'     => 'bewerbung_vorgang_code',
     'Advancement_to'                  => 'end_date',
     'Förderbeginn'                    => 'start_date',
@@ -231,7 +235,7 @@ class CRM_Nav_Config {
    * @throws \CiviCRM_API3_Exception
    */
   private static function create_option_value($check_option_value) {
-    $result = civicrm_api3('OptionValue', 'create', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'create', array(
       'sequential' => 1,
       'option_group_id' => self::get('bewerbungscode_option_group'),
       'label' => $check_option_value,
@@ -252,14 +256,17 @@ class CRM_Nav_Config {
       return;
     }
     $option_group = self::get('bewerbungscode_option_group');
-    $result = civicrm_api3('OptionValue', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'get', array(
       'sequential' => 1,
       'option_group_id' => $option_group,
+      'options' => [
+        'limit' => 0
+      ]
     ));
     if ($result['is_error'] != '1') {
       self::$candidature_process_code_option_value_cache = [];  // clear cache
       foreach ($result['values'] as $val) {
-        self::$candidature_process_code_option_value_cache[] = $val['name'];
+        self::$candidature_process_code_option_value_cache[] = $val['label'];
       }
     }
   }

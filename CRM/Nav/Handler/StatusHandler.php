@@ -85,7 +85,7 @@ class CRM_Nav_Handler_StatusHandler extends CRM_Nav_Handler_HandlerBase {
     $relationship_data['contact_id_a'] = $contact_id;
     $relationship_data['contact_id_b'] = $this->hbs_contact_id;
 
-    $result = civicrm_api3('Relationship', 'create', $relationship_data);
+    $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'create', $relationship_data);
     if ($result['is_error'] == '1') {
       $this->log("[StatusHandler] Couldn't write Relationship to DB. '{$result['error_message']}'");
       throw new Exception("[StatusHandler] Couldn't write Relationship to DB. '{$result['error_message']}'");

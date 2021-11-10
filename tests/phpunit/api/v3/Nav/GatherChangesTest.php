@@ -42,7 +42,7 @@ class api_v3_Nav_GatherChangesTest extends \PHPUnit_Framework_TestCase implement
    * Note how the function name begins with the word "test".
    */
   public function testApiExample() {
-    $result = civicrm_api3('Nav', 'GatherChanges', array('magicword' => 'sesame'));
+    $result = CRM_Nav_Utils::civicrm_nav_api('Nav', 'GatherChanges', array('magicword' => 'sesame'));
     $this->assertEquals('Twelve', $result['values'][12]['name']);
   }
 

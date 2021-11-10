@@ -46,7 +46,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
    * @throws \CiviCRM_API3_Exception
    */
   protected function get_contact_id_from_nav_id($navId) {
-    $result = civicrm_api3('Contact', 'get', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'get', array(
       'sequential' => 1,
       $this->navision_custom_field => $navId,
     ));
@@ -86,7 +86,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
    * @throws \CiviCRM_API3_Exception
    */
   protected function delete_entity($entity_id, $entity) {
-    $result = civicrm_api3($entity, 'delete', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api($entity, 'delete', array(
       'sequential' => 1,
       'id' => $entity_id,
     ));
@@ -101,7 +101,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
    * @throws \CiviCRM_API3_Exception
    */
   protected function disable_relationship($relationship_id) {
-    $result = civicrm_api3('Relationship', 'create', array(
+    $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'create', array(
       'sequential' => 1,
       'id' => $relationship_id,  // Relationship ID
       'is_active' => 0,
@@ -128,7 +128,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
     foreach ($parameters as $key => $value) {
       $values[$key] = $value;
     }
-    $result = civicrm_api3('Relationship', 'get', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api('Relationship', 'get', $values);
     if ($result['is_error'] == '1' || $result['count'] != '1') {
       return "";
     }
@@ -149,7 +149,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
       return "";
     }
     $values['contact_id'] = $contact_id;
-    $result = civicrm_api3($entity, 'get', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api($entity, 'get', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("Error occured while getting {$entity}-Id for Contact {$contact_id} with values " . json_encode($values) . ". Error Message: {$result['error_message']}");
     }
@@ -170,7 +170,7 @@ abstract class CRM_Nav_Handler_HandlerBase {
    * @throws \CiviCRM_API3_Exception
    */
   protected function create_civi_entity($values, $entity) {
-    $result = civicrm_api3($entity, 'create', $values);
+    $result = CRM_Nav_Utils::civicrm_nav_api($entity, 'create', $values);
     if ($result['is_error'] == '1') {
       throw new Exception("Couldn't create Civi Entity {$entity}. Error Message: " . $result['error_message']. ". Values: " . json_encode($values));
     }
