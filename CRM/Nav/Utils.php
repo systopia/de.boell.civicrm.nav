@@ -32,7 +32,7 @@ class CRM_Nav_Utils {
    * @throws CiviCRM_API3_Exception|CRM_Nav_Exceptions_EmptyApiParameterArray
    */
   public static function civicrm_nav_api($entity, $action, $params) {
-    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] API Params for {$entity}.{$action}: " . json_encode($params));
+//    CRM_Core_Error::debug_log_message("[de.boell.civicrm.nav] API Params for {$entity}.{$action}: " . json_encode($params));
 
     // parameter validation
 //    foreach ($params as $key => &$value) {
