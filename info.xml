@@ -20,8 +20,16 @@
   <compatibility>
     <ver>5.28</ver>
   </compatibility>
-  <comments></comments>
+  <comments/>
   <civix>
     <namespace>CRM/Nav</namespace>
+    <format>23.02.1</format>
   </civix>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <mixins>
+    <mixin>smarty-v2@1.0.1</mixin>
+  </mixins>
 </extension>

@@ -20,7 +20,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class CRM_Nav_Data_NavContactTest extends \PHPUnit_Framework_TestCase {
+class CRM_Nav_Data_NavContactTest extends \PHPUnit\Framework\TestCase {
 
   private $contact_1;
   private $contact_2;
