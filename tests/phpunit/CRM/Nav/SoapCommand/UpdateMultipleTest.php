@@ -20,7 +20,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit_Framework_TestCase {
+class CRM_Nav_SoapCommand_UpdateMultipleTest extends \PHPUnit\Framework\TestCase {
 
   private $soapConnectorContact;
   private $soapConnectorRelationship;
