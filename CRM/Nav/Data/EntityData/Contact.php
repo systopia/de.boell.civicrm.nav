@@ -335,6 +335,9 @@ class CRM_Nav_Data_EntityData_Contact  extends CRM_Nav_Data_EntityData_Base {
       }
       $lookup_details = $contact_details['after'];
     }
+    if(empty($lookup_details)) {
+      return "";
+    }
     $result = CRM_Nav_Utils::civicrm_nav_api('Contact', 'get', $lookup_details);
     if ($result['is_error'] == '1') {
       $this->log("Error occured while looking up contacts. Message: " . $result['error_message']);
