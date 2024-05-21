@@ -15,8 +15,6 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-use CRM_Lijuldap_ExtensionUtil as E;
-
 
 /**
  * Class CRM_Nav_Sync
@@ -138,6 +136,9 @@ class CRM_Nav_Mapping {
    * @throws CiviCRM_API3_Exception
    */
   public static function get_civi_studienbereich_value($id) {
+    if (empty($id)) {
+      return $id;
+    }
     if (!array_key_exists($id, self::$nav_studienbereich)) {
       throw new CRM_Nav_Exceptions_InvalidMappingKey("Invalid Studienbereich id ('{$id}')");
     }
@@ -147,6 +148,7 @@ class CRM_Nav_Mapping {
     $result = CRM_Nav_Utils::civicrm_nav_api('OptionValue', 'get', [
       'sequential' => 1,
       'label' => self::$nav_studienbereich[$id],
+      'option_group_id' => "studienbereiche",
     ]);
     if ($result['is_error'] != '0') {
       throw new CRM_Nav_Exceptions_InternalApiError('Internal API Error: ' . $result['error_message']);
